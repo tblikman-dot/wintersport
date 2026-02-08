@@ -1,0 +1,123 @@
+
+body {
+  margin: 0;
+  font-family: system-ui, Arial, sans-serif;
+  background: #f2f6f4;
+  color: #1e3d2b;
+}
+
+.header {
+  text-align: center;
+  padding: 12px 16px;
+  background: #1e7f5c;
+  border-bottom: 6px solid #0f5f45;
+}
+
+.logo {
+  width: 120px;
+  max-width: 70%;
+  height: auto;
+}
+
+/* HERO – gegarandeerd zichtbaar */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 140px;        /* GSM standaard */
+  overflow: hidden;
+  display: block;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  display: block;
+}
+
+.hero-text {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,127,92,0.85);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Vandaag */
+.today-card {
+  background: white;
+  margin: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Tegels */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 18px;
+  padding: 16px;
+}
+
+.tile {
+  background: white;
+  border-radius: 18px;
+  padding: 28px 20px;
+  text-align: center;
+  text-decoration: none;
+  color: #1e3d2b;
+  font-size: 20px;
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+/* GSM */
+@media (max-width: 600px) {
+  .tiles {
+    grid-template-columns: 1fr;
+  }
+
+  .tile {
+    font-size: 22px;
+    padding: 32px 24px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 900px) {
+  .hero {
+    height: 200px;
+  }
+
+  .hero-text {
+    font-size: 22px;
+  }
+
+  .header {
+    padding: 20px;
+  }
+
+  .logo {
+    width: 140px;
+  }
+}
+
+
+/* HEADER + MENU */
+.app-header{position:sticky;top:0;z-index:1000;height:72px;background:#1f7f5c;display:flex;align-items:center;justify-content:center}
+.app-logo{height:48px;width:48px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.menu-btn{position:absolute;left:16px;font-size:26px;background:none;border:none;color:white;cursor:pointer}
+.side-menu{position:fixed;top:0;left:-260px;width:240px;height:100%;background:white;box-shadow:4px 0 20px rgba(0,0,0,.2);padding:88px 16px;display:flex;flex-direction:column;gap:14px;transition:.3s;z-index:1100}
+.side-menu a{text-decoration:none;font-size:18px;font-weight:600;color:#143}
+.side-menu.open{left:0}
+#menuOverlay{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.3s;z-index:1050}
+#menuOverlay.show{opacity:1;pointer-events:auto}
+
+.no-logo .app-logo{display:none}

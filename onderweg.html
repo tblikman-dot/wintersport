@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🚗 Onderweg & Verkeer</title>
+  <link rel="stylesheet" href="style.css"/>
+
+  <style>
+    main { margin: 16px; }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      line-height: 1.7;
+    }
+
+    .warning {
+      background: #fff6e6;
+      border-left: 6px solid #f0a500;
+    }
+
+    .route {
+      background: #f2f6f4;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .route h3 {
+      margin: 0 0 6px;
+    }
+
+    .muted {
+      opacity: 0.7;
+      font-size: 14px;
+    }
+
+    .planb {
+      margin-top: 8px;
+      font-size: 14px;
+      opacity: 0.85;
+    }
+
+    a {
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="verblijf.html">🏡 Verblijf</a>
+  <a href="meenemen.html">🎒 Meenemen</a>
+  <a href="onderweg.html">🚗 Onderweg</a>
+  <a href="ski.html">🎿 Ski</a>
+  <a href="bingo.html">🎲 Bingo</a>
+  <a href="sos.html">🚨 SOS</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <div class="card">
+    <h1>🚗 Onderweg & Verkeer</h1>
+  </div>
+
+  <div class="card warning">
+    <strong>⚠️ Wisseldag (zaterdag)</strong><br>
+    Veel Nederlandse wintersporters onderweg.<br>
+    <strong>Duitsland = verkeersdata</strong><br>
+    <strong>Oostenrijk = webcams</strong>
+  </div>
+
+  <div class="card">
+    <h2>🇩🇪 Duitsland – zo beslis je</h2>
+    <p>
+      Webcams zijn hier beperkt betrouwbaar.<br>
+      Gebruik vooral <strong>verkeersdata</strong>.
+    </p>
+
+    <ul>
+      <li>
+        🚦 <a href="https://www.adac.de/verkehr/verkehrslage/" target="_blank">
+          <strong>ADAC</strong> – filelengte & vertraging
+        </a>
+      </li>
+      <li>
+        🗺️ <a href="https://www.google.com/maps" target="_blank">
+          <strong>Google Maps</strong> – live snelheid
+        </a>
+      </li>
+      <li>
+        📷 <a href="https://www.bayerninfo.de/en/map?bounds=50.561%2C8.776054%2C47.27%2C14.037946&traffic=all" target="_blank">
+          <strong>BayernInfo</strong> – animatie files Duitsland-zuid
+        </a>
+      </li>
+    </ul>
+
+    <div class="route">
+      <h3>1️⃣ A9 Ingolstadt / Manching</h3>
+      <div class="muted">± 5 uur voor aankomst Wald im Pinzgau</div>
+      <div class="planb"><strong>Plan B:</strong> rood/traag → lange pauze vóór München</div>
+    </div>
+
+    <div class="route">
+      <h3>2️⃣ A99 München Ring</h3>
+      <div class="muted">± 4 uur voor aankomst</div>
+      <div class="planb"><strong>Plan B:</strong> volledig vast → niet binnendoor</div>
+    </div>
+
+    <div class="route">
+      <h3>3️⃣ A93 Kiefersfelden</h3>
+      <div class="muted">± 3 uur voor aankomst</div>
+      <div class="planb"><strong>Plan B:</strong> file → stop vóór de grens</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🇦🇹 Oostenrijk – webcams leidend</h2>
+    <p>Vanaf hier zijn webcams doorslaggevend.</p>
+
+    <div class="route">
+      <h3>4️⃣ B178 Ellmau</h3>
+      <div class="muted">± 2 uur voor aankomst</div>
+      <a href="https://www.tirol.gv.at/verkehr/strassenbau-und-strassenerhaltung/webcams/webcams-bezirk-kufstein/b-178-loferer-strasse/" target="_blank">
+        📷 Webcam
+      </a>
+      <div class="planb"><strong>Plan B:</strong> Ellmau vast maar Pass Thurn goed → doorrijden</div>
+    </div>
+
+    <div class="route">
+      <h3>5️⃣ B161 Pass Thurn</h3>
+      <div class="muted">± 1 uur voor aankomst</div>
+      <a href="https://www.tirol.gv.at/verkehr/strassenbau-und-strassenerhaltung/webcams/webcams-bezirk-kitzbuehel/b-161-pass-thurn-strasse/" target="_blank">
+        📷 Webcam
+      </a>
+      <div class="planb"><strong>Plan B:</strong> wit/traag → +30–45 min</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>

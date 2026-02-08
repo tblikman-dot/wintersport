@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🧳 Wie neemt wat mee</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+  main { margin: 16px; }
+  .card, .section {
+    background: white;
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.08);
+  }
+  .filters { display:flex; flex-wrap:wrap; gap:10px; }
+  .filter-btn {
+    padding:12px 18px; border-radius:24px; border:none;
+    font-weight:600; background:#f2f6f4; cursor:pointer;
+  }
+  .filter-btn.active { background:#1e7f5c; color:white; }
+  .section li {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 0; border-bottom:1px solid #eee;
+  }
+  small { display:block; opacity:.6; font-size:13px; }
+  .check { width:32px; height:32px; }
+  .done-banner {
+    display:none; padding:16px; border-radius:16px;
+    background:#e6f7ef; color:#1e7f5c; font-weight:700;
+    text-align:center; margin-bottom:16px;
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="verblijf.html">🏡 Verblijf</a>
+  <a href="meenemen.html">🎒 Meenemen</a>
+  <a href="onderweg.html">🚗 Onderweg</a>
+  <a href="ski.html">🎿 Ski</a>
+  <a href="bingo.html">🎲 Bingo</a>
+  <a href="sos.html">🚨 SOS</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+<div class="card">
+  <h1>🧳 Wie neemt wat mee</h1>
+  <p>Filter op gezin. Alles wordt automatisch onthouden.</p>
+</div>
+
+<div class="card filters">
+  <button class="filter-btn active" onclick="setFilter('all')">Alles</button>
+  <button class="filter-btn" onclick="setFilter('Jan Jaap')">Jan Jaap</button>
+  <button class="filter-btn" onclick="setFilter('Geessien & Tim')">Geessien & Tim</button>
+  <button class="filter-btn" onclick="setFilter('Sanne & Gert')">Sanne & Gert</button>
+  <button class="filter-btn" onclick="setFilter('Kim & Pieter')">Kim & Pieter</button>
+  <button class="filter-btn" onclick="setFilter('Koos & Jan')">Koos & Jan</button>
+</div>
+
+<div id="doneBanner" class="done-banner">🎉 Alles voor dit gezin is ingepakt!</div>
+
+<!-- 🥐 ONTBIJT -->
+<div class="section"><h2>🥐 Ontbijt & basis</h2><ul>
+<li data-wie="Kim & Pieter"><span>Pindakaas emmer</span><input class="check" type="checkbox" data-id="pindakaas"></li>
+<li data-wie="Geessien & Tim"><span>Hagelslag</span><input class="check" type="checkbox" data-id="hagelslag"></li>
+<li data-wie="Geessien & Tim"><span>Speculoos</span><input class="check" type="checkbox" data-id="speculoos"></li>
+<li data-wie="Koos & Jan"><span>Kaas</span><input class="check" type="checkbox" data-id="kaas"></li>
+<li data-wie="Geessien & Tim"><span>Boter (2x bakjes)</span><input class="check" type="checkbox" data-id="boter"></li>
+<li data-wie="Koos & Jan"><span>Koffie + filters + thee</span><input class="check" type="checkbox" data-id="koffie"></li>
+<li data-wie="Koos & Jan"><span>Koffiemelk</span><input class="check" type="checkbox" data-id="koffiemelk"></li>
+<li data-wie="Geessien & Tim"><span>Appelstroop</span><input class="check" type="checkbox" data-id="appelstroop"></li>
+<li data-wie="Kim & Pieter"><span>Nutella</span><input class="check" type="checkbox" data-id="nutella"></li>
+<li data-wie="Koos & Jan"><span>Appels</span><input class="check" type="checkbox" data-id="appels"></li>
+<li data-wie="Sanne & Gert"><span>Sinaasappels</span><input class="check" type="checkbox" data-id="sinaasappels"></li>
+<li data-wie="Sanne & Gert"><span>Bananen</span><input class="check" type="checkbox" data-id="bananen"></li>
+<li data-wie="Geessien & Tim"><span>Muesli + havermout</span><input class="check" type="checkbox" data-id="muesli"></li>
+<li data-wie="Geessien & Tim"><span>Houdbare melk (1e dag)</span><input class="check" type="checkbox" data-id="melk"></li>
+</ul></div>
+
+<!-- 🎿 PISTE -->
+<div class="section"><h2>🎿 Piste</h2><ul>
+<li data-wie="Jan Jaap"><span>Limonade blikken</span><input class="check" type="checkbox" data-id="limonade"></li>
+<li data-wie="Kim & Pieter"><span>Muesli repen (kids)</span><input class="check" type="checkbox" data-id="repen"></li>
+<li data-wie="Kim & Pieter"><span>Tussendoortjes (kids)</span><input class="check" type="checkbox" data-id="tussendoor"></li>
+<li data-wie="Geessien & Tim"><span>Ontbijtkoek (kids)</span><input class="check" type="checkbox" data-id="ontbijtkoek"></li>
+<li data-wie="Sanne & Gert"><span>Pakjes drinken (kids)</span><input class="check" type="checkbox" data-id="pakjes"></li>
+</ul></div>
+
+<!-- 🍷 BORREL -->
+<div class="section"><h2>🍷 Borrel</h2><ul>
+<li data-wie="Jan Jaap"><span>Kaas</span><input class="check" type="checkbox" data-id="borrelkaas"></li>
+<li data-wie="Jan Jaap"><span>Worst & snacks</span><input class="check" type="checkbox" data-id="worst"></li>
+<li data-wie="Jan Jaap"><span>Crackers & dips</span><input class="check" type="checkbox" data-id="crackers"></li>
+<li data-wie="Jan Jaap"><span>Olijven & extra’s</span><input class="check" type="checkbox" data-id="olijven"></li>
+<li data-wie="Sanne & Gert"><span>Chips & nootjes</span><input class="check" type="checkbox" data-id="chips"></li>
+
+<li data-wie="multi" data-wie-list="Jan Jaap|Geessien & Tim|Sanne & Gert|Kim & Pieter|Koos & Jan">
+  <span>Wijn
+    <small>(Jan Jaap, Geessien & Tim, Sanne & Gert, Kim & Pieter, Koos & Jan)</small>
+  </span>
+  <input class="check" type="checkbox" data-id="wijn">
+</li>
+</ul></div>
+
+<!-- 🍽️ AVONDETEN -->
+<div class="section"><h2>🍽️ Avondeten</h2><ul>
+<li data-wie="Kim & Pieter"><span>Pannenkoekenbeslag</span><input class="check" type="checkbox" data-id="pannenkoeken"></li>
+<li data-wie="Kim & Pieter"><span>Stroop + poedersuiker</span><input class="check" type="checkbox" data-id="stroop"></li>
+
+<li data-wie="multi" data-wie-list="Jan Jaap|Geessien & Tim|Sanne & Gert|Kim & Pieter|Koos & Jan">
+  <span>Eigen kookavondbenodigdheden
+    <small>(ieder gezin)</small>
+  </span>
+  <input class="check" type="checkbox" data-id="kookavond">
+</li>
+
+<li data-wie="Jan Jaap"><span>Olijfolie</span><input class="check" type="checkbox" data-id="olie"></li>
+<li data-wie="Jan Jaap"><span>Zout, peper, kruiden</span><input class="check" type="checkbox" data-id="kruiden"></li>
+</ul></div>
+
+<!-- 🥪 PISTE LUNCH -->
+<div class="section"><h2>🥪 Piste lunch</h2><ul>
+
+<li data-wie="multi" data-wie-list="Jan Jaap|Geessien & Tim|Sanne & Gert|Kim & Pieter">
+  <span>Broodtrommel + drinkfles (kids)
+    <small>(ieder gezin met kids)</small>
+  </span>
+  <input class="check" type="checkbox" data-id="lunch">
+</li>
+
+<li data-wie="Sanne & Gert"><span>Boterhamzakjes</span><input class="check" type="checkbox" data-id="zakjes"></li>
+</ul></div>
+
+<!-- 📦 OVERIG -->
+<div class="section"><h2>📦 Overig</h2><ul>
+<li data-wie="Sanne & Gert"><span>Aluminiumfolie</span><input class="check" type="checkbox" data-id="folie"></li>
+<li data-wie="Koos & Jan"><span>Vuilniszakken</span><input class="check" type="checkbox" data-id="vuilnis"></li>
+
+<li data-wie="multi" data-wie-list="Jan Jaap|Geessien & Tim|Sanne & Gert|Kim & Pieter|Koos & Jan">
+  <span>Beddengoed eigen gezin
+    <small>(ieder gezin)</small>
+  </span>
+  <input class="check" type="checkbox" data-id="beddengoed">
+</li>
+
+<li data-wie="multi" data-wie-list="Jan Jaap|Geessien & Tim|Sanne & Gert|Kim & Pieter|Koos & Jan">
+  <span>Handdoeken eigen gezin
+    <small>(ieder gezin)</small>
+  </span>
+  <input class="check" type="checkbox" data-id="handdoeken">
+</li>
+
+<li data-wie="Koos & Jan"><span>Hand- en theedoeken</span><input class="check" type="checkbox" data-id="thee"></li>
+<li data-wie="Koos & Jan"><span>Dreft + afwasborstel</span><input class="check" type="checkbox" data-id="dreft"></li>
+<li data-wie="Sanne & Gert"><span>Handzeep</span><input class="check" type="checkbox" data-id="zeep"></li>
+<li data-wie="Koos & Jan"><span>Vaatwastabletjes</span><input class="check" type="checkbox" data-id="vaatwas"></li>
+</ul></div>
+
+<!-- 🎲 VERTIER -->
+<div class="section"><h2>🎲 Vertier</h2><ul>
+<li data-wie="Koos & Jan"><span>Rummikub</span><input class="check" type="checkbox" data-id="rummikub"></li>
+<li data-wie="Geessien & Tim"><span>30 Seconds</span><input class="check" type="checkbox" data-id="30s"></li>
+<li data-wie="Sanne & Gert"><span>Hitster</span><input class="check" type="checkbox" data-id="hitster"></li>
+<li data-wie="Sanne & Gert"><span>Jenga</span><input class="check" type="checkbox" data-id="jenga"></li>
+<li data-wie="Geessien & Tim"><span>Bingo</span><input class="check" type="checkbox" data-id="bingo"></li>
+<li data-wie="Geessien & Tim"><span>Codenames</span><input class="check" type="checkbox" data-id="codenames"></li>
+<li data-wie="Geessien & Tim"><span>Coblo + Kapla</span><input class="check" type="checkbox" data-id="coblo"></li>
+
+<li data-wie="multi" data-wie-list="Jan Jaap|Geessien & Tim|Sanne & Gert|Kim & Pieter|Koos & Jan">
+  <span>Overige kids spellen
+    <small>(iedereen)</small>
+  </span>
+  <input class="check" type="checkbox" data-id="kidsspellen">
+</li>
+
+<li data-wie="Sanne & Gert"><span>Stiften / potloden / kleurplaten</span><input class="check" type="checkbox" data-id="knutsel_sg"></li>
+<li data-wie="Kim & Pieter"><span>Stiften / potloden / kleurplaten</span><input class="check" type="checkbox" data-id="knutsel_kp"></li>
+</ul></div>
+
+</main>
+
+<script>
+let currentFilter = localStorage.getItem('defaultGezin') || 'all';
+
+function saveState(){
+ document.querySelectorAll('.check').forEach(c =>
+   localStorage.setItem('check_'+c.dataset.id, c.checked)
+ );
+}
+
+function loadState(){
+ document.querySelectorAll('.check').forEach(c =>
+   c.checked = localStorage.getItem('check_'+c.dataset.id) === 'true'
+ );
+}
+
+function setFilter(wie){
+ currentFilter = wie;
+ if(wie !== 'all') localStorage.setItem('defaultGezin', wie);
+
+ document.querySelectorAll('.filter-btn').forEach(b =>
+   b.classList.toggle('active',
+     b.textContent === wie || (wie === 'all' && b.textContent === 'Alles')
+   )
+ );
+
+ document.querySelectorAll('.section li').forEach(li => {
+   const list = li.dataset.wieList ? li.dataset.wieList.split('|') : [li.dataset.wie];
+   li.style.display =
+     (wie === 'all' || list.includes(wie)) ? 'flex' : 'none';
+ });
+
+ checkDone();
+}
+
+function checkDone(){
+ if(currentFilter === 'all') return;
+ const items = [...document.querySelectorAll('.section li')]
+   .filter(li => {
+     const list = li.dataset.wieList ? li.dataset.wieList.split('|') : [li.dataset.wie];
+     return list.includes(currentFilter);
+   })
+   .map(li => li.querySelector('input'));
+
+ document.getElementById('doneBanner').style.display =
+   (items.length && items.every(i => i.checked)) ? 'block' : 'none';
+}
+
+document.querySelectorAll('.check').forEach(c =>
+ c.addEventListener('change', () => { saveState(); checkDone(); })
+);
+
+loadState();
+setFilter(currentFilter);
+
+function toggleMenu(){
+ document.getElementById('sideMenu').classList.toggle('open');
+ document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>

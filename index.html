@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>DIJK Skifestijn 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="app-header no-logo">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="verblijf.html">🏡 Verblijf</a>
+  <a href="meenemen.html">🎒 Meenemen</a>
+  <a href="onderweg.html">🚗 Onderweg</a>
+  <a href="ski.html">🎿 Ski</a>
+  <a href="bingo.html">🎲 Bingo</a>
+  <a href="sos.html">🚨 SOS</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+
+<header class="header">
+  <img src="logo-dijk-soft.png" alt="DIJK logo" class="logo">
+</header>
+
+<section class="hero">
+  <img src="ai.jpg" alt="Skiplezier" class="hero-image">
+  <div class="hero-text">VEEL PLEZIER!!</div>
+</section>
+
+<section id="vandaag" class="today-card">
+  <h2>📅 Vandaag</h2>
+  <p id="vandaag-inhoud">Rooster laden…</p>
+</section>
+
+<main class="tiles">
+  <a class="tile" href="verblijf.html">🏠 Verblijf</a>
+  <a class="tile" href="meenemen.html">🧳 Meenemen</a>
+  <a class="tile" href="onderweg.html">🚗 Onderweg</a>
+  <a class="tile" href="ski.html">🎿 Ski</a>
+  <a class="tile" href="bingo.html">🎲 Bingo</a>
+  <a class="tile" href="sos.html">🚨 SOS</a>
+</main>
+
+<script>
+const schema = {
+  "2026-02-21": {ontbijt:null, avond:"Jan Jaap", schoonmaak:"Geessien & Tim"},
+  "2026-02-22": {ontbijt:"Geessien & Tim", avond:"Sanne & Gert", schoonmaak:"Geessien & Tim"},
+  "2026-02-23": {ontbijt:"Kim & Pieter", avond:"Koos & Jan", schoonmaak:"Kim & Pieter"},
+  "2026-02-24": {ontbijt:"Jan Jaap", avond:"Geessien & Tim", schoonmaak:"Sanne & Gert"},
+  "2026-02-25": {ontbijt:"Sanne & Gert", avond:"Uit eten", schoonmaak:"Jan Jaap"},
+  "2026-02-26": {ontbijt:"Koos & Jan", avond:"Kim & Pieter", schoonmaak:"Koos & Jan"},
+  "2026-02-27": {ontbijt:"Jan Jaap", avond:"Pizza afhalen", schoonmaak:"Allen"},
+  "2026-02-28": {ontbijt:"Sanne & Gert", avond:null, schoonmaak:null}
+};
+
+const vandaag = new Date().toISOString().slice(0,10);
+const inhoud = document.getElementById("vandaag-inhoud");
+
+if (schema[vandaag]) {
+  const d = schema[vandaag];
+  inhoud.innerHTML = `
+    ${d.ontbijt ? "🥐 Ontbijt: <strong>"+d.ontbijt+"</strong><br>" : ""}
+    ${d.avond ? "🍽️ Avondeten: <strong>"+d.avond+"</strong><br>" : ""}
+    ${d.schoonmaak ? "🧽 Schoonmaak: <strong>"+d.schoonmaak+"</strong>" : ""}
+  `;
+} else {
+  inhoud.textContent = "Geen rooster voor vandaag.";
+}
+</script>
+
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>
