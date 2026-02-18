@@ -48,6 +48,201 @@
     a {
       font-weight: 600;
     }
+
+    /* ===== KAMERINDELING TOOL ===== */
+    .room-planner {
+      margin-top: 10px;
+    }
+
+    .family-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .family-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .family-chip:active {
+      transform: scale(0.95);
+    }
+
+    .family-chip.selected {
+      border-color: #222;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      transform: scale(1.05);
+    }
+
+    .family-chip .chip-count {
+      background: rgba(0,0,0,0.12);
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+
+    .fc-haarlem  { background: #FFE0B2; color: #5D4037; }
+    .fc-haren    { background: #B3E5FC; color: #01579B; }
+    .fc-sanne    { background: #C8E6C9; color: #1B5E20; }
+    .fc-zuidhorn { background: #F8BBD0; color: #880E4F; }
+    .fc-joure    { background: #D1C4E9; color: #311B92; }
+
+    .floor-section {
+      margin-bottom: 18px;
+    }
+
+    .floor-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #888;
+      margin-bottom: 8px;
+      padding-left: 4px;
+    }
+
+    .rooms-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .room-card {
+      background: #f7f8fa;
+      border: 2px solid #e8eaed;
+      border-radius: 14px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-height: 90px;
+      position: relative;
+    }
+
+    .room-card:active {
+      transform: scale(0.97);
+    }
+
+    .room-card.highlight {
+      border-color: #222;
+      background: #f0f4ff;
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+    }
+
+    .room-card.has-family {
+      border-color: transparent;
+    }
+
+    .room-card.has-family.fc-haarlem  { background: #FFF3E0; border-color: #FFE0B2; }
+    .room-card.has-family.fc-haren    { background: #E1F5FE; border-color: #B3E5FC; }
+    .room-card.has-family.fc-sanne    { background: #E8F5E9; border-color: #C8E6C9; }
+    .room-card.has-family.fc-zuidhorn { background: #FCE4EC; border-color: #F8BBD0; }
+    .room-card.has-family.fc-joure    { background: #EDE7F6; border-color: #D1C4E9; }
+
+    .room-name {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #333;
+    }
+
+    .room-details {
+      font-size: 11px;
+      color: #888;
+      line-height: 1.4;
+    }
+
+    .room-details span {
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .room-assigned {
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .room-card .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.1);
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      color: #666;
+    }
+
+    .room-card.has-family .remove-btn {
+      opacity: 1;
+    }
+
+    .room-card .remove-btn:active {
+      background: rgba(0,0,0,0.2);
+    }
+
+    .room-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .planner-hint {
+      text-align: center;
+      font-size: 13px;
+      color: #999;
+      margin: 10px 0;
+      padding: 10px;
+      background: #f7f8fa;
+      border-radius: 10px;
+      line-height: 1.5;
+    }
+
+    .planner-hint.active {
+      background: #E3F2FD;
+      color: #1565C0;
+      font-weight: 600;
+    }
+
+    .reset-btn {
+      display: block;
+      margin: 12px auto 0;
+      padding: 8px 20px;
+      border: 1px solid #ddd;
+      border-radius: 50px;
+      background: white;
+      font-size: 13px;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .reset-btn:active {
+      background: #f5f5f5;
+    }
   </style>
 </head>
 <body>
@@ -95,10 +290,52 @@
     </p>
   </div>
 
+  <!-- KAMERINDELING -->
+  <div class="card">
+    <h2>🛏️ Kamerindeling</h2>
+    <p style="font-size:14px;color:#666;margin-bottom:12px;">Tik op een gezin, tik dan op een kamer om toe te wijzen. Tik ✕ om te verwijderen.</p>
+
+    <div class="room-planner">
+
+      <div class="family-selector" id="familySelector">
+        <!-- filled by JS -->
+      </div>
+
+      <div id="plannerHint" class="planner-hint">Kies eerst een gezin hierboven</div>
+
+      <!-- OG -->
+      <div class="floor-section">
+        <div class="floor-label">🔼 Eerste verdieping (OG)</div>
+        <div class="rooms-grid" id="roomsOG">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <!-- DG -->
+      <div class="floor-section">
+        <div class="floor-label">🔺 Zolder (DG – licht afgeschuind)</div>
+        <div class="rooms-grid" id="roomsDG">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <button class="reset-btn" onclick="resetAll()">🔄 Alles wissen</button>
+    </div>
+  </div>
+
+  <!-- HUISINFO -->
+  <div class="card">
+    <h2>🏠 Wat is er in huis?</h2>
+    <p><strong>Begane grond</strong><br>
+      Gezellige woon-/eetkamer met SAT-TV en spelletjes, leeshoek voor kinderen. Goed uitgeruste keuken met 2× fornuis, 2× oven, vaatwasser, magnetron, 2× koffiezetapparaat, waterkoker, 2× koelkast (1× met vriesvak). 2 aparte doucheruimtes, WC, klein zonneterras en tuin. Garderobe met opbergruimte voor ski-/wandelschoenen.</p>
+    <p><strong>Overig</strong><br>
+      Gratis WiFi, 2 kinderstoelen, 2 babybedjes (in overleg), diepvries, ski-opslag in voormalige garage.</p>
+  </div>
+
   <div class="card">
     <h2>🗓️ Dagplanning</h2>
     <p>
-      🥐 Ontbijt om <strong>08:00</strong><br>
+      🥣 Ontbijt om <strong>08:00</strong><br>
       🍽️ Avondeten om <strong>18:00</strong>
     </p>
 
@@ -110,28 +347,28 @@
 
     <div class="day">
       <h3>Zondag 22 februari</h3>
-      🥐 Ontbijt: Geessien & Tim<br>
+      🥣 Ontbijt: Geessien & Tim<br>
       🍽️ Avondeten: Sanne & Gert<br>
       🧽 Schoonmaak: Geessien & Tim
     </div>
 
     <div class="day">
       <h3>Maandag 23 februari</h3>
-      🥐 Ontbijt: Kim & Pieter<br>
+      🥣 Ontbijt: Kim & Pieter<br>
       🍽️ Avondeten: Koos & Jan<br>
       🧽 Schoonmaak: Kim & Pieter
     </div>
 
     <div class="day">
       <h3>Dinsdag 24 februari</h3>
-      🥐 Ontbijt: Jan Jaap<br>
+      🥣 Ontbijt: Jan Jaap<br>
       🍽️ Avondeten: Geessien & Tim<br>
       🧽 Schoonmaak: Sanne & Gert
     </div>
 
     <div class="day">
       <h3>Woensdag 25 februari</h3>
-      🥐 Ontbijt: Sanne & Gert<br>
+      🥣 Ontbijt: Sanne & Gert<br>
       🍽️ <strong>Uit eten</strong><br>
       📍 <a href="https://maps.app.goo.gl/kg5zpc4JHEhuBYxp7" target="_blank">
       Gereserveerd restaurant (vanaf 17:30)
@@ -141,14 +378,14 @@
 
     <div class="day">
       <h3>Donderdag 26 februari</h3>
-      🥐 Ontbijt: Koos & Jan<br>
+      🥣 Ontbijt: Koos & Jan<br>
       🍽️ Avondeten: Kim & Pieter<br>
       🧽 Schoonmaak: Koos & Jan
     </div>
 
     <div class="day">
       <h3>Vrijdag 27 februari</h3>
-      🥐 Ontbijt: Jan Jaap<br>
+      🥣 Ontbijt: Jan Jaap<br>
       🍕 Pizza afhalen<br>
       👉 <a href="https://maps.app.goo.gl/igcq4Z3ouCEPy43A8" target="_blank">
       Pizzeria (bel direct)
@@ -158,7 +395,7 @@
 
     <div class="day">
       <h3>Zaterdag 28 februari</h3>
-      🥐 Ontbijt: Sanne & Gert
+      🥣 Ontbijt: Sanne & Gert
     </div>
   </div>
 
@@ -169,6 +406,142 @@ function toggleMenu(){
   document.getElementById('sideMenu').classList.toggle('open');
   document.getElementById('menuOverlay').classList.toggle('show');
 }
+
+// ===== KAMERINDELING LOGIC =====
+
+const families = [
+  { id: 'haarlem',  name: 'Jan Jaap & Philippa', short: 'Jan Jaap & P.', css: 'fc-haarlem',  members: '1V + 1K', count: 2 },
+  { id: 'haren',    name: 'Tim & Geessien',       short: 'Tim & Geessien', css: 'fc-haren',    members: '2V + 2K', count: 4 },
+  { id: 'sanne',    name: 'Sanne & Gert Jan',     short: 'Sanne & Gert', css: 'fc-sanne',    members: '2V + 2K', count: 4 },
+  { id: 'zuidhorn', name: 'Kim & Pieter',          short: 'Kim & Pieter',  css: 'fc-zuidhorn', members: '2V + 3K', count: 5 },
+  { id: 'joure',    name: 'Koos & Jan Dirk',       short: 'Koos & Jan',    css: 'fc-joure',    members: '2V + 0K', count: 2 },
+];
+
+const rooms = [
+  // OG
+  { id: 'og1', floor: 'OG', name: 'Kamer 1', beds: '2p dubbelbed', icons: '🚿🚽🏔️', desc: 'Eigen douche/WC + balkon', capacity: 2 },
+  { id: 'og2', floor: 'OG', name: 'Kamer 2', beds: '2p losse bedden', icons: '🚰', desc: 'Stromend water', capacity: 2 },
+  { id: 'og3', floor: 'OG', name: 'Kamer 3', beds: '3p dubbel+enkel', icons: '🚰🏔️', desc: 'Stromend water + balkon', capacity: 3 },
+  { id: 'og4', floor: 'OG', name: 'Kamer 4', beds: '3p dubbel+enkel', icons: '🚰🏔️', desc: 'Stromend water + balkon', capacity: 3 },
+  { id: 'og5', floor: 'OG', name: 'Kamer 5', beds: '3p dubbel+enkel', icons: '🚰🏔️', desc: 'Stromend water + balkon', capacity: 3 },
+  // DG
+  { id: 'dg1', floor: 'DG', name: 'Kamer 6', beds: '1p eenpersoonsbed', icons: '🚰', desc: 'Stromend water', capacity: 1 },
+  { id: 'dg2', floor: 'DG', name: 'Kamer 7', beds: '2p dubbelbed', icons: '🚰🏔️', desc: 'Stromend water + balkon', capacity: 2 },
+  { id: 'dg3', floor: 'DG', name: 'Kamer 8', beds: '2p dubbelbed', icons: '🚰🏔️', desc: 'Stromend water + balkon', capacity: 2 },
+  { id: 'dg4', floor: 'DG', name: 'Kamer 9', beds: '2–3p dubbel+extra', icons: '🚰🏔️', desc: 'Stromend water + balkon', capacity: 3 },
+  { id: 'dg5', floor: 'DG', name: 'Kamer 10', beds: '3p losse bedden', icons: '🚰', desc: 'Stromend water', capacity: 3 },
+];
+
+// State
+let selectedFamily = null;
+let assignments = {}; // roomId -> familyId
+
+// Load from localStorage
+function loadState() {
+  try {
+    const saved = localStorage.getItem('dijkKamers');
+    if (saved) assignments = JSON.parse(saved);
+  } catch(e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem('dijkKamers', JSON.stringify(assignments));
+  } catch(e) {}
+}
+
+// Render families
+function renderFamilies() {
+  const container = document.getElementById('familySelector');
+  container.innerHTML = families.map(f => {
+    const isSelected = selectedFamily === f.id;
+    return `<div class="family-chip ${f.css} ${isSelected ? 'selected' : ''}" onclick="selectFamily('${f.id}')">
+      ${f.short} <span class="chip-count">${f.count}</span>
+    </div>`;
+  }).join('');
+}
+
+// Render rooms
+function renderRooms() {
+  const ogContainer = document.getElementById('roomsOG');
+  const dgContainer = document.getElementById('roomsDG');
+
+  ogContainer.innerHTML = rooms.filter(r => r.floor === 'OG').map(renderRoomCard).join('');
+  dgContainer.innerHTML = rooms.filter(r => r.floor === 'DG').map(renderRoomCard).join('');
+}
+
+function renderRoomCard(room) {
+  const familyId = assignments[room.id];
+  const family = familyId ? families.find(f => f.id === familyId) : null;
+  const hasFamily = !!family;
+  const highlight = selectedFamily && !hasFamily ? 'highlight' : '';
+  const familyCss = hasFamily ? `has-family ${family.css}` : '';
+
+  return `<div class="room-card ${highlight} ${familyCss}" onclick="assignRoom('${room.id}')">
+    ${hasFamily ? `<button class="remove-btn" onclick="event.stopPropagation();removeAssignment('${room.id}')">✕</button>` : ''}
+    <div class="room-name">🛏️ ${room.name}</div>
+    <div class="room-details">
+      <span>${room.beds}</span><br>
+      <span>${room.desc}</span>
+    </div>
+    ${hasFamily ? `<div class="room-assigned">👨‍👩‍👧 ${family.short}</div>` : ''}
+  </div>`;
+}
+
+function selectFamily(familyId) {
+  if (selectedFamily === familyId) {
+    selectedFamily = null;
+  } else {
+    selectedFamily = familyId;
+  }
+  updateUI();
+}
+
+function assignRoom(roomId) {
+  if (!selectedFamily) return;
+
+  // If room already assigned to same family, remove
+  if (assignments[roomId] === selectedFamily) {
+    delete assignments[roomId];
+  } else {
+    assignments[roomId] = selectedFamily;
+  }
+  saveState();
+  updateUI();
+}
+
+function removeAssignment(roomId) {
+  delete assignments[roomId];
+  saveState();
+  updateUI();
+}
+
+function resetAll() {
+  if (confirm('Alle kamertoewijzingen wissen?')) {
+    assignments = {};
+    selectedFamily = null;
+    saveState();
+    updateUI();
+  }
+}
+
+function updateUI() {
+  renderFamilies();
+  renderRooms();
+  const hint = document.getElementById('plannerHint');
+  if (selectedFamily) {
+    const f = families.find(f => f.id === selectedFamily);
+    hint.textContent = `Tik nu op een kamer om "${f.short}" toe te wijzen`;
+    hint.className = 'planner-hint active';
+  } else {
+    hint.textContent = 'Kies eerst een gezin hierboven';
+    hint.className = 'planner-hint';
+  }
+}
+
+// Init
+loadState();
+updateUI();
 </script>
 
 </body>

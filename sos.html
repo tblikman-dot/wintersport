@@ -2,8 +2,66 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<title>SOS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚨 SOS</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  main { margin: 16px; }
+
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    line-height: 1.7;
+  }
+
+  .sos-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .sos-item:last-child {
+    border-bottom: none;
+  }
+
+  .sos-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sos-name {
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .sos-desc {
+    font-size: 13px;
+    opacity: 0.65;
+  }
+
+  .sos-call {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e74c3c;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+
+  .sos-call:hover {
+    background: #c0392b;
+  }
+</style>
 </head>
 <body>
 
@@ -24,14 +82,53 @@
 
 <div id="menuOverlay" onclick="toggleMenu()"></div>
 
-<h1>🚨 SOS & nood</h1>
-<ul>
-<li>112 – Europees alarmnummer</li>
-<li>140 – Bergredding Oostenrijk</li>
-<li>ANWB Alarmcentrale: +31 70 314 14 14</li>
-<li>NL Consulair: +31 247 247 247</li>
-</ul>
-<a href="index.html">⬅️ Home</a>
+<main>
+
+  <div class="card">
+    <h1>🚨 SOS & nood</h1>
+  </div>
+
+  <div class="card">
+    <h2>📞 Alarmnummers</h2>
+
+    <div class="sos-item">
+      <div class="sos-info">
+        <span class="sos-name">112</span>
+        <span class="sos-desc">Europees alarmnummer</span>
+      </div>
+      <a href="tel:112" class="sos-call">📞 Bel</a>
+    </div>
+
+    <div class="sos-item">
+      <div class="sos-info">
+        <span class="sos-name">140</span>
+        <span class="sos-desc">Bergredding Oostenrijk</span>
+      </div>
+      <a href="tel:140" class="sos-call">📞 Bel</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🇳🇱 Nederlandse hulplijnen</h2>
+
+    <div class="sos-item">
+      <div class="sos-info">
+        <span class="sos-name">ANWB Alarmcentrale</span>
+        <span class="sos-desc">Pechhulp & reisbijstand</span>
+      </div>
+      <a href="tel:+31703141414" class="sos-call">📞 Bel</a>
+    </div>
+
+    <div class="sos-item">
+      <div class="sos-info">
+        <span class="sos-name">Consulair noodlijn</span>
+        <span class="sos-desc">Nederlandse ambassade</span>
+      </div>
+      <a href="tel:+31247247247" class="sos-call">📞 Bel</a>
+    </div>
+  </div>
+
+</main>
 
 <script>
 function toggleMenu(){
