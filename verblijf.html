@@ -258,6 +258,8 @@
   <a href="meenemen.html">🎒 Meenemen</a>
   <a href="onderweg.html">🚗 Onderweg</a>
   <a href="ski.html">🎿 Ski</a>
+  <a href="boodschappen.html">🛒 Boodschappen</a>
+  <a href="fotos.html">📸 Foto's</a>
   <a href="bingo.html">🎲 Bingo</a>
   <a href="sos.html">🚨 SOS</a>
 </nav>
@@ -290,38 +292,6 @@
     </p>
   </div>
 
-  <!-- KAMERINDELING -->
-  <div class="card">
-    <h2>🛏️ Kamerindeling</h2>
-    <p style="font-size:14px;color:#666;margin-bottom:12px;">Tik op een gezin, tik dan op een kamer om toe te wijzen. Tik ✕ om te verwijderen.</p>
-
-    <div class="room-planner">
-
-      <div class="family-selector" id="familySelector">
-        <!-- filled by JS -->
-      </div>
-
-      <div id="plannerHint" class="planner-hint">Kies eerst een gezin hierboven</div>
-
-      <!-- OG -->
-      <div class="floor-section">
-        <div class="floor-label">🔼 Eerste verdieping (OG)</div>
-        <div class="rooms-grid" id="roomsOG">
-          <!-- filled by JS -->
-        </div>
-      </div>
-
-      <!-- DG -->
-      <div class="floor-section">
-        <div class="floor-label">🔺 Zolder (DG – licht afgeschuind)</div>
-        <div class="rooms-grid" id="roomsDG">
-          <!-- filled by JS -->
-        </div>
-      </div>
-
-      <button class="reset-btn" onclick="resetAll()">🔄 Alles wissen</button>
-    </div>
-  </div>
 
   <!-- HUISINFO -->
   <div class="card">
@@ -396,6 +366,39 @@
     <div class="day">
       <h3>Zaterdag 28 februari</h3>
       🥣 Ontbijt: Sanne & Gert
+    </div>
+  </div>
+
+  <!-- KAMERINDELING -->
+  <div class="card">
+    <h2>🛏️ Kamerindeling</h2>
+    <p style="font-size:14px;color:#666;margin-bottom:12px;"> Hier de beschikbare kamers, speel wat en kijk hoe het handig is in te delen (geeft je wat inzicht) Klik eerst een gezin aan en klik dan op een kamer om toe te wijzen. Tik ✕ om te verwijderen.</p>
+
+    <div class="room-planner">
+
+      <div class="family-selector" id="familySelector">
+        <!-- filled by JS -->
+      </div>
+
+      <div id="plannerHint" class="planner-hint">Kies eerst een gezin hierboven</div>
+
+      <!-- OG -->
+      <div class="floor-section">
+        <div class="floor-label">🔼 Eerste verdieping (OG)</div>
+        <div class="rooms-grid" id="roomsOG">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <!-- DG -->
+      <div class="floor-section">
+        <div class="floor-label">🔺 Zolder (DG – licht afgeschuind)</div>
+        <div class="rooms-grid" id="roomsDG">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <button class="reset-btn" onclick="resetAll()">🔄 Alles wissen</button>
     </div>
   </div>
 
