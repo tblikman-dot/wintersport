@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🛒 Boodschappen</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
   <style>
     main { margin: 16px; padding-bottom: 80px; }
@@ -277,6 +279,29 @@
       pointer-events: none;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ===== SYNC STATUS ===== */
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 50px;
+      float: right;
+    }
+    .sync-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .sync-status.live .sync-dot { background: #43a047; }
+    .sync-status.live { color: #43a047; }
+    .sync-status.offline .sync-dot { background: #ff9800; }
+    .sync-status.offline { color: #ff9800; }
+    .sync-status.error .sync-dot { background: #e53935; }
+    .sync-status.error { color: #e53935; }
   </style>
 </head>
 <body>
@@ -305,6 +330,10 @@
   <div class="card">
     <h1>🛒 Boodschappenlijst</h1>
     <p>Voeg items toe, vink ze af in de winkel, en deel de lijst via WhatsApp.</p>
+    <div id="syncStatus" class="sync-status offline">
+      <span class="sync-dot"></span>
+      <span id="syncLabel">Verbinden…</span>
+    </div>
   </div>
 
   <!-- TOEVOEGEN -->
@@ -374,10 +403,83 @@ let items = [];
 let selCat = 'overig';
 let selFam = 'iedereen';
 let filter = 'alle';
+let fbRef = null;
+let fbConnected = false;
+
+// ===== FIREBASE CONFIG =====
+// 👇 VUL HIER JE FIREBASE DATABASE URL IN
+const FIREBASE_CONFIG = {
+  databaseURL: 'https://dijkski-default-rtdb.europe-west1.firebasedatabase.app'
+};
+
+// ===== FIREBASE INIT =====
+function initFirebase() {
+  try {
+    if (FIREBASE_CONFIG.databaseURL === 'PLAK_HIER_JE_DATABASE_URL') {
+      console.log('Firebase niet geconfigureerd, alleen localStorage.');
+      setSyncStatus('offline', 'Lokaal');
+      loadLocal();
+      return;
+    }
+
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const db = firebase.database();
+    fbRef = db.ref('boodschappen');
+
+    // Verbindingsstatus
+    db.ref('.info/connected').on('value', snap => {
+      if (snap.val() === true) {
+        fbConnected = true;
+        setSyncStatus('live', 'Live sync');
+      } else {
+        fbConnected = false;
+        setSyncStatus('offline', 'Offline');
+      }
+    });
+
+    // Luister naar wijzigingen (real-time sync!)
+    fbRef.on('value', snap => {
+      const data = snap.val();
+      items = data ? Object.values(data) : [];
+      saveLocal(); // lokale backup
+      renderLijst();
+    });
+
+  } catch(e) {
+    console.error('Firebase fout:', e);
+    setSyncStatus('error', 'Fout');
+    loadLocal();
+  }
+}
+
+function setSyncStatus(status, label) {
+  const el = document.getElementById('syncStatus');
+  const lbl = document.getElementById('syncLabel');
+  el.className = 'sync-status ' + status;
+  lbl.textContent = label;
+}
 
 // ===== OPSLAG =====
-function load(){ try { const s=localStorage.getItem('dijkBoodschappen'); if(s) items=JSON.parse(s); } catch(e){} }
-function save(){ try { localStorage.setItem('dijkBoodschappen',JSON.stringify(items)); } catch(e){} }
+function loadLocal() {
+  try { const s = localStorage.getItem('dijkBoodschappen'); if (s) items = JSON.parse(s); } catch(e) {}
+}
+
+function saveLocal() {
+  try { localStorage.setItem('dijkBoodschappen', JSON.stringify(items)); } catch(e) {}
+}
+
+function save() {
+  saveLocal();
+  if (fbRef && fbConnected) {
+    // Sla op als object met id als key (Firebase-vriendelijk)
+    const obj = {};
+    items.forEach(i => { obj[i.id] = i; });
+    fbRef.set(obj).catch(e => {
+      console.error('Firebase write error:', e);
+      setSyncStatus('error', 'Schrijffout');
+    });
+  }
+}
 
 // ===== CHIPS =====
 function renderCats(){
@@ -567,7 +669,9 @@ function toast(msg){
 }
 
 // ===== INIT =====
-load(); renderCats(); renderFams(); renderFilter(); renderLijst();
+loadLocal(); // toon lokale data direct
+renderCats(); renderFams(); renderFilter(); renderLijst();
+initFirebase(); // start sync (overschrijft lokale data zodra verbonden)
 </script>
 
 </body>
