@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📸 Fotomuur</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+  <style>
+    main { margin: 16px; padding-bottom: 100px; }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      line-height: 1.7;
+    }
+
+    .sub {
+      background: #f2f6f4;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .sub h3 { margin: 0 0 6px; }
+
+    a { font-weight: 600; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { opacity: .7; font-size: 14px; }
+
+    /* ===== SYNC STATUS ===== */
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 50px;
+      float: right;
+    }
+    .sync-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .sync-status.live .sync-dot { background: #43a047; }
+    .sync-status.live { color: #43a047; }
+    .sync-status.offline .sync-dot { background: #ff9800; }
+    .sync-status.offline { color: #ff9800; }
+
+    /* ===== ALBUM LINK ===== */
+    .album-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #4285f4, #34a853);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(66,133,244,0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+      margin-top: 10px;
+    }
+    .album-btn:hover { text-decoration: none; transform: scale(1.02); box-shadow: 0 6px 20px rgba(66,133,244,0.4); }
+    .album-btn:active { transform: scale(0.98); }
+    .album-btn .album-icon { font-size: 24px; }
+
+    /* ===== UPLOAD AREA ===== */
+    .upload-area {
+      margin-top: 12px;
+    }
+    .upload-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .camera-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #ff6f00, #ffa726);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 4px 14px rgba(255,111,0,0.25);
+      transition: transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .camera-btn:active { transform: scale(0.97); }
+    .camera-btn input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      font-size: 200px;
+    }
+    .camera-btn .cam-icon { font-size: 22px; }
+
+    .gallery-btn {
+      width: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      background: #f0f0f0;
+      border: 2px solid #ddd;
+      cursor: pointer;
+      font-size: 22px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s;
+    }
+    .gallery-btn:active { transform: scale(0.97); }
+    .gallery-btn input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      font-size: 200px;
+    }
+
+    /* Family selector for upload */
+    .upload-family {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .upload-family .uf-label {
+      width: 100%;
+      font-size: 12px;
+      font-weight: 700;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .uf-chip {
+      padding: 5px 11px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid transparent;
+      background: #e8eceb;
+      color: #555;
+      user-select: none;
+      transition: all 0.15s;
+    }
+    .uf-chip:active { transform: scale(0.95); }
+    .uf-chip.on { border-color: #333; box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+    .uf-chip.on[data-fam="haarlem"]  { background: #FFE0B2; color: #5D4037; }
+    .uf-chip.on[data-fam="haren"]    { background: #B3E5FC; color: #01579B; }
+    .uf-chip.on[data-fam="sanne"]    { background: #C8E6C9; color: #1B5E20; }
+    .uf-chip.on[data-fam="zuidhorn"] { background: #F8BBD0; color: #880E4F; }
+    .uf-chip.on[data-fam="joure"]    { background: #D1C4E9; color: #311B92; }
+
+    /* Upload progress */
+    .upload-progress {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #E3F2FD;
+      color: #1565C0;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .upload-progress.show { display: block; }
+    .upload-progress.error { background: #FFEBEE; color: #c62828; }
+
+    /* ===== CHALLENGE ===== */
+    .challenge-box {
+      background: linear-gradient(135deg, #fff8e1, #fff3e0);
+      border: 2px solid #ffe082;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 12px;
+      text-align: center;
+    }
+    .challenge-box .ch-day {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #f57f17;
+      margin-bottom: 4px;
+    }
+    .challenge-box .ch-text {
+      font-size: 17px;
+      font-weight: 700;
+      color: #333;
+      line-height: 1.4;
+    }
+    .challenge-box .ch-icon {
+      font-size: 32px;
+      margin-bottom: 6px;
+    }
+
+    /* ===== PHOTO WALL ===== */
+    .wall-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .wall-count {
+      font-size: 14px;
+      color: #999;
+      flex: 1;
+    }
+    .slide-btn {
+      padding: 8px 16px;
+      border-radius: 50px;
+      border: 1px solid #ddd;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .slide-btn:active { transform: scale(0.97); }
+    .slide-btn.active { background: #333; color: #fff; border-color: #333; }
+
+    /* Masonry-ish grid */
+    .photo-grid {
+      column-count: 2;
+      column-gap: 12px;
+    }
+    @media (min-width: 600px) { .photo-grid { column-count: 3; } }
+
+    .polaroid {
+      break-inside: avoid;
+      background: #fff;
+      border-radius: 12px;
+      padding: 6px;
+      margin-bottom: 12px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+      cursor: pointer;
+      animation: fadeUp 0.4s ease both;
+    }
+    .polaroid:active { transform: scale(0.97); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .polaroid img {
+      width: 100%;
+      border-radius: 8px;
+      display: block;
+    }
+    .polaroid .pol-info {
+      padding: 6px 4px 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .polaroid .pol-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 50px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .pol-tag-haarlem   { background: #FFE0B2; color: #5D4037; }
+    .pol-tag-haren     { background: #B3E5FC; color: #01579B; }
+    .pol-tag-sanne     { background: #C8E6C9; color: #1B5E20; }
+    .pol-tag-zuidhorn  { background: #F8BBD0; color: #880E4F; }
+    .pol-tag-joure     { background: #D1C4E9; color: #311B92; }
+    .polaroid .pol-time {
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    .empty-wall {
+      text-align: center;
+      padding: 40px 20px;
+      color: #bbb;
+    }
+    .empty-wall .ew-icon { font-size: 48px; margin-bottom: 8px; }
+    .empty-wall p { font-size: 14px; }
+
+    /* Delete button on polaroid */
+    .polaroid .pol-del {
+      float: right;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.06);
+      color: #bbb;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .polaroid .pol-del:active { color: #e53935; background: #ffebee; }
+
+    /* ===== LIGHTBOX ===== */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 20000;
+      background: rgba(0,0,0,0.92);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 75vh;
+      border-radius: 12px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .lightbox .lb-info {
+      margin-top: 12px;
+      color: #fff;
+      text-align: center;
+      font-size: 14px;
+    }
+    .lightbox .lb-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox .lb-close:active { background: rgba(255,255,255,0.3); }
+    .lightbox .lb-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox .lb-nav:active { background: rgba(255,255,255,0.25); }
+    .lightbox .lb-prev { left: 12px; }
+    .lightbox .lb-next { right: 12px; }
+
+    /* ===== SLIDESHOW OVERLAY ===== */
+    .slideshow {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 30000;
+      background: #000;
+      align-items: center;
+      justify-content: center;
+    }
+    .slideshow.open { display: flex; }
+    .slideshow img {
+      max-width: 95vw;
+      max-height: 85vh;
+      border-radius: 16px;
+      box-shadow: 0 12px 60px rgba(0,0,0,0.8);
+      transition: opacity 0.6s ease;
+    }
+    .slideshow .ss-info {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.8);
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      background: rgba(0,0,0,0.4);
+      padding: 8px 20px;
+      border-radius: 50px;
+    }
+    .slideshow .ss-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slideshow .ss-counter {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .slideshow .ss-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #4285f4, #34a853);
+      border-radius: 0 2px 2px 0;
+      transition: width 0.1s linear;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      z-index: 40000;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="verblijf.html">🏡 Verblijf</a>
+  <a href="meenemen.html">🎒 Meenemen</a>
+  <a href="onderweg.html">🚗 Onderweg</a>
+  <a href="ski.html">🎿 Ski</a>
+  <a href="boodschappen.html">🛒 Boodschappen</a>
+  <a href="fotos.html">📸 Foto's</a>
+  <a href="bingo.html">🎲 Bingo</a>
+  <a href="sos.html">🚨 SOS</a>
+</nav>
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <!-- TITEL -->
+  <div class="card">
+    <h1>📸 Fotomuur</h1>
+    <p>Deel foto's live met alle gezinnen. Verschijnt direct bij iedereen!</p>
+    <div id="syncStatus" class="sync-status offline">
+      <span class="sync-dot"></span>
+      <span id="syncLabel">Verbinden…</span>
+    </div>
+  </div>
+
+  <!-- GOOGLE PHOTOS ALBUM -->
+  <div class="card">
+    <h2>🖼️ Gedeeld album</h2>
+    <p>Alle foto's in hoge kwaliteit staan in ons gedeeld Google Photos album.</p>
+    <a href="https://photos.app.goo.gl/dLUzXYcPWiUQ9m2E6" target="_blank" class="album-btn">
+      <span class="album-icon">🖼️</span>
+      Open Google Photos album →
+    </a>
+    <p class="muted" style="margin-top:8px; text-align:center;">Full-res foto's uploaden & downloaden</p>
+  </div>
+
+  <!-- FOTO MAKEN -->
+  <div class="card">
+    <h2>📷 Deel een moment</h2>
+    <p>Maak een foto of kies er één — hij verschijnt direct op ieders fotomuur.</p>
+
+    <div class="upload-area">
+      <div class="upload-row">
+        <label class="camera-btn">
+          <span class="cam-icon">📷</span> Maak foto
+          <input type="file" accept="image/*" capture="environment" onchange="handleUpload(this)">
+        </label>
+        <label class="gallery-btn" title="Kies uit galerij">
+          🖼️
+          <input type="file" accept="image/*" onchange="handleUpload(this)">
+        </label>
+      </div>
+
+      <div class="upload-family" id="uploadFamChips">
+        <span class="uf-label">Geplaatst door</span>
+      </div>
+
+      <div class="upload-progress" id="uploadProgress">📤 Verkleinen & uploaden…</div>
+    </div>
+  </div>
+
+  <!-- DAGELIJKSE UITDAGING -->
+  <div class="card">
+    <h2>🏆 Foto-uitdaging van de dag</h2>
+    <div class="challenge-box" id="challengeBox">
+      <div class="ch-icon">📸</div>
+      <div class="ch-day" id="chDay">—</div>
+      <div class="ch-text" id="chText">De vakantie is nog niet begonnen!</div>
+    </div>
+  </div>
+
+  <!-- FOTOMUUR -->
+  <div class="card">
+    <h2>🧱 Live Fotomuur</h2>
+
+    <div class="wall-controls">
+      <span class="wall-count" id="wallCount">0 foto's</span>
+      <button class="slide-btn" onclick="startSlideshow()">▶ Slideshow</button>
+    </div>
+
+    <div class="photo-grid" id="photoGrid"></div>
+  </div>
+
+</main>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <button class="lb-nav lb-prev" onclick="event.stopPropagation();navLightbox(-1)">‹</button>
+  <button class="lb-nav lb-next" onclick="event.stopPropagation();navLightbox(1)">›</button>
+  <img id="lbImg" src="" alt="">
+  <div class="lb-info" id="lbInfo"></div>
+</div>
+
+<!-- SLIDESHOW -->
+<div class="slideshow" id="slideshow">
+  <div class="ss-progress" id="ssProgress"></div>
+  <span class="ss-counter" id="ssCounter"></span>
+  <button class="ss-close" onclick="stopSlideshow()">✕</button>
+  <img id="ssImg" src="" alt="">
+  <div class="ss-info" id="ssInfo"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+
+// ===== DATA =====
+const fams = [
+  { id:'haarlem',  short:'Jan Jaap' },
+  { id:'haren',    short:'Tim & Geessien' },
+  { id:'sanne',    short:'Sanne & Gert' },
+  { id:'zuidhorn', short:'Kim & Pieter' },
+  { id:'joure',    short:'Koos & Jan Dirk' },
+];
+
+const challenges = {
+  '2026-02-21': { icon:'🚗', text:'Onderweg! Maak een kekke foto je ULBE-MOBIEL.' },
+  '2026-02-22': { icon:'🏔️', text:'Eerste indruk: Maak indruk, klik je gaafste foto en win PRIJZEN (bingoooo???).' },
+  '2026-02-23': { icon:'🎿', text:'Actie! Foto van de spannendste ski-move van vandaag.' },
+  '2026-02-24': { icon:'😂', text:'Funniest fail: eigen invulling!!!.' },
+  '2026-02-25': { icon:'👨‍👩‍👧‍👦', text:'Groepsfoto! Alle gezinnen samen — bij het restaurant vanavond?' },
+  '2026-02-26': { icon:'🌅', text:'Golden hour: Foto van een gezellige borrel!!.' },
+  '2026-02-27': { icon:'🍕', text:'Pizza-avond! Maak de lekkerste foodfoto van de vakantie.' },
+  '2026-02-28': { icon:'🧳', text:'Laatste dag: maak een foto die deze vakantie het beste samenvat.' },
+};
+
+let photos = [];
+let selUploadFam = 'haren'; // default
+let fbRef = null;
+let fbConnected = false;
+let lightboxIdx = 0;
+let ssTimer = null;
+let ssIdx = 0;
+
+// ===== FIREBASE =====
+const FIREBASE_CONFIG = {
+  databaseURL: 'https://dijkski-default-rtdb.europe-west1.firebasedatabase.app'
+};
+
+function initFirebase(){
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const db = firebase.database();
+    fbRef = db.ref('fotos');
+
+    db.ref('.info/connected').on('value', snap => {
+      fbConnected = snap.val() === true;
+      setSyncStatus(fbConnected ? 'live' : 'offline', fbConnected ? 'Live sync' : 'Offline');
+    });
+
+    // Real-time luisteren
+    fbRef.on('value', snap => {
+      const data = snap.val();
+      photos = data ? Object.values(data) : [];
+      photos.sort((a,b) => b.ts - a.ts); // nieuwste eerst
+      renderWall();
+    });
+  } catch(e) {
+    console.error('Firebase error:', e);
+    setSyncStatus('offline', 'Fout');
+  }
+}
+
+function setSyncStatus(s, l){
+  document.getElementById('syncStatus').className = 'sync-status ' + s;
+  document.getElementById('syncLabel').textContent = l;
+}
+
+// ===== UPLOAD FAM CHIPS =====
+function renderUploadFams(){
+  const el = document.getElementById('uploadFamChips');
+  const lbl = el.querySelector('.uf-label');
+  el.innerHTML = '';
+  el.appendChild(lbl);
+  fams.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'uf-chip' + (selUploadFam === f.id ? ' on' : '');
+    d.setAttribute('data-fam', f.id);
+    d.textContent = f.short;
+    d.onclick = () => { selUploadFam = f.id; renderUploadFams(); };
+    el.appendChild(d);
+  });
+}
+
+// ===== UPLOAD HANDLER =====
+function handleUpload(input){
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+
+  const prog = document.getElementById('uploadProgress');
+  prog.className = 'upload-progress show';
+  prog.textContent = '📤 Verkleinen & uploaden…';
+
+  resizeImage(file, 900, 0.7, (dataUrl) => {
+    if (!fbRef || !fbConnected) {
+      prog.textContent = '❌ Geen verbinding met Firebase';
+      prog.className = 'upload-progress show error';
+      setTimeout(() => prog.className = 'upload-progress', 3000);
+      return;
+    }
+
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+    const photo = {
+      id: id,
+      data: dataUrl,
+      fam: selUploadFam,
+      ts: Date.now()
+    };
+
+    fbRef.child(id).set(photo)
+      .then(() => {
+        prog.textContent = '✅ Geüpload!';
+        setTimeout(() => prog.className = 'upload-progress', 2000);
+        toast('📸 Foto gedeeld!');
+      })
+      .catch(e => {
+        console.error(e);
+        prog.textContent = '❌ Upload mislukt';
+        prog.className = 'upload-progress show error';
+        setTimeout(() => prog.className = 'upload-progress', 3000);
+      });
+  });
+
+  // Reset input zodat je dezelfde foto opnieuw kunt kiezen
+  input.value = '';
+}
+
+// Client-side resize via Canvas
+function resizeImage(file, maxPx, quality, cb){
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      let w = img.width, h = img.height;
+      if (w > maxPx || h > maxPx) {
+        if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
+        else { w = Math.round(w * maxPx / h); h = maxPx; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      cb(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ===== CHALLENGE =====
+function renderChallenge(){
+  const today = new Date().toISOString().slice(0,10);
+  const ch = challenges[today];
+  const dayEl = document.getElementById('chDay');
+  const txtEl = document.getElementById('chText');
+  const iconEl = document.querySelector('.ch-icon');
+
+  if (ch) {
+    const dagNaam = new Date().toLocaleDateString('nl-NL', { weekday:'long', day:'numeric', month:'long' });
+    dayEl.textContent = dagNaam;
+    txtEl.textContent = ch.text;
+    iconEl.textContent = ch.icon;
+  } else {
+    const startMid = new Date(2026, 1, 21);
+    const now = new Date();
+    const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (todayMid < startMid) {
+      const diff = Math.ceil((startMid - todayMid) / (1000*60*60*24));
+      dayEl.textContent = 'Nog even geduld…';
+      txtEl.textContent = `Nog ${diff} dag${diff===1?'':'en'} tot de eerste uitdaging!`;
+      iconEl.textContent = '⏳';
+    } else {
+      dayEl.textContent = 'Vakantie voorbij';
+      txtEl.textContent = 'Wat een mooie foto\'s hebben we gemaakt!';
+      iconEl.textContent = '🏆';
+    }
+  }
+}
+
+// ===== PHOTO WALL =====
+function renderWall(){
+  const grid = document.getElementById('photoGrid');
+  const countEl = document.getElementById('wallCount');
+
+  countEl.textContent = photos.length + ' foto' + (photos.length !== 1 ? '\'s' : '');
+
+  if (photos.length === 0) {
+    grid.innerHTML = `<div class="empty-wall">
+      <div class="ew-icon">📷</div>
+      <p>Nog geen foto's gedeeld.<br>Maak de eerste!</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = photos.map((p, idx) => {
+    const fam = fams.find(f => f.id === p.fam);
+    const time = new Date(p.ts).toLocaleString('nl-NL', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+    return `<div class="polaroid" style="animation-delay:${Math.min(idx*0.05, 0.5)}s">
+      <img src="${p.data}" alt="Foto" loading="lazy" onclick="openLightbox(${idx})">
+      <div class="pol-info">
+        <span class="pol-tag pol-tag-${p.fam}">${fam ? fam.short : '?'}</span>
+        <span class="pol-time">${time}</span>
+        <button class="pol-del" onclick="event.stopPropagation();deletePhoto('${p.id}')" title="Verwijder">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function deletePhoto(id){
+  if (!confirm('Foto verwijderen?')) return;
+  if (fbRef && fbConnected) {
+    fbRef.child(id).remove().then(() => toast('🗑️ Verwijderd'));
+  }
+}
+
+// ===== LIGHTBOX =====
+function openLightbox(idx){
+  lightboxIdx = idx;
+  const p = photos[idx];
+  const fam = fams.find(f => f.id === p.fam);
+  const time = new Date(p.ts).toLocaleString('nl-NL', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+
+  document.getElementById('lbImg').src = p.data;
+  document.getElementById('lbInfo').textContent = (fam ? fam.short : '') + ' · ' + time;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e){
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('lb-close')) return;
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function navLightbox(dir){
+  lightboxIdx = (lightboxIdx + dir + photos.length) % photos.length;
+  openLightbox(lightboxIdx);
+}
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (document.getElementById('lightbox').classList.contains('open')) {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') navLightbox(-1);
+    if (e.key === 'ArrowRight') navLightbox(1);
+  }
+  if (document.getElementById('slideshow').classList.contains('open')) {
+    if (e.key === 'Escape') stopSlideshow();
+  }
+});
+
+// Touch swipe for lightbox
+let touchStartX = 0;
+document.getElementById('lightbox').addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+document.getElementById('lightbox').addEventListener('touchend', e => {
+  const diff = e.changedTouches[0].screenX - touchStartX;
+  if (Math.abs(diff) > 50) navLightbox(diff > 0 ? -1 : 1);
+}, { passive: true });
+
+// ===== SLIDESHOW =====
+function startSlideshow(){
+  if (photos.length === 0) { toast('Nog geen foto\'s'); return; }
+  ssIdx = 0;
+  document.getElementById('slideshow').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  showSlide();
+  ssTimer = setInterval(advanceSlide, 5000);
+  // Progress bar animation
+  animateProgress();
+}
+
+function stopSlideshow(){
+  clearInterval(ssTimer);
+  ssTimer = null;
+  document.getElementById('slideshow').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function showSlide(){
+  const p = photos[ssIdx];
+  if (!p) { stopSlideshow(); return; }
+  const fam = fams.find(f => f.id === p.fam);
+  const time = new Date(p.ts).toLocaleString('nl-NL', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+
+  const img = document.getElementById('ssImg');
+  img.style.opacity = '0';
+  setTimeout(() => {
+    img.src = p.data;
+    img.style.opacity = '1';
+  }, 300);
+
+  document.getElementById('ssInfo').textContent = (fam ? fam.short : '') + ' · ' + time;
+  document.getElementById('ssCounter').textContent = (ssIdx + 1) + ' / ' + photos.length;
+}
+
+function advanceSlide(){
+  ssIdx = (ssIdx + 1) % photos.length;
+  showSlide();
+  animateProgress();
+}
+
+function animateProgress(){
+  const bar = document.getElementById('ssProgress');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      bar.style.transition = 'width 5s linear';
+      bar.style.width = '100%';
+    });
+  });
+}
+
+// ===== TOAST =====
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ===== INIT =====
+renderUploadFams();
+renderChallenge();
+initFirebase();
+</script>
+
+</body>
+</html>
