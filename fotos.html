@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>📸 Fotomuur</title>
   <link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1e7f5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DIJK SKI">
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
@@ -314,6 +320,65 @@
     }
     .polaroid .pol-del:active { color: #e53935; background: #ffebee; }
 
+    /* ===== WINTER REACTIONS ===== */
+    .pol-reactions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 4px 4px 2px;
+    }
+    .react-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 8px;
+      border-radius: 50px;
+      border: 1.5px solid #e8eaed;
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.15s;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .react-btn:active { transform: scale(0.9); }
+    .react-btn .react-count {
+      font-size: 11px;
+      font-weight: 700;
+      color: #999;
+      min-width: 8px;
+      text-align: center;
+    }
+    .react-btn.reacted {
+      border-color: #90caf9;
+      background: #e3f2fd;
+    }
+    .react-btn.reacted .react-count { color: #1565C0; }
+
+    /* Snow burst animation on react */
+    @keyframes snowBurst {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.4); }
+      60% { transform: scale(0.9); }
+      100% { transform: scale(1); }
+    }
+    .react-btn.pop {
+      animation: snowBurst 0.4s ease;
+    }
+
+    /* Floating snowflake particles on like */
+    @keyframes snowFloat {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+      100% { opacity: 0; transform: translateY(-40px) rotate(180deg) scale(0.3); }
+    }
+    .snow-particle {
+      position: absolute;
+      pointer-events: none;
+      font-size: 14px;
+      animation: snowFloat 0.8s ease-out forwards;
+      z-index: 10;
+    }
+
     /* ===== LIGHTBOX ===== */
     .lightbox {
       display: none;
@@ -557,6 +622,7 @@
   <button class="lb-nav lb-next" onclick="event.stopPropagation();navLightbox(1)">›</button>
   <img id="lbImg" src="" alt="">
   <div class="lb-info" id="lbInfo"></div>
+  <div class="pol-reactions" id="lbReactions" style="margin-top:10px;"></div>
 </div>
 
 <!-- SLIDESHOW -->
@@ -599,10 +665,21 @@ const challenges = {
 let photos = [];
 let selUploadFam = 'haren'; // default
 let fbRef = null;
+let fbReactRef = null;
 let fbConnected = false;
 let lightboxIdx = 0;
 let ssTimer = null;
 let ssIdx = 0;
+let reactions = {}; // photoId -> { emoji -> { odwarsFamily: true } }
+let myFam = null; // wordt ingesteld via chip selectie
+
+const winterReacts = [
+  { emoji: '❄️', label: 'Cool' },
+  { emoji: '🔥', label: 'Fire' },
+  { emoji: '🎿', label: 'Sick' },
+  { emoji: '😂', label: 'Haha' },
+  { emoji: '❤️', label: 'Love' },
+];
 
 // ===== FIREBASE =====
 const FIREBASE_CONFIG = {
@@ -614,18 +691,25 @@ function initFirebase(){
     firebase.initializeApp(FIREBASE_CONFIG);
     const db = firebase.database();
     fbRef = db.ref('fotos');
+    fbReactRef = db.ref('reacties');
 
     db.ref('.info/connected').on('value', snap => {
       fbConnected = snap.val() === true;
       setSyncStatus(fbConnected ? 'live' : 'offline', fbConnected ? 'Live sync' : 'Offline');
     });
 
-    // Real-time luisteren
+    // Real-time luisteren naar foto's
     fbRef.on('value', snap => {
       const data = snap.val();
       photos = data ? Object.values(data) : [];
-      photos.sort((a,b) => b.ts - a.ts); // nieuwste eerst
+      photos.sort((a,b) => b.ts - a.ts);
       renderWall();
+    });
+
+    // Real-time luisteren naar reacties
+    fbReactRef.on('value', snap => {
+      reactions = snap.val() || {};
+      renderWall(); // re-render met nieuwe reacties
     });
   } catch(e) {
     console.error('Firebase error:', e);
@@ -649,7 +733,7 @@ function renderUploadFams(){
     d.className = 'uf-chip' + (selUploadFam === f.id ? ' on' : '');
     d.setAttribute('data-fam', f.id);
     d.textContent = f.short;
-    d.onclick = () => { selUploadFam = f.id; renderUploadFams(); };
+    d.onclick = () => { selUploadFam = f.id; myFam = f.id; renderUploadFams(); };
     el.appendChild(d);
   });
 }
@@ -768,6 +852,21 @@ function renderWall(){
   grid.innerHTML = photos.map((p, idx) => {
     const fam = fams.find(f => f.id === p.fam);
     const time = new Date(p.ts).toLocaleString('nl-NL', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+    const photoReacts = reactions[p.id] || {};
+
+    // Build reaction buttons
+    let reactHtml = '<div class="pol-reactions">';
+    winterReacts.forEach(r => {
+      const emojiData = photoReacts[r.emoji] || {};
+      const count = Object.keys(emojiData).length;
+      const iReacted = myFam && emojiData[myFam];
+      reactHtml += `<div class="react-btn${iReacted ? ' reacted' : ''}" onclick="event.stopPropagation();react('${p.id}','${r.emoji}',this)" title="${r.label}">
+        <span>${r.emoji}</span>
+        ${count > 0 ? `<span class="react-count">${count}</span>` : ''}
+      </div>`;
+    });
+    reactHtml += '</div>';
+
     return `<div class="polaroid" style="animation-delay:${Math.min(idx*0.05, 0.5)}s">
       <img src="${p.data}" alt="Foto" loading="lazy" onclick="openLightbox(${idx})">
       <div class="pol-info">
@@ -775,6 +874,7 @@ function renderWall(){
         <span class="pol-time">${time}</span>
         <button class="pol-del" onclick="event.stopPropagation();deletePhoto('${p.id}')" title="Verwijder">✕</button>
       </div>
+      ${reactHtml}
     </div>`;
   }).join('');
 }
@@ -784,6 +884,53 @@ function deletePhoto(id){
   if (fbRef && fbConnected) {
     fbRef.child(id).remove().then(() => toast('🗑️ Verwijderd'));
   }
+}
+
+// ===== REACTIONS =====
+function react(photoId, emoji, btnEl) {
+  if (!myFam) {
+    toast('Kies eerst je gezin bij "Geplaatst door"');
+    return;
+  }
+  if (!fbReactRef || !fbConnected) {
+    toast('Geen verbinding');
+    return;
+  }
+
+  const path = `${photoId}/${emoji}/${myFam}`;
+  const currentReacts = reactions[photoId] && reactions[photoId][emoji] && reactions[photoId][emoji][myFam];
+
+  if (currentReacts) {
+    // Unreact
+    fbReactRef.child(path).remove();
+  } else {
+    // React + animation
+    fbReactRef.child(path).set(true);
+
+    // Pop animation
+    btnEl.classList.remove('pop');
+    void btnEl.offsetWidth; // force reflow
+    btnEl.classList.add('pop');
+
+    // Snow particles burst
+    spawnSnowParticles(btnEl, emoji);
+  }
+}
+
+function spawnSnowParticles(el, emoji) {
+  const rect = el.getBoundingClientRect();
+  const particles = ['❄️', '❄️', '✨', emoji];
+  particles.forEach((p, i) => {
+    const span = document.createElement('span');
+    span.className = 'snow-particle';
+    span.textContent = p;
+    span.style.left = (rect.left + rect.width/2 + (Math.random()-0.5)*30) + 'px';
+    span.style.top = (rect.top + window.scrollY - 5) + 'px';
+    span.style.animationDelay = (i * 0.08) + 's';
+    span.style.fontSize = (12 + Math.random()*8) + 'px';
+    document.body.appendChild(span);
+    setTimeout(() => span.remove(), 1000);
+  });
 }
 
 // ===== LIGHTBOX =====
@@ -797,6 +944,19 @@ function openLightbox(idx){
   document.getElementById('lbInfo').textContent = (fam ? fam.short : '') + ' · ' + time;
   document.getElementById('lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  // Render lightbox reactions
+  const photoReacts = reactions[p.id] || {};
+  const lbr = document.getElementById('lbReactions');
+  lbr.innerHTML = winterReacts.map(r => {
+    const emojiData = photoReacts[r.emoji] || {};
+    const count = Object.keys(emojiData).length;
+    const iReacted = myFam && emojiData[myFam];
+    return `<div class="react-btn${iReacted ? ' reacted' : ''}" style="border-color:rgba(255,255,255,0.2);${iReacted?'background:rgba(255,255,255,0.15);':''}" onclick="event.stopPropagation();react('${p.id}','${r.emoji}',this)">
+      <span>${r.emoji}</span>
+      ${count > 0 ? `<span class="react-count" style="color:rgba(255,255,255,0.8);">${count}</span>` : ''}
+    </div>`;
+  }).join('');
 }
 
 function closeLightbox(e){
@@ -895,6 +1055,7 @@ function toast(msg){
 }
 
 // ===== INIT =====
+myFam = selUploadFam; // default reactie-gezin
 renderUploadFams();
 renderChallenge();
 initFirebase();

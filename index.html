@@ -4,7 +4,15 @@
 <meta charset="UTF-8">
 <title>DIJK Skifestijn 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1e7f5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DIJK SKI">
 <link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
 /* ===== COUNTDOWN BADGE TOP-RIGHT ===== */
 .countdown-badge {
@@ -117,6 +125,190 @@
   letter-spacing: 0.5px;
   margin-top: 2px;
 }
+
+/* ===== PISTE MAP BUTTON IN HEADER ===== */
+.piste-btn {
+  position: absolute;
+  left: 56px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.piste-btn:hover { text-decoration: none; background: rgba(255,255,255,0.3); }
+.piste-btn:active { transform: translateY(-50%) scale(0.95); }
+
+/* ===== SPOTIFY TILE ===== */
+.tile-spotify {
+  background: linear-gradient(135deg, #1DB954, #1ed760);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.tile-spotify:active {
+  transform: scale(0.97);
+}
+.tile-spotify .sp-wave {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 30%;
+  background: rgba(0,0,0,0.08);
+  border-radius: 0 0 14px 14px;
+}
+
+/* ===== SPOTIFY EMBED SECTION ===== */
+.spotify-section {
+  margin: 0 16px 16px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+  border-radius: 16px;
+}
+.spotify-section.open {
+  max-height: 400px;
+  opacity: 1;
+}
+.spotify-section iframe {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+}
+/* ===== LIVE FOTO FEED ===== */
+.feed-section {
+  margin: 0 16px 24px;
+}
+.feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.feed-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.feed-live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #e53935;
+  display: inline-block;
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+.feed-link {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1565C0;
+  text-decoration: none;
+}
+
+.feed-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+}
+.feed-scroll::-webkit-scrollbar { display: none; }
+
+.feed-card {
+  flex-shrink: 0;
+  width: 200px;
+  scroll-snap-align: start;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  transition: transform 0.15s;
+  cursor: pointer;
+}
+.feed-card:active { transform: scale(0.97); }
+.feed-card img {
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+.feed-card-info {
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.feed-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.feed-tag-haarlem   { background: #FFE0B2; color: #5D4037; }
+.feed-tag-haren     { background: #B3E5FC; color: #01579B; }
+.feed-tag-sanne     { background: #C8E6C9; color: #1B5E20; }
+.feed-tag-zuidhorn  { background: #F8BBD0; color: #880E4F; }
+.feed-tag-joure     { background: #D1C4E9; color: #311B92; }
+.feed-time {
+  font-size: 10px;
+  color: #aaa;
+}
+.feed-reactions {
+  padding: 2px 10px 8px;
+  font-size: 12px;
+  color: #999;
+  display: flex;
+  gap: 6px;
+}
+.feed-reactions span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.feed-empty {
+  width: 100%;
+  text-align: center;
+  padding: 24px 16px;
+  color: #bbb;
+  font-size: 14px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+@keyframes feedSlideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.feed-card { animation: feedSlideIn 0.3s ease both; }
 </style>
 </head>
 <body>
@@ -139,6 +331,7 @@
 
 <header class="app-header no-logo">
   <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <a href="https://zillertal.intermaps.com/zillertalarena" target="_blank" class="piste-btn">🗺️ Pistekaart</a>
   <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
 </header>
 
@@ -179,7 +372,31 @@
   <a class="tile" href="fotos.html">📸 Foto's</a>
   <a class="tile" href="bingo.html">🎲 Bingo</a>
   <a class="tile" href="sos.html">🚨 SOS</a>
+  <div class="tile tile-spotify" onclick="toggleSpotify()">
+    🎵 Playlist
+    <div class="sp-wave"></div>
+  </div>
 </main>
+
+<!-- SPOTIFY EMBED (toggled by tile) -->
+<div class="spotify-section" id="spotifySection">
+  <iframe id="spotifyFrame" height="352" frameborder="0" allowfullscreen
+    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+    loading="lazy"></iframe>
+</div>
+
+<!-- LIVE FOTO FEED -->
+<div class="feed-section">
+  <div class="feed-header">
+    <div class="feed-title">
+      <span class="feed-live-dot"></span> Live foto's
+    </div>
+    <a href="fotos.html" class="feed-link">Alles bekijken →</a>
+  </div>
+  <div class="feed-scroll" id="feedScroll">
+    <div class="feed-empty">📷 Foto's laden…</div>
+  </div>
+</div>
 
 <script>
 const schema = {
@@ -205,6 +422,21 @@ if (schema[vandaag]) {
   `;
 } else {
   inhoud.textContent = "Geen rooster voor vandaag.";
+}
+</script>
+
+<script>
+function toggleSpotify(){
+  const sec = document.getElementById('spotifySection');
+  const frame = document.getElementById('spotifyFrame');
+  sec.classList.toggle('open');
+  // Lazy-load iframe alleen bij eerste open
+  if (!frame.src) {
+    frame.src = 'https://open.spotify.com/embed/playlist/4UEajBJjXLcphtkw3zyFQC?utm_source=generator';
+  }
+  if (sec.classList.contains('open')) {
+    setTimeout(() => sec.scrollIntoView({ behavior:'smooth', block:'nearest' }), 100);
+  }
 }
 </script>
 
@@ -238,6 +470,87 @@ function toggleMenu(){
   } else {
     num.textContent = '✓';
     lbl.textContent = 'voorbij';
+  }
+})();
+</script>
+
+<script>
+// ===== LIVE FOTO FEED =====
+(function(){
+  const FIREBASE_CONFIG = {
+    databaseURL: 'https://dijkski-default-rtdb.europe-west1.firebasedatabase.app'
+  };
+
+  const feedFams = [
+    { id:'haarlem',  short:'Jan Jaap' },
+    { id:'haren',    short:'Tim & Geessien' },
+    { id:'sanne',    short:'Sanne & Gert' },
+    { id:'zuidhorn', short:'Kim & Pieter' },
+    { id:'joure',    short:'Koos & Jan Dirk' },
+  ];
+
+  try {
+    // Check of Firebase al geïnitialiseerd is
+    if (!firebase.apps.length) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
+    const db = firebase.database();
+    const fbFotos = db.ref('fotos');
+    const fbReacties = db.ref('reacties');
+    let allReactions = {};
+
+    // Luister naar reacties
+    fbReacties.on('value', snap => {
+      allReactions = snap.val() || {};
+    });
+
+    // Luister naar laatste 10 foto's
+    fbFotos.orderByChild('ts').limitToLast(10).on('value', snap => {
+      const data = snap.val();
+      let photos = data ? Object.values(data) : [];
+      photos.sort((a,b) => b.ts - a.ts);
+
+      const container = document.getElementById('feedScroll');
+
+      if (photos.length === 0) {
+        container.innerHTML = '<div class="feed-empty">📷 Nog geen foto\'s gedeeld.<br><a href="fotos.html" style="color:#1565C0;font-weight:700;">Maak de eerste!</a></div>';
+        return;
+      }
+
+      container.innerHTML = photos.map((p, idx) => {
+        const fam = feedFams.find(f => f.id === p.fam);
+        const time = timeAgo(p.ts);
+
+        // Gather reactions for this photo
+        const pr = allReactions[p.id] || {};
+        let reactStr = '';
+        ['❄️','🔥','🎿','😂','❤️'].forEach(emoji => {
+          const cnt = pr[emoji] ? Object.keys(pr[emoji]).length : 0;
+          if (cnt > 0) reactStr += `<span>${emoji} ${cnt}</span>`;
+        });
+
+        return `<a href="fotos.html" class="feed-card" style="animation-delay:${idx*0.06}s; text-decoration:none; color:inherit;">
+          <img src="${p.data}" alt="Foto" loading="lazy">
+          <div class="feed-card-info">
+            <span class="feed-tag feed-tag-${p.fam}">${fam ? fam.short : '?'}</span>
+            <span class="feed-time">${time}</span>
+          </div>
+          ${reactStr ? `<div class="feed-reactions">${reactStr}</div>` : ''}
+        </a>`;
+      }).join('');
+    });
+
+  } catch(e) {
+    console.log('Feed: Firebase niet beschikbaar', e);
+    document.getElementById('feedScroll').innerHTML = '<div class="feed-empty">📷 <a href="fotos.html" style="color:#1565C0;font-weight:700;">Bekijk foto\'s →</a></div>';
+  }
+
+  function timeAgo(ts) {
+    const diff = Math.floor((Date.now() - ts) / 1000);
+    if (diff < 60) return 'zojuist';
+    if (diff < 3600) return Math.floor(diff/60) + ' min';
+    if (diff < 86400) return Math.floor(diff/3600) + ' uur';
+    return Math.floor(diff/86400) + ' dag' + (Math.floor(diff/86400) !== 1 ? 'en' : '');
   }
 })();
 </script>
