@@ -53,6 +53,100 @@
     a:hover {
       text-decoration: underline;
     }
+
+    /* === SPELLEN SECTIE === */
+    .games-card {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 2px solid #fde68a;
+      position: relative;
+      overflow: hidden;
+    }
+    .games-card::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 100px; height: 100px;
+      background: radial-gradient(circle, rgba(251,191,36,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .games-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .games-icon {
+      font-size: 2.4rem;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.1));
+      animation: wiggle 2s ease-in-out infinite;
+    }
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(5deg); }
+    }
+    .games-header h2 {
+      font-size: 1.15rem;
+      color: #92400e;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .game-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 12px 6px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: #1e293b;
+      transition: transform 0.12s, box-shadow 0.12s;
+      border: 2px solid transparent;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .game-chip:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      text-decoration: none;
+    }
+    .game-chip:active { transform: scale(0.95); }
+
+    .gc-emoji { font-size: 1.6rem; }
+    .gc-name { font-size: 0.68rem; font-weight: 700; text-align: center; line-height: 1.2; }
+
+    .gc1 { border-color: #fde68a; }
+    .gc2 { border-color: #bbf7d0; }
+    .gc3 { border-color: #c7d2fe; }
+    .gc4 { border-color: #fecdd3; }
+    .gc5 { border-color: #ddd6fe; }
+    .gc6 { border-color: #a5f3fc; }
+
+    .games-cta {
+      display: block;
+      text-align: center;
+      padding: 12px;
+      background: linear-gradient(135deg, #f97316, #fbbf24);
+      color: #fff;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: transform 0.12s, box-shadow 0.12s;
+      box-shadow: 0 4px 16px rgba(249,115,22,0.25);
+    }
+    .games-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(249,115,22,0.35);
+      text-decoration: none;
+    }
+    .games-cta:active { transform: scale(0.97); }
   </style>
 </head>
 <body>
@@ -80,6 +174,48 @@
 
   <div class="card">
     <h1>🚗 Onderweg & Verkeer</h1>
+  </div>
+
+  <!-- SPELLEN SECTIE -->
+  <div class="card games-card">
+    <div class="games-header">
+      <span class="games-icon">🎮</span>
+      <div>
+        <h2 style="margin:0;">Kinderen vervelen zich?</h2>
+        <p class="muted" style="margin:4px 0 0;">6 autospellen met score — de hele reis lang!</p>
+      </div>
+    </div>
+
+    <div class="games-grid">
+      <a href="spellen.html" class="game-chip gc1">
+        <span class="gc-emoji">🚗</span>
+        <span class="gc-name">Auto Bingo</span>
+      </a>
+      <a href="spellen.html" class="game-chip gc2">
+        <span class="gc-emoji">🏎️</span>
+        <span class="gc-name">Autojacht</span>
+      </a>
+      <a href="spellen.html" class="game-chip gc3">
+        <span class="gc-emoji">👀</span>
+        <span class="gc-name">Ik Zie Ik Zie</span>
+      </a>
+      <a href="spellen.html" class="game-chip gc4">
+        <span class="gc-emoji">🧠</span>
+        <span class="gc-name">Reis Quiz</span>
+      </a>
+      <a href="spellen.html" class="game-chip gc5">
+        <span class="gc-emoji">🔢</span>
+        <span class="gc-name">Tel Wedstrijd</span>
+      </a>
+      <a href="spellen.html" class="game-chip gc6">
+        <span class="gc-emoji">📖</span>
+        <span class="gc-name">Gekke Verhalen</span>
+      </a>
+    </div>
+
+    <a href="spellen.html" class="games-cta">
+      🎮 Alle spellen openen →
+    </a>
   </div>
 
   <div class="card warning">

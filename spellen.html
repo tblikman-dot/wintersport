@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>🚗 Autospellen - DIJK Skifestijn 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  --fun-yellow: #fbbf24;
+  --fun-orange: #f97316;
+  --fun-pink: #ec4899;
+  --fun-blue: #3b82f6;
+  --fun-green: #22c55e;
+  --fun-purple: #8b5cf6;
+  --fun-red: #ef4444;
+  --fun-cyan: #06b6d4;
+  --bg: #fef9ee;
+  --card: #ffffff;
+  --dark: #1e293b;
+  --muted: #64748b;
+  --radius: 20px;
+  --shadow: 0 6px 24px rgba(0,0,0,0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--dark);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* === HEADER === */
+.pg-header {
+  background: linear-gradient(135deg, var(--fun-orange) 0%, var(--fun-yellow) 100%);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(249,115,22,0.25);
+}
+.pg-header h1 {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.pg-header .back-link {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* === ROAD DECORATION === */
+.road-deco {
+  height: 8px;
+  background: repeating-linear-gradient(90deg, #94a3b8 0, #94a3b8 30px, transparent 30px, transparent 50px);
+  opacity: 0.25;
+}
+
+/* === GAME MENU === */
+.game-menu {
+  padding: 20px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.game-tile {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px 14px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  border: 3px solid transparent;
+  text-decoration: none;
+  color: var(--dark);
+  position: relative;
+  overflow: hidden;
+}
+.game-tile:active { transform: scale(0.96); }
+.game-tile:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+
+.game-tile .gt-emoji {
+  font-size: 2.8rem;
+  display: block;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.1));
+}
+.game-tile .gt-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.game-tile .gt-age {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.game-tile .gt-blob {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  opacity: 0.1;
+  top: -20px;
+  right: -20px;
+}
+
+.gt-c1 { border-color: #fde68a; }
+.gt-c1 .gt-blob { background: var(--fun-yellow); }
+.gt-c2 { border-color: #bbf7d0; }
+.gt-c2 .gt-blob { background: var(--fun-green); }
+.gt-c3 { border-color: #c7d2fe; }
+.gt-c3 .gt-blob { background: var(--fun-blue); }
+.gt-c4 { border-color: #fecdd3; }
+.gt-c4 .gt-blob { background: var(--fun-pink); }
+.gt-c5 { border-color: #ddd6fe; }
+.gt-c5 .gt-blob { background: var(--fun-purple); }
+.gt-c6 { border-color: #a5f3fc; }
+.gt-c6 .gt-blob { background: var(--fun-cyan); }
+
+/* === GAME SCREEN === */
+.game-screen {
+  display: none;
+  padding: 16px;
+  max-width: 500px;
+  margin: 0 auto;
+  animation: slideUp 0.3s ease;
+}
+.game-screen.active { display: block; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.game-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0,0,0,0.06);
+  border: none;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  margin-bottom: 14px;
+  transition: background 0.15s;
+}
+.game-back:hover { background: rgba(0,0,0,0.1); }
+
+.game-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.game-subtitle {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+/* === BINGO GRID === */
+.bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.bingo-cell {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 10px 4px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2.5px solid #e2e8f0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.bingo-cell .bc-emoji { font-size: 1.6rem; display: block; }
+.bingo-cell .bc-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-top: 2px;
+  line-height: 1.2;
+}
+
+.bingo-cell.found {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  border-color: var(--fun-green);
+  transform: scale(0.95);
+}
+.bingo-cell.found .bc-emoji { filter: none; }
+.bingo-cell.found .bc-label { color: #166534; font-weight: 700; }
+
+.bingo-cell.found::after {
+  content: '✓';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--fun-green);
+  color: #fff;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bingo-cell { position: relative; }
+
+/* === PROGRESS BAR === */
+.progress-wrap {
+  background: #e2e8f0;
+  border-radius: 20px;
+  height: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 20px;
+  background: linear-gradient(90deg, var(--fun-green), #4ade80);
+  transition: width 0.4s ease;
+  width: 0%;
+}
+.progress-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+/* === QUIZ / IK ZIE === */
+.quiz-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+
+.quiz-question {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.quiz-hint {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.quiz-opt {
+  background: #f1f5f9;
+  border: 2.5px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--dark);
+  text-align: center;
+}
+.quiz-opt:active { transform: scale(0.96); }
+.quiz-opt.correct {
+  background: #dcfce7;
+  border-color: var(--fun-green);
+  color: #166534;
+}
+.quiz-opt.wrong {
+  background: #fee2e2;
+  border-color: var(--fun-red);
+  color: #991b1b;
+}
+
+.quiz-next {
+  display: none;
+  margin: 14px auto 0;
+  padding: 12px 32px;
+  background: var(--fun-blue);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.quiz-next:hover { background: #2563eb; }
+.quiz-next.visible { display: inline-block; }
+
+/* === IK ZIE CARD === */
+.ikzie-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ikzie-emoji { font-size: 3.5rem; margin-bottom: 10px; }
+.ikzie-text {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--dark);
+}
+.ikzie-hint {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.ikzie-btn {
+  margin-top: 16px;
+  padding: 14px 36px;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.ikzie-btn:active { transform: scale(0.95); }
+
+/* === TELLER SPEL === */
+.teller-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.teller-item {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px 10px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 3px solid #e2e8f0;
+}
+
+.teller-emoji { font-size: 2rem; display: block; margin-bottom: 4px; }
+.teller-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.teller-count {
+  font-family: 'Baloo 2', cursive;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--dark);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.teller-btns { display: flex; gap: 6px; justify-content: center; }
+.teller-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  color: var(--dark);
+}
+.teller-btn:active { transform: scale(0.9); background: #e2e8f0; }
+
+/* === STORY GAME === */
+.story-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+.story-prompt {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.story-sub {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+/* === RESET BTN === */
+.reset-btn {
+  display: block;
+  margin: 8px auto 24px;
+  padding: 10px 28px;
+  background: #f1f5f9;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.reset-btn:hover { background: #e2e8f0; }
+
+/* === CONFETTI === */
+.confetti-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+.confetti-overlay.show { display: block; }
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation: confettiFall 2s ease forwards;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* === SCORE BANNER === */
+.score-banner {
+  background: linear-gradient(135deg, var(--fun-green), #4ade80);
+  color: #fff;
+  text-align: center;
+  padding: 16px;
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  font-family: 'Baloo 2', cursive;
+  box-shadow: 0 4px 16px rgba(34,197,94,0.3);
+}
+.score-banner .sb-big { font-size: 2rem; font-weight: 800; }
+.score-banner .sb-text { font-size: 0.9rem; opacity: 0.9; }
+
+/* === SCORE OVERLAY === */
+.score-overlay { display:none; position:fixed; top:0;left:0;right:0;bottom:0; z-index:9000; background:rgba(0,0,0,0.4); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); justify-content:center; align-items:center; padding:24px; }
+.score-overlay.open { display:flex; }
+.score-form { background:var(--card); border-radius:var(--radius); padding:28px 24px; width:100%; max-width:360px; box-shadow:0 20px 60px rgba(0,0,0,0.2); animation:popIn 0.25s ease; text-align:center; }
+@keyframes popIn { from{transform:scale(0.9);opacity:0;} to{transform:scale(1);opacity:1;} }
+.score-form h2 { font-family:'Baloo 2',cursive; font-size:1.4rem; margin-bottom:4px; }
+.score-form p { font-size:0.82rem; color:var(--muted); margin-bottom:18px; }
+.player-inputs { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+.player-row { display:flex; align-items:center; gap:10px; }
+.player-dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,0.15); }
+.player-row input { flex:1; padding:12px 14px; border:2.5px solid #e2e8f0; border-radius:12px; font-family:'Outfit',sans-serif; font-size:1rem; font-weight:500; outline:none; }
+.player-row input:focus { border-color:var(--fun-blue); }
+.score-form-btns { display:flex; gap:8px; }
+.sf-btn { flex:1; padding:12px; border:none; border-radius:14px; font-family:'Baloo 2',cursive; font-size:1rem; font-weight:700; cursor:pointer; }
+.sf-btn:active { transform:scale(0.96); }
+.sf-btn-start { background:var(--fun-green); color:#fff; }
+.sf-btn-skip { background:#f1f5f9; color:var(--muted); }
+
+/* === SCOREBOARD === */
+.scoreboard { display:none; background:linear-gradient(135deg,#1e293b,#334155); border-radius:16px; padding:12px 16px; margin-bottom:14px; color:#fff; }
+.scoreboard.visible { display:block; }
+.scoreboard-title { font-size:0.68rem; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:8px; font-weight:600; }
+.sb-players { display:flex; gap:8px; }
+.sb-player { flex:1; text-align:center; background:rgba(255,255,255,0.08); border-radius:12px; padding:8px 6px; }
+.sb-player-name { font-size:0.72rem; font-weight:600; opacity:0.7; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sb-player-score { font-family:'Baloo 2',cursive; font-size:1.6rem; font-weight:800; line-height:1; }
+.sb-player-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:3px; vertical-align:middle; }
+
+/* === POINT BUTTONS === */
+.point-buttons { display:flex; gap:4px; margin-top:6px; justify-content:center; }
+.point-btn { padding:3px 10px; border-radius:20px; border:2px solid; background:#fff; font-size:0.65rem; font-weight:700; cursor:pointer; font-family:'Outfit',sans-serif; }
+.point-btn:active { transform:scale(0.92); }
+.point-btn.p0 { border-color:var(--player1); color:var(--player1); }
+.point-btn.p0.active,.point-btn.p0:hover { background:var(--player1); color:#fff; }
+.point-btn.p1 { border-color:var(--player2); color:var(--player2); }
+.point-btn.p1.active,.point-btn.p1:hover { background:var(--player2); color:#fff; }
+.point-btn.p2 { border-color:var(--player3); color:var(--player3); }
+.point-btn.p2.active,.point-btn.p2:hover { background:var(--player3); color:#fff; }
+
+/* === FOUND BY MARKER === */
+.bingo-cell .found-by { position:absolute; top:-5px; right:-5px; width:18px; height:18px; border-radius:50%; font-size:9px; font-weight:800; color:#fff; display:none; align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,0.2); }
+.bingo-cell.found .found-by { display:flex; }
+
+/* === IK ZIE WHO === */
+.ikzie-who { display:none; gap:6px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+.ikzie-who.visible { display:flex; }
+.ikzie-who-label { font-size:0.78rem; color:var(--muted); font-weight:600; width:100%; text-align:center; margin-bottom:2px; }
+.ikzie-point-btn { padding:8px 20px; border-radius:50px; border:2.5px solid; background:#fff; font-family:'Outfit',sans-serif; font-size:0.85rem; font-weight:700; cursor:pointer; }
+
+/* === QUIZ WHO === */
+.quiz-who { display:none; gap:6px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
+.quiz-who.visible { display:flex; }
+.quiz-who-label { font-size:0.75rem; color:var(--muted); font-weight:600; width:100%; margin-bottom:2px; text-align:center; }
+
+/* === PODIUM === */
+.podium { margin-top:12px; display:flex; gap:8px; justify-content:center; }
+.podium-place { background:rgba(255,255,255,0.2); border-radius:12px; padding:8px 14px; text-align:center; min-width:70px; }
+.podium-medal { font-size:1.3rem; }
+.podium-name { font-size:0.78rem; font-weight:700; }
+.podium-pts { font-size:0.7rem; opacity:0.8; }
+
+/* === PLAYER COLORS === */
+:root { --player1:#ef4444; --player2:#3b82f6; --player3:#f59e0b; }
+
+
+/* === HALL OF FAME === */
+.hall-of-fame {
+  margin: 0 16px 16px;
+  max-width: 468px;
+  margin-left: auto;
+  margin-right: auto;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: 20px;
+  padding: 20px;
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+}
+.hof-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 14px;
+}
+.hof-players { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.hof-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.hof-medal { font-size: 1.2rem; width: 28px; text-align: center; }
+.hof-name { flex: 1; font-weight: 700; font-size: 1rem; }
+.hof-score {
+  font-family: 'Baloo 2', cursive;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+.hof-games {
+  text-align: center;
+  font-size: 0.75rem;
+  opacity: 0.5;
+  margin-bottom: 10px;
+}
+.hof-reset {
+  display: block;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.5);
+  padding: 6px 18px;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.hof-reset:hover { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+</style>
+</head>
+
+<body>
+
+<header class="app-header no-logo">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="verblijf.html">🏡 Verblijf</a>
+  <a href="meenemen.html">🎒 Meenemen</a>
+  <a href="onderweg.html">🚗 Onderweg</a>
+  <a href="ski.html">🎿 Ski</a>
+  <a href="boodschappen.html">🛒 Boodschappen</a>
+  <a href="fotos.html">📸 Foto's</a>
+  <a href="bingo.html">🎲 Bingo</a>
+  <a href="sos.html">🚨 SOS</a>
+</nav>
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<div class="pg-header">
+  <h1>🚗 Autospellen</h1>
+  <a href="index.html" class="back-link">← Home</a>
+</div>
+<div class="road-deco"></div>
+<!-- ============ SCORE FORMULIER OVERLAY ============ -->
+<div class="score-overlay" id="scoreOverlay">
+  <div class="score-form">
+    <h2>👦👧 Wie spelen er mee?</h2>
+    <p>Vul de namen in (max 3). Laat leeg als er minder spelen.</p>
+    <div class="player-inputs">
+      <div class="player-row">
+        <div class="player-dot" style="background:var(--player1)"></div>
+        <input type="text" id="pName0" placeholder="Speler 1" maxlength="12" autocomplete="off">
+      </div>
+      <div class="player-row">
+        <div class="player-dot" style="background:var(--player2)"></div>
+        <input type="text" id="pName1" placeholder="Speler 2" maxlength="12" autocomplete="off">
+      </div>
+      <div class="player-row">
+        <div class="player-dot" style="background:var(--player3)"></div>
+        <input type="text" id="pName2" placeholder="Speler 3 (optioneel)" maxlength="12" autocomplete="off">
+      </div>
+    </div>
+    <div class="score-form-btns">
+      <button class="sf-btn sf-btn-skip" onclick="skipScoring()">Zonder score</button>
+      <button class="sf-btn sf-btn-start" onclick="startWithPlayers()">Start! 🎮</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============ GAME MENU ============ -->
+<div class="game-menu" id="gameMenu">
+  <div class="game-tile gt-c1" onclick="requestGame('autobingo')">
+    <div class="gt-blob"></div>
+    <span class="gt-emoji">🚗</span>
+    <div class="gt-title">Auto Bingo</div>
+    <div class="gt-age">Zoek alles op de weg!</div>
+  </div>
+  <div class="game-tile gt-c2" onclick="requestGame('autojacht')">
+    <div class="gt-blob"></div>
+    <span class="gt-emoji">🏎️</span>
+    <div class="gt-title">Auto­jacht</div>
+    <div class="gt-age">Kleuren & soorten zoeken!</div>
+  </div>
+  <div class="game-tile gt-c3" onclick="requestGame('ikzie')">
+    <div class="gt-blob"></div>
+    <span class="gt-emoji">👀</span>
+    <div class="gt-title">Ik Zie Ik Zie</div>
+    <div class="gt-age">Zoek-opdrachten!</div>
+  </div>
+  <div class="game-tile gt-c4" onclick="requestGame('quiz')">
+    <div class="gt-blob"></div>
+    <span class="gt-emoji">🧠</span>
+    <div class="gt-title">Reis Quiz</div>
+    <div class="gt-age">Ken jij alle landen?</div>
+  </div>
+  <div class="game-tile gt-c5" onclick="requestGame('teller')">
+    <div class="gt-blob"></div>
+    <span class="gt-emoji">🔢</span>
+    <div class="gt-title">Tel Wedstrijd</div>
+    <div class="gt-age">Wie telt de meeste?</div>
+  </div>
+  <div class="game-tile gt-c6" onclick="requestGame('verhaal')">
+    <div class="gt-blob"></div>
+    <span class="gt-emoji">📖</span>
+    <div class="gt-title">Gekke Verhalen</div>
+    <div class="gt-age">Samen een verhaal!</div>
+  </div>
+</div>
+
+<!-- ============ HALL OF FAME ============ -->
+<div class="hall-of-fame" id="hallOfFame" style="display:none;"></div>
+
+<!-- ============ GAME: AUTO BINGO ============ -->
+<div class="game-screen" id="game-autobingo">
+  <button class="game-back" onclick="backToMenu()">← Terug</button>
+  <div class="game-title">🚗 Auto Bingo</div>
+  <div class="game-subtitle">Tik op iets dat je ziet. Kies dan wie het als eerste zag!</div>
+  <div class="scoreboard" id="sb-autobingo"><div class="scoreboard-title">🏆 Score</div><div class="sb-players" id="sbp-autobingo"></div></div>
+  <div class="progress-wrap"><div class="progress-fill" id="bingo-progress"></div></div>
+  <div class="progress-text" id="bingo-progress-text">0 / 16 gevonden</div>
+  <div class="bingo-grid" id="bingoGrid"></div>
+  <button class="reset-btn" onclick="initBingo()">🔄 Nieuw spel</button>
+</div>
+
+<!-- ============ GAME: AUTOJACHT ============ -->
+<div class="game-screen" id="game-autojacht">
+  <button class="game-back" onclick="backToMenu()">← Terug</button>
+  <div class="game-title">🏎️ Autojacht</div>
+  <div class="game-subtitle">Zoek auto's met deze kleur of van dit type! Wie vindt ze het eerst?</div>
+  <div class="scoreboard" id="sb-autojacht"><div class="scoreboard-title">🏆 Score</div><div class="sb-players" id="sbp-autojacht"></div></div>
+  <div class="progress-wrap"><div class="progress-fill" id="jacht-progress"></div></div>
+  <div class="progress-text" id="jacht-progress-text">0 / 16</div>
+  <div class="bingo-grid" id="jachtGrid"></div>
+  <button class="reset-btn" onclick="initJacht()">🔄 Nieuw spel</button>
+</div>
+
+<!-- ============ GAME: IK ZIE IK ZIE ============ -->
+<div class="game-screen" id="game-ikzie">
+  <button class="game-back" onclick="backToMenu()">← Terug</button>
+  <div class="game-title">👀 Ik Zie Ik Zie</div>
+  <div class="game-subtitle">Lees de opdracht voor — wie vindt het als eerste?</div>
+  <div class="scoreboard" id="sb-ikzie"><div class="scoreboard-title">🏆 Score</div><div class="sb-players" id="sbp-ikzie"></div></div>
+  <div class="ikzie-card" id="ikzieCard">
+    <div class="ikzie-emoji" id="ikzieEmoji">👀</div>
+    <div class="ikzie-text" id="ikzieText">Druk op de knop!</div>
+  </div>
+  <div class="ikzie-who" id="ikzieWho"></div>
+  <button class="ikzie-btn" style="background:var(--fun-pink);" onclick="nextIkZie()">Volgende opdracht!</button>
+</div>
+
+<!-- ============ GAME: REIS QUIZ ============ -->
+<div class="game-screen" id="game-quiz">
+  <button class="game-back" onclick="backToMenu()">← Terug</button>
+  <div class="game-title">🧠 Reis Quiz</div>
+  <div class="game-subtitle">Wie weet het antwoord? Geef een punt aan wie het goed had!</div>
+  <div class="scoreboard" id="sb-quiz"><div class="scoreboard-title">🏆 Score</div><div class="sb-players" id="sbp-quiz"></div></div>
+  <div id="quizScore" class="score-banner" style="display:none;"></div>
+  <div class="quiz-card" id="quizCard"></div>
+  <div class="quiz-who" id="quizWho"></div>
+  <button class="quiz-next" id="quizNext" onclick="nextQuiz()">Volgende vraag →</button>
+</div>
+
+<!-- ============ GAME: TEL WEDSTRIJD ============ -->
+<div class="game-screen" id="game-teller">
+  <button class="game-back" onclick="backToMenu()">← Terug</button>
+  <div class="game-title">🔢 Tel Wedstrijd</div>
+  <div class="game-subtitle">Ieder kiest iets om te tellen. Wie ziet er het meeste?</div>
+  <div class="teller-wrap" id="tellerWrap"></div>
+  <button class="reset-btn" onclick="initTeller()">🔄 Reset tellers</button>
+</div>
+
+<!-- ============ GAME: GEKKE VERHALEN ============ -->
+<div class="game-screen" id="game-verhaal">
+  <button class="game-back" onclick="backToMenu()">← Terug</button>
+  <div class="game-title">📖 Gekke Verhalen</div>
+  <div class="game-subtitle">Om de beurt een zin toevoegen. Hoe gekker, hoe beter!</div>
+  <div class="story-card">
+    <div class="story-prompt" id="storyPrompt"></div>
+    <div class="story-sub" id="storySub"></div>
+  </div>
+  <button class="ikzie-btn" style="background:var(--fun-purple);" onclick="nextStory()">Nieuw begin!</button>
+</div>
+
+<!-- CONFETTI -->
+<div class="confetti-overlay" id="confetti"></div>
+
+<script>
+const PCOLORS_HEX = ['#ef4444','#3b82f6','#f59e0b'];
+let players = [];
+let pendingGame = '';
+let useScoring = false;
+
+// ===== PERSISTENT TOTAL SCORES =====
+let totalScores = JSON.parse(localStorage.getItem('dijk-spellen-totaal') || '{}');
+let gameHistory = JSON.parse(localStorage.getItem('dijk-spellen-history') || '[]');
+
+function saveTotals() {
+  localStorage.setItem('dijk-spellen-totaal', JSON.stringify(totalScores));
+  localStorage.setItem('dijk-spellen-history', JSON.stringify(gameHistory));
+}
+
+function addToTotals(gameName) {
+  if (!useScoring || players.length === 0) return;
+  const entry = { game: gameName, time: Date.now(), scores: {} };
+  players.forEach(p => {
+    if (!totalScores[p.name]) totalScores[p.name] = 0;
+    totalScores[p.name] += p.score;
+    entry.scores[p.name] = p.score;
+  });
+  gameHistory.push(entry);
+  saveTotals();
+}
+
+// ===== LOAD SAVED NAMES =====
+const savedNames = JSON.parse(localStorage.getItem('dijk-spellen-namen') || '["","",""]');
+window.addEventListener('DOMContentLoaded', () => {
+  for (let i = 0; i < 3; i++) if (savedNames[i]) document.getElementById('pName'+i).value = savedNames[i];
+  renderHallOfFame();
+});
+
+// ===== HALL OF FAME RENDER =====
+function renderHallOfFame() {
+  const el = document.getElementById('hallOfFame');
+  const entries = Object.entries(totalScores).filter(([n,s]) => s > 0).sort((a,b) => b[1] - a[1]);
+  if (entries.length === 0) {
+    el.style.display = 'none'; return;
+  }
+  el.style.display = 'block';
+  const medals = ['🥇','🥈','🥉'];
+  const colors = {};
+  // Match colors to saved names
+  const sn = JSON.parse(localStorage.getItem('dijk-spellen-namen') || '["","",""]');
+  sn.forEach((n,i) => { if(n) colors[n] = PCOLORS_HEX[i]; });
+
+  el.innerHTML = `
+    <div class="hof-title">🏆 Totaalstand reis</div>
+    <div class="hof-players">${entries.map(([name, score], i) => `
+      <div class="hof-player">
+        <span class="hof-medal">${medals[i]||'  '}</span>
+        <span class="hof-name" style="color:${colors[name]||'#fff'}">${name}</span>
+        <span class="hof-score">${score}</span>
+      </div>`).join('')}
+    </div>
+    <div class="hof-games">${gameHistory.length} spel${gameHistory.length!==1?'len':''} gespeeld</div>
+    <button class="hof-reset" onclick="resetTotals()">Wis totaalstand</button>
+  `;
+}
+
+function resetTotals() {
+  if (!confirm('Weet je zeker dat je de totaalstand wilt wissen?')) return;
+  totalScores = {};
+  gameHistory = [];
+  saveTotals();
+  renderHallOfFame();
+}
+
+// ===== GAME FLOW =====
+function requestGame(id) { pendingGame = id; document.getElementById('scoreOverlay').classList.add('open'); }
+
+function startWithPlayers() {
+  players = []; const names = [];
+  for (let i = 0; i < 3; i++) { const n = document.getElementById('pName'+i).value.trim(); names.push(n); if (n) players.push({name:n,score:0}); }
+  localStorage.setItem('dijk-spellen-namen', JSON.stringify(names));
+  if (players.length === 0) players.push({name:'Speler 1',score:0});
+  useScoring = true;
+  document.getElementById('scoreOverlay').classList.remove('open');
+  launchGame(pendingGame);
+}
+
+function skipScoring() { players = []; useScoring = false; document.getElementById('scoreOverlay').classList.remove('open'); launchGame(pendingGame); }
+
+function launchGame(id) {
+  document.getElementById('gameMenu').style.display = 'none';
+  document.getElementById('hallOfFame').style.display = 'none';
+  document.getElementById('game-'+id).classList.add('active');
+  window.scrollTo(0,0);
+  players.forEach(p => p.score = 0);
+  const sb = document.getElementById('sb-'+id);
+  if (sb) { if (useScoring && players.length > 0) { sb.classList.add('visible'); renderScoreboard(id); } else { sb.classList.remove('visible'); } }
+  if (id==='autobingo') initBingo();
+  if (id==='autojacht') initJacht();
+  if (id==='ikzie') nextIkZie();
+  if (id==='quiz') initQuiz();
+  if (id==='teller') initTeller();
+  if (id==='verhaal') nextStory();
+}
+
+function backToMenu() {
+  // Save scores of current game if applicable
+  const activeGame = document.querySelector('.game-screen.active');
+  if (activeGame && useScoring && players.length > 0) {
+    const hasPoints = players.some(p => p.score > 0);
+    if (hasPoints) {
+      const gameNames = {'game-autobingo':'Auto Bingo','game-autojacht':'Autojacht','game-ikzie':'Ik Zie Ik Zie','game-quiz':'Reis Quiz','game-teller':'Tel Wedstrijd','game-verhaal':'Verhalen'};
+      addToTotals(gameNames[activeGame.id] || 'Spel');
+    }
+  }
+  document.querySelectorAll('.game-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('gameMenu').style.display='grid';
+  renderHallOfFame();
+  window.scrollTo(0,0);
+}
+
+function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); document.getElementById('menuOverlay').classList.toggle('show'); }
+
+function renderScoreboard(gid) {
+  const w = document.getElementById('sbp-'+gid);
+  if (!w||!useScoring) return;
+  w.innerHTML = players.map((p,i) => `<div class="sb-player"><div class="sb-player-name"><span class="sb-player-dot" style="background:${PCOLORS_HEX[i]}"></span>${p.name}</div><div class="sb-player-score" style="color:${PCOLORS_HEX[i]}">${p.score}</div></div>`).join('');
+}
+
+function addPoint(pi, gid) { if (pi<0||pi>=players.length) return; players[pi].score++; renderScoreboard(gid); }
+
+function showWinner(cid) {
+  if (!useScoring||players.length===0) return;
+  const sorted = [...players].sort((a,b)=>b.score-a.score);
+  const medals = ['🥇','🥈','🥉'];
+  const el = document.getElementById(cid); if (!el) return;
+  el.style.display = 'block';
+  el.innerHTML = '<div class="sb-big">🏆 Uitslag!</div><div class="podium">' + sorted.map((p,i) => `<div class="podium-place"><div class="podium-medal">${medals[i]||''}</div><div class="podium-name">${p.name}</div><div class="podium-pts">${p.score} pt</div></div>`).join('') + '</div>';
+  // Auto-save totals
+  const gameNames = {'quizEndScore':'Reis Quiz'};
+  addToTotals(gameNames[cid] || 'Spel');
+  showConfetti();
+}
+
+// ===== 1. AUTO BINGO =====
+const BINGO_ITEMS = [
+  ['🚛','Vrachtwagen'],['🏍️','Motor'],['🚌','Bus'],['🚜','Tractor'],
+  ['🚒','Brandweer'],['🚑','Ambulance'],['🚓','Politie'],['⛽','Tankstation'],
+  ['🐄','Koe in wei'],['🐴','Paard'],['🌈','Regenboog'],['💨','Tunnel'],
+  ['🏔️','Bergen'],['⛪','Kerk'],['🌉','Brug'],['🎡','Windmolen'],
+  ['✈️','Vliegtuig'],['🚲','Fiets op auto'],['🏕️','Caravan'],['🚃','Trein'],
+  ['🦅','Roofvogel'],['🏰','Kasteel'],['🎪','Tent'],['🚧','Wegwerk'],
+  ['🐑','Schapen'],['🚐','Camper'],['⛵','Boot'],['🌻','Zonnebloemveld'],
+  ['🏭','Fabriek'],['🎈','Ballon'],['🚂','Goederentrein'],['🐕','Hond in auto']
+];
+let bingoState = [];
+
+function initBingo() {
+  bingoState = [...BINGO_ITEMS].sort(()=>Math.random()-0.5).slice(0,16).map(([e,l])=>({emoji:e,label:l,found:false,foundBy:-1}));
+  players.forEach(p=>p.score=0); renderScoreboard('autobingo'); renderBingo();
+}
+function renderBingo() {
+  const g = document.getElementById('bingoGrid');
+  g.innerHTML = bingoState.map((item,i) => {
+    const c = item.foundBy>=0 ? PCOLORS_HEX[item.foundBy] : '#22c55e';
+    const init = item.foundBy>=0&&players[item.foundBy] ? players[item.foundBy].name[0] : '✓';
+    return `<div class="bingo-cell ${item.found?'found':''}" onclick="${item.found?'untoggleBingo('+i+')':'toggleBingo('+i+')'}"><span class="bc-emoji">${item.emoji}</span><span class="bc-label">${item.label}</span><div class="found-by" style="background:${c}">${init}</div></div>`;
+  }).join('');
+  const f = bingoState.filter(i=>i.found).length;
+  document.getElementById('bingo-progress').style.width = (f/16*100)+'%';
+  document.getElementById('bingo-progress-text').textContent = f+' / 16';
+  if (f===16) { addToTotals('Auto Bingo'); showConfetti(); }
+}
+function toggleBingo(i) {
+  if (useScoring && players.length > 1) {
+    const cell = document.getElementById('bingoGrid').children[i];
+    cell.innerHTML = `<span class="bc-emoji">${bingoState[i].emoji}</span><span class="bc-label" style="color:var(--fun-blue);font-weight:700">Wie zag het?</span><div class="point-buttons" style="margin-top:4px">${players.map((p,pi)=>`<button class="point-btn p${pi}" onclick="event.stopPropagation();claimBingo(${i},${pi})">${p.name}</button>`).join('')}</div>`;
+  } else { bingoState[i].found=true; bingoState[i].foundBy=players.length===1?0:-1; if(players.length===1)addPoint(0,'autobingo'); renderBingo(); }
+}
+function claimBingo(i,pi) { bingoState[i].found=true; bingoState[i].foundBy=pi; addPoint(pi,'autobingo'); renderBingo(); }
+function untoggleBingo(i) { if(bingoState[i].foundBy>=0&&useScoring){players[bingoState[i].foundBy].score=Math.max(0,players[bingoState[i].foundBy].score-1);} bingoState[i].found=false; bingoState[i].foundBy=-1; renderScoreboard('autobingo'); renderBingo(); }
+
+// ===== 2. AUTOJACHT =====
+const JACHT_ITEMS = [
+  ['🔴','Rode auto'],['🔵','Blauwe auto'],['⚪','Witte auto'],['⚫','Zwarte auto'],
+  ['🟡','Gele auto'],['🟢','Groene auto'],['🟠','Oranje auto'],['🩶','Grijze auto'],
+  ['🚛','Vrachtwagen'],['🚌','Bus'],['🚐','Busje'],['🏍️','Motor'],
+  ['🚜','Tractor'],['🏎️','Sportwagen'],['🚙','SUV / jeep'],['🚗','Cabrio'],
+  ['🚒','Brandweerauto'],['🚑','Ambulance'],['🚓','Politieauto'],['🏕️','Caravan'],
+  ['🚚','Vuilniswagen'],['🛻','Pick-up truck'],['🛵','Scooter'],['🚲','Fietser']
+];
+let jachtState = [];
+
+function initJacht() {
+  jachtState = [...JACHT_ITEMS].sort(()=>Math.random()-0.5).slice(0,16).map(([e,l])=>({emoji:e,label:l,found:false,foundBy:-1}));
+  players.forEach(p=>p.score=0); renderScoreboard('autojacht'); renderJacht();
+}
+function renderJacht() {
+  const g = document.getElementById('jachtGrid');
+  g.innerHTML = jachtState.map((item,i) => {
+    const c = item.foundBy>=0 ? PCOLORS_HEX[item.foundBy] : '#22c55e';
+    const init = item.foundBy>=0&&players[item.foundBy] ? players[item.foundBy].name[0] : '✓';
+    return `<div class="bingo-cell ${item.found?'found':''}" onclick="${item.found?'untoggleJacht('+i+')':'toggleJacht('+i+')'}"><span class="bc-emoji">${item.emoji}</span><span class="bc-label">${item.label}</span><div class="found-by" style="background:${c}">${init}</div></div>`;
+  }).join('');
+  const f = jachtState.filter(i=>i.found).length;
+  document.getElementById('jacht-progress').style.width = (f/16*100)+'%';
+  document.getElementById('jacht-progress-text').textContent = f+' / 16';
+  if (f===16) { addToTotals('Autojacht'); showConfetti(); }
+}
+function toggleJacht(i) {
+  if (useScoring && players.length > 1) {
+    const cell = document.getElementById('jachtGrid').children[i];
+    cell.innerHTML = `<span class="bc-emoji">${jachtState[i].emoji}</span><span class="bc-label" style="color:var(--fun-blue);font-weight:700">Wie zag het?</span><div class="point-buttons" style="margin-top:4px">${players.map((p,pi)=>`<button class="point-btn p${pi}" onclick="event.stopPropagation();claimJacht(${i},${pi})">${p.name}</button>`).join('')}</div>`;
+  } else { jachtState[i].found=true; jachtState[i].foundBy=players.length===1?0:-1; if(players.length===1)addPoint(0,'autojacht'); renderJacht(); }
+}
+function claimJacht(i,pi) { jachtState[i].found=true; jachtState[i].foundBy=pi; addPoint(pi,'autojacht'); renderJacht(); }
+function untoggleJacht(i) { if(jachtState[i].foundBy>=0&&useScoring){players[jachtState[i].foundBy].score=Math.max(0,players[jachtState[i].foundBy].score-1);} jachtState[i].found=false; jachtState[i].foundBy=-1; renderScoreboard('autojacht'); renderJacht(); }
+
+// ===== 3. IK ZIE IK ZIE =====
+const IKZIE_ITEMS = [
+  ['🔴','Wie ziet als eerste iets ROODS buiten de auto?'],['🔵','Zoek iets wat BLAUW is en beweegt!'],
+  ['🟢','Vind 3 groene dingen!'],['🐕','Wie ziet als eerste een HOND?'],
+  ['🔢','Zoek een nummerbord met een 7 erin!'],['🏠','Vind een huis met een ROOD dak!'],
+  ['🚗','Zoek een auto in dezelfde kleur als de onze!'],['👋','Zwaai naar iemand in een andere auto!'],
+  ['🌳','Tel hoeveel bomen je in 10 seconden ziet!'],['✨','Zoek iets dat GLINSTERT in de zon!'],
+  ['🔤','Vind alle letters van je naam op nummerborden!'],['🏔️','Wie ziet als eerste SNEEUW op een berg?'],
+  ['🐦','Zoek een vogel die vliegt!'],['🟡','Vind een GELE auto!'],['🏗️','Zoek een bouwkraan!'],
+  ['🌊','Wie ziet als eerste water?'],['🐮','Tel zoveel mogelijk koeien in 1 minuut!'],
+  ['📫','Vind een brievenbus langs de weg!'],['🏳️','Zoek een vlag!'],['🎵','Zoek iets waar geluid uit komt!'],
+  ['⭐','Vind iets met een ster erop!'],['🚲','Zoek een fietser!'],['👓','Vind iemand met een zonnebril!'],
+  ['🎄','Zoek een dennenboom!'],['🏰','Wie ziet als eerste een kasteel?'],['🚁','Zoek een helikopter!'],
+  ['🌸','Vind iets roze!'],['🔺','Zoek een driehoekig verkeersbord!'],['🐈','Zoek een kat!'],['🏪','Vind een winkel die je kent!']
+];
+let ikzieUsed = [];
+
+function nextIkZie() {
+  if (ikzieUsed.length >= IKZIE_ITEMS.length) ikzieUsed = [];
+  let idx; do { idx = Math.floor(Math.random()*IKZIE_ITEMS.length); } while (ikzieUsed.includes(idx));
+  ikzieUsed.push(idx);
+  const [emoji,text] = IKZIE_ITEMS[idx];
+  document.getElementById('ikzieEmoji').textContent = emoji;
+  document.getElementById('ikzieText').textContent = text;
+  const whoDiv = document.getElementById('ikzieWho');
+  if (useScoring && players.length > 0) {
+    whoDiv.classList.add('visible');
+    whoDiv.innerHTML = '<span class="ikzie-who-label">Wie vond het als eerste?</span>' + players.map((p,i) => `<button class="ikzie-point-btn" style="border-color:${PCOLORS_HEX[i]};color:${PCOLORS_HEX[i]};" onclick="this.style.background='${PCOLORS_HEX[i]}';this.style.color='#fff';addPoint(${i},'ikzie')">${p.name}</button>`).join('');
+  } else { whoDiv.classList.remove('visible'); }
+  const card = document.getElementById('ikzieCard'); card.style.animation='none'; card.offsetHeight; card.style.animation='slideUp 0.3s ease';
+}
+
+// ===== 4. REIS QUIZ =====
+const QUIZ_DATA = [
+  {q:'Door welk land rijden we naar Oostenrijk?',o:['België','Duitsland','Frankrijk','Denemarken'],a:1},
+  {q:'Welk dier staat op het wapen van Oostenrijk?',o:['Beer','Leeuw','Adelaar','Wolf'],a:2},
+  {q:'Hoe zeg je "Hallo" in het Duits?',o:['Bonjour','Hallo','Ciao','Hola'],a:1},
+  {q:'Wat is de hoofdstad van Oostenrijk?',o:['München','Salzburg','Wenen','Innsbruck'],a:2},
+  {q:'Welke kleur heeft sneeuw?',o:['Blauw','Wit','Grijs','Doorzichtig'],a:1},
+  {q:'Waarmee glij je een berg af?',o:['Surfboard','Step','Ski','Vliegtuig'],a:2},
+  {q:'In welk land staat de Eiffeltoren?',o:['Engeland','Nederland','Duitsland','Frankrijk'],a:3},
+  {q:'Hoeveel wielen heeft een auto?',o:['2','3','4','6'],a:2},
+  {q:'Welk dier zegt "Moe"?',o:['Schaap','Koe','Paard','Geit'],a:1},
+  {q:'Wat smelt als het warm wordt?',o:['Steen','Sneeuw','Hout','Gras'],a:1},
+  {q:'Welke kleur heeft een banaan?',o:['Rood','Groen','Geel','Paars'],a:2},
+  {q:'Hoe noem je een heel hoge berg?',o:['Heuvel','Alp','Duin','Klif'],a:1},
+  {q:'In welk land wonen wij?',o:['België','Nederland','Duitsland','Luxemburg'],a:1},
+  {q:'Wat draag je tegen de zon op de piste?',o:['Paraplu','Zonnebril','Pet','Sjaal'],a:1},
+  {q:'Hoe heet veel sneeuw tegelijk?',o:['Hagelbui','Sneeuwstorm','Regenbui','Motregen'],a:1},
+  {q:'Welk getal komt na 99?',o:['98','999','100','101'],a:2},
+  {q:'Hoeveel dagen gaan we op wintersport?',o:['3','5','7','10'],a:2},
+  {q:'Waar drink je warme choco na het skiën?',o:['Op de piste','In de skilift','In de berghut','In de sneeuw'],a:2}
+];
+let quizState = {questions:[],current:0,score:0};
+
+function initQuiz() {
+  quizState.questions=[...QUIZ_DATA].sort(()=>Math.random()-0.5).slice(0,10); quizState.current=0; quizState.score=0;
+  players.forEach(p=>p.score=0);
+  document.getElementById('quizEndScore').style.display='none';
+  document.getElementById('quizNext').classList.remove('visible');
+  const w=document.getElementById('quizWho'); if(w)w.innerHTML='';
+  renderScoreboard('quiz'); renderQuiz();
+}
+function renderQuiz() {
+  const card=document.getElementById('quizCard'); const q=quizState.questions[quizState.current];
+  if (!q) { card.style.display='none'; document.getElementById('quizNext').classList.remove('visible'); document.getElementById('quizWho').innerHTML=''; showWinner('quizEndScore'); return; }
+  card.style.display='block';
+  card.innerHTML=`<div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px">Vraag ${quizState.current+1} / ${quizState.questions.length}</div><div class="quiz-question">${q.q}</div><div class="quiz-options">${q.o.map((opt,i)=>`<button class="quiz-opt" onclick="answerQuiz(${i})">${opt}</button>`).join('')}</div>`;
+  document.getElementById('quizWho').innerHTML='';
+}
+function answerQuiz(i) {
+  const q=quizState.questions[quizState.current]; const btns=document.querySelectorAll('.quiz-opt');
+  btns.forEach((btn,idx)=>{btn.onclick=null;btn.style.pointerEvents='none';if(idx===q.a)btn.classList.add('correct');if(idx===i&&i!==q.a)btn.classList.add('wrong');});
+  if(i===q.a) quizState.score++;
+  quizState.current++;
+  if(useScoring&&players.length>0&&i===q.a) {
+    const w=document.getElementById('quizWho'); w.classList.add('visible');
+    w.innerHTML='<span class="quiz-who-label">Wie wist het?</span>'+players.map((p,pi)=>`<button class="point-btn p${pi}" onclick="this.classList.add('active');addPoint(${pi},'quiz')">${p.name}</button>`).join('');
+  }
+  document.getElementById('quizNext').classList.add('visible');
+}
+function nextQuiz() { document.getElementById('quizNext').classList.remove('visible'); renderQuiz(); }
+
+// ===== 5. TEL WEDSTRIJD =====
+const TELLER_ITEMS=[['🐄','Koeien'],['🚛','Vrachtwagens'],['🔴','Rode auto\'s'],['⛪','Kerken'],['💨','Tunnels'],['🚲','Fietsers'],['🏔️','Bergen'],['🐑','Schapen']];
+let tellerState=[];
+function initTeller(){tellerState=[...TELLER_ITEMS].sort(()=>Math.random()-0.5).slice(0,4).map(([e,l])=>({emoji:e,label:l,count:0}));renderTeller();}
+function renderTeller(){document.getElementById('tellerWrap').innerHTML=tellerState.map((t,i)=>`<div class="teller-item"><span class="teller-emoji">${t.emoji}</span><span class="teller-label">${t.label}</span><div class="teller-count">${t.count}</div><div class="teller-btns"><button class="teller-btn" onclick="tellerAdd(${i},-1)">−</button><button class="teller-btn" onclick="tellerAdd(${i},1)" style="background:var(--fun-green);color:#fff;border-color:var(--fun-green)">+</button></div></div>`).join('');}
+function tellerAdd(i,d){tellerState[i].count=Math.max(0,tellerState[i].count+d);renderTeller();}
+
+// ===== 6. GEKKE VERHALEN =====
+const STORY_STARTERS=[
+  {emoji:'🐲',text:'Er was eens een draak die niet kon vuurspuwen maar wél...',hint:'Wat kon de draak wél? Iedereen een zin!'},
+  {emoji:'🚀',text:'De raket landde midden op de snelweg en er stapte uit...',hint:'Wie stapte eruit? Wat gebeurde er?'},
+  {emoji:'🎿',text:'Op de skipiste stond opeens een...',hint:'Wat stond er? Wat deed het?'},
+  {emoji:'🐧',text:'Een pinguïn liep de supermarkt binnen en zei...',hint:'Wat zei de pinguïn? Wat kocht hij?'},
+  {emoji:'👽',text:'Het buitenaardse wezen at het liefst...',hint:'Wat at het? Waar kwam het vandaan?'},
+  {emoji:'🦖',text:'De dinosaurus werd wakker in 2026 en zag als eerste...',hint:'Wat zag hij? Hoe reageerde hij?'},
+  {emoji:'🧙',text:'De tovenaar toverde per ongeluk alle auto\'s om in...',hint:'Waarin? Wat deden de mensen?'},
+  {emoji:'🐋',text:'De walvis zwom de Rijn op en...',hint:'Wat gebeurde er? Wie zag het als eerste?'},
+  {emoji:'🤖',text:'De robot kon maar één ding zeggen...',hint:'Wat zei hij? Hoe reageerden mensen?'},
+  {emoji:'🎅',text:'De Kerstman ging op skivakantie maar vergat zijn...',hint:'Wat vergat hij? Hoe loste hij het op?'}
+];
+function nextStory(){const s=STORY_STARTERS[Math.floor(Math.random()*STORY_STARTERS.length)];document.getElementById('storyPrompt').textContent=s.emoji+' '+s.text;document.getElementById('storySub').textContent=s.hint;}
+
+// ===== CONFETTI =====
+function showConfetti(){const el=document.getElementById('confetti');el.classList.add('show');const colors=['#fbbf24','#ef4444','#22c55e','#3b82f6','#ec4899','#8b5cf6','#f97316'];let h='';for(let i=0;i<60;i++){const c=colors[Math.floor(Math.random()*colors.length)];h+=`<div class="confetti-piece" style="left:${Math.random()*100}%;background:${c};animation-delay:${Math.random()*1.5}s;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px"></div>`;}el.innerHTML=h;setTimeout(()=>{el.classList.remove('show');el.innerHTML='';},3500);}
+</script>
+</body>
+</html>
