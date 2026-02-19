@@ -148,6 +148,11 @@
 }
 .piste-btn:hover { text-decoration: none; background: rgba(255,255,255,0.3); }
 .piste-btn:active { transform: translateY(-50%) scale(0.95); }
+.webcam-btn {
+  left: 126px;
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.25);
+}
 
 /* ===== SPOTIFY TILE ===== */
 .tile-spotify {
@@ -331,7 +336,8 @@
 
 <header class="app-header no-logo">
   <button class="menu-btn" onclick="toggleMenu()">☰</button>
-  <a href="https://zillertal.intermaps.com/zillertalarena" target="_blank" class="piste-btn">🗺️ Pistekaart</a>
+  <a href="https://zillertal.intermaps.com/zillertalarena" target="_blank" class="piste-btn">🗺️ Piste</a>
+  <a href="https://panocam.zillertalarena.com/filzstein" target="_blank" class="piste-btn webcam-btn">📸 Webcam</a>
   <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
 </header>
 
