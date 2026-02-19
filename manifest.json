@@ -2,7 +2,7 @@
   "name": "DIJK Skifestijn 2026",
   "short_name": "DIJK SKI",
   "description": "Wintersport Van Dijk en de Rest — Hochkrimml 2026",
-  "start_url": "/index.html",
+  "start_url": "https://tblikman-dot.github.io/wintersport/",
   "display": "standalone",
   "background_color": "#f2f6f4",
   "theme_color": "#1e7f5c",
