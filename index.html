@@ -314,6 +314,112 @@
   to { opacity: 1; transform: translateX(0); }
 }
 .feed-card { animation: feedSlideIn 0.3s ease both; }
+
+/* ===== WEER WIDGET ===== */
+.weer-widget {
+  margin: 0 16px 16px;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 60%, #38bdf8 100%);
+  border-radius: 16px;
+  padding: 16px 18px;
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(30,58,95,0.25);
+  position: relative;
+  overflow: hidden;
+}
+.weer-widget::after {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.weer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.weer-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.weer-icon { font-size: 2.2rem; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15)); }
+.weer-temp {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+.weer-temp .weer-unit { font-size: 1rem; font-weight: 400; opacity: 0.6; }
+.weer-meta {
+  text-align: right;
+  font-size: 0.72rem;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+.weer-desc {
+  font-size: 0.82rem;
+  font-weight: 500;
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+.weer-stats {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.weer-stat {
+  background: rgba(255,255,255,0.13);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.weer-forecast {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.weer-forecast::-webkit-scrollbar { display: none; }
+.weer-fc-day {
+  flex-shrink: 0;
+  text-align: center;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 6px 8px;
+  min-width: 52px;
+  font-size: 0.7rem;
+}
+.weer-fc-day .fc-name { font-weight: 600; opacity: 0.7; margin-bottom: 2px; }
+.weer-fc-day .fc-icon { font-size: 1.1rem; }
+.weer-fc-day .fc-temps { font-weight: 700; font-size: 0.72rem; }
+.weer-fc-day .fc-snow { font-size: 0.62rem; color: #93c5fd; margin-top: 1px; }
+.weer-ski-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.weer-loading {
+  text-align: center;
+  padding: 12px;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
 </style>
 </head>
 <body>
@@ -368,6 +474,11 @@
   <h2>📅 Vandaag</h2>
   <p id="vandaag-inhoud">Rooster laden…</p>
 </section>
+
+<!-- WEER WIDGET -->
+<div class="weer-widget" id="weerWidget">
+  <div class="weer-loading">🌨️ Weer ophalen…</div>
+</div>
 
 <main class="tiles">
   <a class="tile" href="verblijf.html">🏠 Verblijf</a>
@@ -557,6 +668,105 @@ function toggleMenu(){
     if (diff < 3600) return Math.floor(diff/60) + ' min';
     if (diff < 86400) return Math.floor(diff/3600) + ' uur';
     return Math.floor(diff/86400) + ' dag' + (Math.floor(diff/86400) !== 1 ? 'en' : '');
+  }
+})();
+</script>
+
+<script>
+// ===== WEER WIDGET =====
+(function(){
+  const LAT = 47.2468, LON = 12.1714;
+  const WMO = {
+    0:['☀️','Zonnig'],1:['🌤️','Overwegend zonnig'],2:['⛅','Half bewolkt'],3:['☁️','Bewolkt'],
+    45:['🌫️','Mistig'],48:['🌫️','IJsmist'],
+    51:['🌦️','Lichte motregen'],53:['🌧️','Motregen'],55:['🌧️','Dichte motregen'],
+    56:['🌧️','IJzel'],57:['🌧️','IJzel'],
+    61:['🌧️','Lichte regen'],63:['🌧️','Regen'],65:['🌧️','Zware regen'],
+    66:['🌧️','IJzel'],67:['🌧️','IJzel'],
+    71:['🌨️','Lichte sneeuw'],73:['🌨️','Sneeuw'],75:['❄️','Zware sneeuw'],77:['❄️','Sneeuwkorrels'],
+    80:['🌦️','Buien'],81:['🌧️','Regenbuien'],82:['⛈️','Zware buien'],
+    85:['🌨️','Sneeuwbuien'],86:['❄️','Zware sneeuwbuien'],
+    95:['⛈️','Onweer'],96:['⛈️','Onweer+hagel'],99:['⛈️','Zwaar onweer']
+  };
+  function wmo(c){return WMO[c]||['🌡️','?'];}
+
+  const params = new URLSearchParams({
+    latitude:LAT, longitude:LON, timezone:'Europe/Vienna', forecast_days:6,
+    hourly:'temperature_2m,apparent_temperature,weather_code,wind_speed_10m,snowfall,visibility',
+    daily:'temperature_2m_max,temperature_2m_min,weather_code,snowfall_sum,wind_speed_10m_max,uv_index_max,sunrise,sunset'
+  });
+
+  fetch('https://api.open-meteo.com/v1/forecast?'+params)
+    .then(r=>r.json()).then(render)
+    .catch(()=>{
+      document.getElementById('weerWidget').innerHTML='<div class="weer-loading">⚠️ Weer niet beschikbaar</div>';
+    });
+
+  function render(d){
+    const now=new Date();
+    // Find current hour index
+    let hi=0, minD=Infinity;
+    d.hourly.time.forEach((t,i)=>{const df=Math.abs(new Date(t)-now);if(df<minD){minD=df;hi=i;}});
+
+    const code=d.hourly.weather_code[hi];
+    const [icon,desc]=wmo(code);
+    const temp=Math.round(d.hourly.temperature_2m[hi]);
+    const feels=Math.round(d.hourly.apparent_temperature[hi]);
+    const wind=Math.round(d.hourly.wind_speed_10m[hi]);
+    const vis=(d.hourly.visibility[hi]/1000).toFixed(0);
+    const tMax=Math.round(d.daily.temperature_2m_max[0]);
+    const tMin=Math.round(d.daily.temperature_2m_min[0]);
+    const snow=d.daily.snowfall_sum[0];
+    const uv=Math.round(d.daily.uv_index_max[0]);
+
+    // Ski score
+    let score=3;
+    if(snow>10)score+=2;else if(snow>3)score+=1;
+    if(code<=2)score+=1;
+    if(d.daily.wind_speed_10m_max[0]>50)score-=2;else if(d.daily.wind_speed_10m_max[0]>35)score-=1;
+    if(code>=61&&code<=67)score-=2;
+    if(tMax>8)score-=1;
+    if(code>=95)score-=2;
+    score=Math.max(1,Math.min(5,score));
+    const stars='⭐'.repeat(score);
+    const verdicts={1:'Rustdag 🛋️',2:'Lastig',3:'Prima!',4:'Goed! 🎿',5:'Perfect! 🏔️'};
+
+    // Forecast days
+    const dagen=['Zo','Ma','Di','Wo','Do','Vr','Za'];
+    let fcHtml='';
+    for(let i=1;i<d.daily.time.length;i++){
+      const dt=new Date(d.daily.time[i]);
+      const nm=i===1?'Morgen':dagen[dt.getDay()];
+      const [ic]=wmo(d.daily.weather_code[i]);
+      const h=Math.round(d.daily.temperature_2m_max[i]);
+      const l=Math.round(d.daily.temperature_2m_min[i]);
+      const sn=d.daily.snowfall_sum[i];
+      fcHtml+=`<div class="weer-fc-day">
+        <div class="fc-name">${nm}</div>
+        <div class="fc-icon">${ic}</div>
+        <div class="fc-temps">${h}° / ${l}°</div>
+        ${sn>0?'<div class="fc-snow">❄ '+sn.toFixed(0)+' cm</div>':''}
+      </div>`;
+    }
+
+    document.getElementById('weerWidget').innerHTML=`
+      <div class="weer-ski-score">${stars} ${verdicts[score]}</div>
+      <div class="weer-top">
+        <div class="weer-main">
+          <span class="weer-icon">${icon}</span>
+          <span class="weer-temp">${temp}°<span class="weer-unit">C</span></span>
+        </div>
+        <div class="weer-meta">Hochkrimml<br>↑${tMax}° ↓${tMin}°</div>
+      </div>
+      <div class="weer-desc">${desc} · voelt als ${feels}°</div>
+      <div class="weer-stats">
+        ${snow>0?'<div class="weer-stat">❄️ '+snow.toFixed(1)+' cm</div>':''}
+        <div class="weer-stat">💨 ${wind} km/u</div>
+        <div class="weer-stat">👁 ${vis} km</div>
+        <div class="weer-stat">☀️ UV ${uv}</div>
+      </div>
+      <div class="weer-forecast">${fcHtml}</div>
+    `;
   }
 })();
 </script>
