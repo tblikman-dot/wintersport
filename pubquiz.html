@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🎿 DIJK Pubquiz 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+:root{--snow:#f0f4f8;--white:#fff;--blue:#1a73a7;--blue-dark:#0d4f73;--blue-light:#e3f0fa;--accent:#e74c3c;--gold:#f4a623;--green:#27ae60;--gray:#7f8c8d;--text:#2c3e50;--radius:16px;--shadow:0 6px 24px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:var(--snow);color:var(--text);min-height:100vh}
+.sf{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.sf span{position:absolute;top:-10px;color:rgba(255,255,255,.7);animation:fa linear infinite}
+@keyframes fa{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(360deg);opacity:.2}}
+header{background:linear-gradient(135deg,var(--blue-dark),var(--blue));color:#fff;text-align:center;padding:22px 16px 16px;position:relative;z-index:2;box-shadow:0 4px 16px rgba(13,79,115,.25)}
+header h1{font-size:1.35rem;font-weight:900}
+header p{font-size:.75rem;opacity:.7;font-weight:600;margin-top:2px}
+main{max-width:600px;margin:0 auto;padding:14px 12px 40px;position:relative;z-index:1}
+.card{background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+
+/* Setup */
+.ts{text-align:center}
+.ts h2{color:var(--blue-dark);font-size:1.15rem;margin-bottom:6px}
+.ts p{color:var(--gray);font-size:.83rem;margin-bottom:12px}
+.ti{width:100%;padding:11px 14px;border-radius:12px;border:2px solid #ddd;font-family:inherit;font-size:1rem;font-weight:700;text-align:center;outline:none}
+.ti:focus{border-color:var(--blue)}
+.er{display:flex;gap:6px;justify-content:center;margin:10px 0;flex-wrap:wrap}
+.em{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;border:3px solid transparent;background:var(--blue-light);transition:all .15s}
+.em.sel{border-color:var(--blue);background:var(--gold);transform:scale(1.1)}
+.bp{padding:11px 22px;border-radius:12px;background:var(--blue);color:#fff;font-family:inherit;font-size:.9rem;font-weight:800;border:none;cursor:pointer;margin-top:6px}
+.bp:disabled{opacity:.4;cursor:not-allowed}
+
+.badge{display:inline-flex;align-items:center;gap:5px;background:var(--blue-light);padding:4px 11px;border-radius:50px;font-size:.78rem;font-weight:700;color:var(--blue-dark);margin-bottom:10px}
+
+/* Round nav */
+.rnav{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:3px}
+.rnav::-webkit-scrollbar{display:none}
+.rb{padding:8px 12px;border-radius:10px;font-family:inherit;font-size:.72rem;font-weight:700;border:none;cursor:pointer;white-space:nowrap;background:var(--white);color:var(--text);box-shadow:0 2px 6px rgba(0,0,0,.05);transition:all .15s}
+.rb.act{background:var(--blue);color:#fff}
+.rb .rc{font-size:.62rem;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:6px;margin-left:3px}
+.rb.act .rc{background:rgba(255,255,255,.2)}
+
+/* Question */
+.qc{background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:10px;transition:opacity .3s}
+.qc.q-locked{opacity:.45;pointer-events:none}
+.qc.q-closed .af{background:#f5f5f5}
+.q-status{font-size:.65rem;font-weight:800;text-transform:uppercase;padding:2px 8px;border-radius:6px;letter-spacing:.04em}
+.qs-locked{background:#e0e0e0;color:#999}
+.qs-open{background:#d4efdf;color:var(--green)}
+.qs-closed{background:#fadbd8;color:var(--accent)}
+.qh{display:flex;align-items:center;gap:8px;padding:10px 12px 6px}
+.qn{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.82rem;color:#fff;flex-shrink:0}
+.qn.c1{background:var(--blue)}.qn.c2{background:var(--gold)}.qn.c3{background:#1DB954}.qn.c4{background:var(--green)}.qn.c5{background:#9b59b6}.qn.c6{background:var(--accent)}
+.qt{font-size:.82rem;font-weight:600;line-height:1.35;flex:1}
+.qimg{width:100%;aspect-ratio:4/3;background:var(--snow);overflow:hidden}
+.qimg img{width:100%;height:100%;object-fit:contain;display:block}
+.qi{padding:8px 12px;border-top:1px solid rgba(0,0,0,.04);display:flex;gap:6px;align-items:center}
+.af{flex:1;padding:8px 10px;border-radius:9px;border:2px solid #e0e0e0;font-family:inherit;font-size:.82rem;font-weight:600;outline:none;transition:border .2s}
+.af:focus{border-color:var(--blue)}
+.af:disabled{opacity:.6}
+.ac{font-size:1rem;opacity:.25}.ac.ok{opacity:1;color:var(--green)}
+
+/* Waiting */
+.waiting{text-align:center;padding:40px 20px;color:var(--gray)}
+.waiting .wi{font-size:2.5rem;margin-bottom:8px;animation:bounce 1.5s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="sf" id="sf"></div>
+<header><h1>🎿 DIJK Pubquiz 2026</h1><p>Familie Van Dijk • Hochkrimml / Königsleiten</p></header>
+<main>
+<div id="setup" class="card ts">
+  <h2>⛷️ Welkom bij de Pubquiz!</h2>
+  <p>Kies een teamnaam en mascotte.</p>
+  <input type="text" id="tni" class="ti" placeholder="Teamnaam..." maxlength="24" autocomplete="off">
+  <div class="er" id="erow"></div>
+  <button class="bp" id="sbtn" onclick="regTeam()" disabled>Starten! 🚀</button>
+</div>
+<div id="app" class="hidden">
+  <div class="badge" id="tbadge"></div>
+  <div class="rnav" id="rnav"></div>
+  <div id="rc"></div>
+</div>
+</main>
+<script>
+const fbCfg={apiKey:"AIzaSyDUvXeaT5FLYuhtbalhHdGF4E3pN3E-JVo",authDomain:"wintersport-d2c0e.firebaseapp.com",databaseURL:"https://wintersport-d2c0e-default-rtdb.europe-west1.firebasedatabase.app",projectId:"wintersport-d2c0e",storageBucket:"wintersport-d2c0e.firebasestorage.app",messagingSenderId:"407498117498",appId:"1:407498117498:web:7b94a7de0867c8fee30b46"};
+let db;try{firebase.initializeApp(fbCfg);db=firebase.database()}catch(e){}
+
+const R=[
+{id:'nieuws',emoji:'📰',name:'Nieuws',color:'c1',qs:[
+'Welke grote internationale top werd er in juni 2025 in Nederland gehouden?',
+'Met welk liedje deed Nederland mee aan het Eurovisie Songfestival 2025?',
+'Wie won de Tour de France 2025?',
+'Welke rage is er gaande? Een pluizig beestje met grote oren, scherpe tandjes en een ondeugende grijns.',
+'Welk programma won de Gouden Televizier-Ring 2025?',
+'Er was een kunstroof in het Drents Museum. Wat werd er gestolen?',
+'Hoe heette de eerste verkenner na de Tweede Kamerverkiezingen?',
+'Wie eindigde op de 2e plaats in de Eredivisie seizoen 24-25?',
+'Welke plaats bezocht het Koningshuis tijdens Koningsdag 2025?',
+'Wat is de belangrijkste oorzaak van de uitzonderlijk veel lawines in winter 2025-2026?',
+'In welk Frans skigebied kwamen op 13 februari 2026 drie skiërs om door een lawine?',
+'Hoe breed was de enorme lawine in Sankt Anton am Arlberg volgens de politie?',
+'Welk maximale lawinegevaarniveau gold tijdelijk in de Franse Alpen en kanton Wallis?',
+'Lawine-expert Rolf Westerhof vergeleek de slechte sneeuwopbouw met iets uit de bouw. Waarmee?',
+'Hoeveel minuten heb je bij begraving door een lawine ongeveer om te overleven?',
+],imgs:[]},
+{id:'winter',emoji:'⛷️',name:'Wintersport',color:'c2',qs:[
+'In welk skigebied zijn wij op wintersport?',
+'Hoeveel kilometer piste heeft de Zillertal Arena?',
+'Hoeveel liften heeft de Zillertal Arena?',
+'Tot welke hoogte kun je skiën in de Zillertal Arena?',
+'Wat is het Europese alarmnummer voor in de bergen?',
+'Op welke hoogte ligt het dorp Königsleiten?',
+'Hoe lang is de langste rodelbaan van het Zillertal?',
+'Welke drie veiligheidsmiddelen neem je mee als je off-piste gaat?',
+'Hoe heet de activiteit waarbij je op banden de helling af gaat?',
+'Welke beroemde watervallen kun je bevroren bezoeken bij ons skigebied?',
+],imgs:[]},
+{id:'muziek',emoji:'🎵',name:'Muziek',color:'c3',qs:[
+'Nummer 1 — Herken je dit nummer?','Nummer 2 — Nederlands nummer','Nummer 3 — Film-duet',
+'Nummer 4 — Rap-klassieker','Nummer 5 — Schots talent','Nummer 6 — Hollands trots',
+'Nummer 7 — Britse popster','Nummer 8 — Grunge-legende','Nummer 9 — Nederlands klein maar fijn',
+'Nummer 10 — The Boss',
+],imgs:[]},
+{id:'foto',emoji:'📷',name:"Foto's",color:'c4',qs:[
+'Welke toren is dit?','Welke toren is dit?','Welke toren is dit?','Welke toren is dit?','Welke toren is dit?',
+'Welke stripfiguur is dit?','Welke stripfiguur is dit?','Welke stripfiguur is dit?','Welke stripfiguur is dit?','Welke stripfiguur is dit?',
+],imgs:[
+'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Groningen_Martinitoren.jpg/300px-Groningen_Martinitoren.jpg',
+'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Brandaris_Lighthouse.jpg/300px-Brandaris_Lighthouse.jpg',
+'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Domtoren_vanuit_Pandhof_%281%29.jpg/300px-Domtoren_vanuit_Pandhof_%281%29.jpg',
+'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Delft_Oude_Kerk.jpg/300px-Delft_Oude_Kerk.jpg',
+'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Rembrandttoren2.jpg/300px-Rembrandttoren2.jpg',
+'https://upload.wikimedia.org/wikipedia/en/8/8b/Fireman_Sam_2016_logo.png',
+'https://upload.wikimedia.org/wikipedia/en/1/18/Gabby%27s_Dollhouse_poster.jpg',
+'https://upload.wikimedia.org/wikipedia/en/thumb/b/be/Bluey_%28TV_series%29.png/220px-Bluey_%28TV_series%29.png',
+'https://upload.wikimedia.org/wikipedia/en/2/21/Web_of_Spider-Man_Vol_1_129-1.png',
+'https://upload.wikimedia.org/wikipedia/en/8/8a/Peppa_Pig_logo.png',
+]},
+{id:'ijsstokjes',emoji:'🪵',name:'IJsstokjes',color:'c5',qs:[],imgs:[]},
+{id:'schatten',emoji:'🎯',name:'Schatten',color:'c6',qs:[
+'Hoeveel sneeuwkanonnen heeft de Zillertal Arena (bij benadering)?',
+'Hoeveel lawinedoden zijn er gemiddeld per jaar in de Europese Alpen?',
+'Hoeveel kilometer hemelsbreed van Groningen naar Hochkrimml?',
+'Hoe hoog zijn de Krimmler Wasserfälle (totale valhoogte in meters)?',
+'Hoeveel personen telt de familie Van Dijk op deze vakantie?',
+],imgs:[]},
+];
+
+const EMOJIS=['⛷️','🏔️','🎿','🏂','❄️','🦌','🐻','🧊','🎅','🧤','🦉','🐧'];
+let TN='',TE='',ans={},curR='nieuws',qStates={};
+// qStates from Firebase: { "nieuws_0":"open", "nieuws_1":"closed", ... }
+// missing key = locked
+
+function qst(key){return qStates[key]||'locked'}
+
+// Snow
+(function(){const c=document.getElementById('sf'),f=['❄','❅','❆'];for(let i=0;i<16;i++){const s=document.createElement('span');s.textContent=f[i%3];s.style.left=Math.random()*100+'%';s.style.animationDuration=(5+Math.random()*5)+'s';s.style.animationDelay=Math.random()*6+'s';s.style.fontSize=(8+Math.random()*10)+'px';c.appendChild(s)}})();
+
+// Team
+function initE(){document.getElementById('erow').innerHTML=EMOJIS.map(e=>`<div class="em" onclick="pkE(this,'${e}')">${e}</div>`).join('')}
+function pkE(el,e){document.querySelectorAll('.em').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');TE=e;ck()}
+document.getElementById('tni').addEventListener('input',ck);
+function ck(){document.getElementById('sbtn').disabled=!(document.getElementById('tni').value.trim().length>=2&&TE)}
+function regTeam(){TN=document.getElementById('tni').value.trim();if(!TN||!TE)return;localStorage.setItem('pq_t',JSON.stringify({n:TN,e:TE}));go()}
+function go(){
+  document.getElementById('setup').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('tbadge').innerHTML=`${TE} ${TN} <span style="font-size:.6rem;opacity:.35;cursor:pointer" onclick="rst()">(wijzig)</span>`;
+  listen();nav();show(curR);
+}
+function rst(){if(!confirm('Opnieuw? Antwoorden weg.'))return;localStorage.clear();location.reload()}
+// Restore
+(function(){try{const s=JSON.parse(localStorage.getItem('pq_t'));if(s&&s.n){TN=s.n;TE=s.e||'⛷️';ans=JSON.parse(localStorage.getItem('pq_a')||'{}');go()}}catch(e){}})();
+
+// Firebase listen
+function listen(){
+  if(!db)return;
+  db.ref('pubquiz/qstates').on('value',snap=>{
+    const prev=JSON.stringify(qStates);
+    qStates=snap.val()||{};
+    // Auto-push on any question closing
+    if(JSON.stringify(qStates)!==prev) push();
+    nav();show(curR);
+  });
+}
+
+function push(){
+  if(!db||!TN)return;
+  db.ref('pubquiz/submissions/'+TN.replace(/[.#$/[\]]/g,'_')).set({team:TN,emoji:TE,answers:ans,timestamp:Date.now()});
+}
+
+// Nav
+function nav(){
+  document.getElementById('rnav').innerHTML=R.map(r=>{
+    const n=r.qs.length;
+    const filled=n?r.qs.filter((_,i)=>ans[r.id+'_'+i]).length:0;
+    const hasOpen=r.qs.some((_,i)=>qst(r.id+'_'+i)==='open');
+    return `<button class="rb ${r.id===curR?'act':''}" onclick="show('${r.id}')">${r.emoji} ${r.name}${n?`<span class="rc">${filled}/${n}</span>`:''}${hasOpen?'<span style="color:#2ecc71;margin-left:3px">●</span>':''}</button>`;
+  }).join('');
+}
+
+// Show round
+function show(id){
+  curR=id;nav();
+  const r=R.find(x=>x.id===id);
+  const el=document.getElementById('rc');
+
+  if(!r.qs.length){
+    // IJsstokjes
+    const anyOpen=qst(r.id+'_0')==='open';
+    el.innerHTML=`<div class="card" style="text-align:center;padding:30px"><div style="font-size:2.5rem;margin-bottom:6px">${r.emoji}</div><h3 style="color:var(--blue-dark)">${r.name}</h3><p style="color:var(--gray);font-size:.85rem;margin-top:4px">${anyOpen?'De quizmaster heeft deze opdracht geopend!':'Wacht tot de quizmaster deze opdracht opent.'}</p></div>`;
+    return;
+  }
+
+  // Check if any question in this round is open → auto-scroll hint
+  let html='';
+  let firstOpenIdx=-1;
+
+  r.qs.forEach((q,i)=>{
+    const key=r.id+'_'+i;
+    const st=qst(key);
+    const val=ans[key]||'';
+    const isLocked=st==='locked';
+    const isClosed=st==='closed';
+    const isOpen=st==='open';
+    if(isOpen&&firstOpenIdx<0) firstOpenIdx=i;
+
+    const stLabel=isLocked?'Op slot':isOpen?'Beantwoord nu!':'Gesloten';
+    const stClass=isLocked?'qs-locked':isOpen?'qs-open':'qs-closed';
+
+    html+=`<div class="qc ${isLocked?'q-locked':''} ${isClosed?'q-closed':''}" id="q_${key}">`;
+    html+=`<div class="qh"><div class="qn ${r.color}">${i+1}</div><div class="qt">${isLocked?'<span style="opacity:.4">Vraag '+(i+1)+' — wacht op de quizmaster</span>':q}</div><span class="q-status ${stClass}">${stLabel}</span></div>`;
+
+    if(!isLocked&&r.imgs[i]) html+=`<div class="qimg"><img src="${r.imgs[i]}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'padding:14px;text-align:center;color:var(--gray)\\'>📷</div>'"></div>`;
+
+    if(!isLocked){
+      html+=`<div class="qi"><input class="af" id="a_${key}" value="${val}" placeholder="${isOpen?'Jouw antwoord...':'(afgesloten)'}" oninput="sA('${key}',this.value)" ${isClosed?'disabled':''} autocomplete="off"><span class="ac ${val?'ok':''}" id="c_${key}">${val?'✅':'○'}</span></div>`;
+    }
+    html+=`</div>`;
+  });
+
+  // If nothing is open or closed, show waiting
+  const allLocked=r.qs.every((_,i)=>qst(r.id+'_'+i)==='locked');
+  if(allLocked){
+    html=`<div class="waiting"><div class="wi">🔒</div><p style="font-weight:700;font-size:.95rem">Ronde "${r.name}" is nog niet begonnen</p><p style="font-size:.8rem;margin-top:4px">Wacht tot de quizmaster de eerste vraag opent!</p></div>`;
+  }
+
+  el.innerHTML=html;
+
+  // Scroll to first open question
+  if(firstOpenIdx>=0){
+    const target=document.getElementById('q_'+r.id+'_'+firstOpenIdx);
+    if(target) setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'center'}),200);
+  }
+}
+
+function sA(key,val){
+  if(qst(key)!=='open')return; // safety
+  ans[key]=val.trim();
+  const c=document.getElementById('c_'+key);
+  if(c){c.className='ac '+(val.trim()?'ok':'');c.textContent=val.trim()?'✅':'○'}
+  localStorage.setItem('pq_a',JSON.stringify(ans));
+  nav();
+  clearTimeout(sA._t);sA._t=setTimeout(push,1200);
+}
+
+initE();
+</script>
+</body>
+</html>

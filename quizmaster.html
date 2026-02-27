@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🎩 Quizmaster — DIJK Pubquiz 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#131720;--card:#1c2130;--border:#2a3040;--blue:#1a73a7;--gold:#f4a623;--green:#27ae60;--accent:#e74c3c;--gray:#7f8c8d;--spotify:#1DB954}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:#ddd;min-height:100vh}
+header{background:linear-gradient(135deg,#2c1810,#8b4513);color:#fff;text-align:center;padding:18px 14px 14px}
+header h1{font-size:1.2rem;font-weight:900}
+header p{font-size:.7rem;opacity:.55;margin-top:2px}
+main{max-width:700px;margin:0 auto;padding:12px 10px 40px}
+.card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:12px}
+h2{font-size:1rem;color:var(--gold);margin-bottom:8px}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 12px;border-radius:10px;font-family:inherit;font-size:.75rem;font-weight:700;border:none;cursor:pointer;white-space:nowrap;background:#252a3a;color:#888;transition:all .15s}
+.tab.act{background:var(--gold);color:#111}
+
+/* Round selector in control tab */
+.rsel{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+.rs{padding:7px 12px;border-radius:10px;font-family:inherit;font-size:.73rem;font-weight:700;border:none;cursor:pointer;background:#252a3a;color:#888;transition:all .15s}
+.rs.act{background:var(--blue);color:#fff}
+
+/* Question row in quizmaster */
+.qr{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;margin-bottom:6px;background:#161a28;border:1px solid var(--border);transition:all .2s}
+.qr:hover{border-color:#444}
+.qr-nr{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.75rem;color:#fff;flex-shrink:0}
+.qr-nr.c1{background:var(--blue)}.qr-nr.c2{background:var(--gold)}.qr-nr.c3{background:var(--spotify)}.qr-nr.c4{background:var(--green)}.qr-nr.c5{background:#9b59b6}.qr-nr.c6{background:var(--accent)}
+.qr-q{flex:1;font-size:.78rem;font-weight:600;line-height:1.3;color:#bbb}
+.qr-st{font-size:.62rem;font-weight:800;text-transform:uppercase;padding:2px 7px;border-radius:5px;flex-shrink:0}
+.st-l{background:#333;color:#777}
+.st-o{background:var(--green);color:#fff;animation:pu 1.5s infinite}
+.st-c{background:var(--accent);color:#fff}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.6}}
+.qr-btn{padding:5px 10px;border-radius:8px;font-family:inherit;font-size:.68rem;font-weight:700;border:none;cursor:pointer;transition:all .15s;flex-shrink:0}
+.qr-btn:hover{transform:scale(1.05)}
+.qr-btn:disabled{opacity:.25;cursor:not-allowed;transform:none}
+.b-open{background:var(--green);color:#fff}
+.b-close{background:var(--accent);color:#fff}
+.b-lock{background:#444;color:#aaa}
+
+/* Batch actions */
+.batch{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.bb{padding:8px 14px;border-radius:10px;font-family:inherit;font-size:.75rem;font-weight:700;border:none;cursor:pointer;transition:all .15s}
+.bb:hover{transform:scale(1.03)}
+.bb-open{background:var(--green);color:#fff}
+.bb-close{background:var(--accent);color:#fff}
+.bb-lock{background:#444;color:#aaa}
+.bb-next{background:var(--blue);color:#fff}
+
+/* Spotify */
+.sp{display:flex;align-items:center;gap:8px;padding:10px;border-radius:10px;margin-bottom:6px;background:#161a28;border:1px solid var(--border)}
+.sp:hover{border-color:var(--spotify)}
+.sp-nr{width:26px;height:26px;border-radius:50%;background:var(--spotify);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.7rem;flex-shrink:0}
+.sp-i{flex:1}.sp-h{font-size:.78rem;font-weight:600;color:#bbb}
+.sp-a{font-size:.68rem;color:var(--gold);filter:blur(5px);cursor:pointer;transition:filter .3s;user-select:none;margin-top:1px}
+.sp-a.show{filter:none}
+.sp-p{padding:6px 10px;border-radius:50px;background:var(--spotify);color:#fff;text-decoration:none;font-size:.72rem;font-weight:700;flex-shrink:0}
+
+/* Teams */
+.tm{border-radius:10px;margin-bottom:6px;overflow:hidden;border:1px solid var(--border)}
+.tm-h{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#161a28;cursor:pointer}
+.tm-h:hover{background:#1e2438}
+.tm-n{font-weight:700;flex:1;font-size:.88rem}
+.tm-s{font-size:.72rem;color:#666}
+.tm-b{display:none;background:#0e1118;padding:8px 12px}
+.tm-b.open{display:block}
+.tm-rh{font-weight:700;color:var(--gold);font-size:.72rem;padding:6px 0 2px;border-top:1px solid #1e2438}
+.tm-r{display:flex;gap:5px;padding:3px 0;font-size:.75rem;border-bottom:1px solid #161a28}
+.tm-r:last-child{border:none}
+.tm-rn{font-weight:800;color:var(--blue);width:20px}
+.tm-g{flex:1;font-weight:600}
+.tm-ok{color:var(--green)}.tm-no{color:var(--accent);opacity:.65}
+.tm-ra{font-size:.65rem;color:#444;max-width:35%;text-align:right}
+
+/* Scores */
+.sr{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;margin-bottom:5px;background:#161a28}
+.sr:first-child{background:linear-gradient(135deg,#2d2010,#4a3010);border:1px solid var(--gold)}
+.sr-k{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.75rem;color:#fff;background:#444;flex-shrink:0}
+.sr:nth-child(1) .sr-k{background:var(--gold)}
+.sr:nth-child(2) .sr-k{background:#95a5a6}
+.sr:nth-child(3) .sr-k{background:#cd7f32}
+.sr-n{flex:1;font-weight:700;font-size:.88rem}
+.sr-p{font-weight:900;font-size:1.05rem;color:var(--gold);min-width:28px;text-align:center}
+.sr-b{background:#333;color:#fff;border:none;border-radius:7px;padding:4px 10px;font-family:inherit;font-weight:800;cursor:pointer;font-size:.8rem}
+.sr-b:hover{transform:scale(1.06)}.sr-b.pl{background:var(--green)}.sr-b.mi{background:var(--accent)}
+
+/* Ref */
+.rf{font-size:.75rem;padding:4px 8px;border-radius:6px;background:#161a28;display:flex;gap:5px;margin-bottom:2px}
+.rf-n{font-weight:800;color:var(--blue);width:20px}.rf-a{color:var(--gold);font-weight:600;flex:1}
+
+.live{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);animation:pu 2s infinite}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header><h1>🎩 Quizmaster Paneel</h1><p>DIJK Skifestijn 2026 — Vraag voor vraag</p></header>
+<main>
+<div class="card" style="display:flex;align-items:center;gap:8px;padding:10px 14px">
+  <span class="live"></span><span style="font-weight:700;font-size:.82rem">Live</span><span style="flex:1"></span><span id="tc" style="font-size:.78rem;color:#666">0 teams</span>
+</div>
+<div class="tabs">
+  <button class="tab act" data-t="ctrl" onclick="tt('ctrl')">🎛️ Vragen</button>
+  <button class="tab" data-t="spot" onclick="tt('spot')">🎵 Spotify</button>
+  <button class="tab" data-t="team" onclick="tt('team')">👥 Teams</button>
+  <button class="tab" data-t="score" onclick="tt('score')">🏆 Scores</button>
+  <button class="tab" data-t="ref" onclick="tt('ref')">📋 Antwoorden</button>
+</div>
+
+<!-- CTRL -->
+<div id="t-ctrl">
+<div class="card">
+  <h2>🎛️ Vragen beheren — per vraag</h2>
+  <p style="font-size:.73rem;color:#666;margin-bottom:10px">Selecteer een ronde, dan open/sluit je vragen één voor één. Of gebruik de knoppen om de hele ronde of de volgende vraag te bedienen.</p>
+  <div class="rsel" id="rsel"></div>
+  <div class="batch" id="batch"></div>
+  <div id="qlist"></div>
+</div>
+</div>
+
+<!-- SPOTIFY -->
+<div id="t-spot" class="hidden"><div class="card"><h2>🎵 Muziekronde</h2><p style="font-size:.73rem;color:#666;margin-bottom:10px">Klik antwoord om te onthullen. Open de muziekvragen in het "Vragen"-tabblad.</p><div id="slist"></div></div></div>
+
+<!-- TEAMS -->
+<div id="t-team" class="hidden"><div class="card"><h2>👥 Teams</h2><p style="font-size:.73rem;color:#666;margin-bottom:10px">Klik een team om antwoorden te zien.</p><div id="tlist"></div></div></div>
+
+<!-- SCORES -->
+<div id="t-score" class="hidden"><div class="card"><h2>🏆 Scorebord</h2><div id="sboard"></div></div></div>
+
+<!-- REF -->
+<div id="t-ref" class="hidden"><div class="card"><h2>📋 Juiste antwoorden</h2><div id="aref"></div></div></div>
+</main>
+
+<script>
+const fbCfg={apiKey:"AIzaSyDUvXeaT5FLYuhtbalhHdGF4E3pN3E-JVo",authDomain:"wintersport-d2c0e.firebaseapp.com",databaseURL:"https://wintersport-d2c0e-default-rtdb.europe-west1.firebasedatabase.app",projectId:"wintersport-d2c0e",storageBucket:"wintersport-d2c0e.firebasestorage.app",messagingSenderId:"407498117498",appId:"1:407498117498:web:7b94a7de0867c8fee30b46"};
+let db;try{firebase.initializeApp(fbCfg);db=firebase.database()}catch(e){}
+
+const R=[
+{id:'nieuws',emoji:'📰',name:'Nieuws',color:'c1',qs:['Welke grote internationale top in juni 2025 in NL?','Liedje Songfestival 2025?','Winnaar Tour de France 2025?','Pluizig beestje-rage?','Gouden Televizier-Ring 2025?','Kunstroof Drents Museum — wat gestolen?','Eerste verkenner na verkiezingen?','2e plaats Eredivisie 24-25?','Koningsdag 2025 — welke plaats?','Oorzaak veel lawines 2025-2026?','Frans skigebied 13 feb lawine?','Breedte lawine Sankt Anton?','Max lawinegevaarniveau Alpen?','Vergelijking Westerhof (bouw)?','Minuten overleven lawine?']},
+{id:'winter',emoji:'⛷️',name:'Wintersport',color:'c2',qs:['Welk skigebied?','Km piste Zillertal Arena?','Aantal liften?','Max hoogte skiën?','Alarmnummer bergen?','Hoogte Königsleiten?','Langste rodelbaan Zillertal?','3 veiligheidsmiddelen off-piste?','Activiteit op banden?','Bevroren watervallen?']},
+{id:'muziek',emoji:'🎵',name:'Muziek',color:'c3',qs:['Nr 1','Nr 2','Nr 3','Nr 4','Nr 5','Nr 6','Nr 7','Nr 8','Nr 9','Nr 10']},
+{id:'foto',emoji:'📷',name:"Foto's",color:'c4',qs:['Foto 1','Foto 2','Foto 3','Foto 4','Foto 5','Foto 6','Foto 7','Foto 8','Foto 9','Foto 10']},
+{id:'ijsstokjes',emoji:'🪵',name:'IJsstokjes',color:'c5',qs:['Opdracht']},
+{id:'schatten',emoji:'🎯',name:'Schatten',color:'c6',qs:['Sneeuwkanonnen?','Lawinedoden/jaar?','Km Groningen-Hochkrimml?','Hoogte Krimmler Wasserfälle?','Aantal personen vakantie?']},
+];
+
+const ANS={
+nieuws_0:'NAVO-top',nieuws_1:"Claude, c'est la vie",nieuws_2:'Tadej Pogacar',nieuws_3:'Labubu',
+nieuws_4:'Vandaag Inside',nieuws_5:'Gouden helm + 3 armbanden',nieuws_6:'Wouter Koolmees',
+nieuws_7:'Ajax',nieuws_8:'Doetinchem',nieuws_9:'Zwakke onderlaag (suikersneeuw)',
+nieuws_10:"Val d'Isère",nieuws_11:'450 meter breed',nieuws_12:'Niveau 5',
+nieuws_13:'Huis op betonrot',nieuws_14:'12-15 minuten',
+winter_0:'Zillertal Arena',winter_1:'150 km',winter_2:'52',winter_3:'2.500 m',
+winter_4:'112 (of 140)',winter_5:'1.600 m',winter_6:'7 km',
+winter_7:'Pieper, sonde, schep',winter_8:'Snow tubing',winter_9:'Krimmler Wasserfälle',
+muziek_0:"GN'R – Sweet Child O' Mine",muziek_1:'Racoon – Oceaan',
+muziek_2:'Gaga/Cooper – Shallow',muziek_3:'Eminem – Lose Yourself',
+muziek_4:'Nutini – Iron Sky',muziek_5:'Guus Meeuwis – Brabant',
+muziek_6:'Robbie Williams – Angels',muziek_7:'Pearl Jam – Alive',
+muziek_8:'Klein Orkest – Over de Muur',muziek_9:'Springsteen – The River',
+foto_0:'Martinitoren',foto_1:'Brandaris',foto_2:'Domtoren',foto_3:'Oude Kerk Delft',
+foto_4:'Rembrandttoren',foto_5:'Brandweerman Sam',foto_6:'Gabby',foto_7:'Bluey',foto_8:'Spider-Man',foto_9:'Peppa Pig',
+schatten_0:'~1.000',schatten_1:'~100',schatten_2:'~750 km',schatten_3:'380 m',schatten_4:'(eigen)',
+};
+
+const SPOT=[
+{nr:1,h:'Herken dit',u:'https://open.spotify.com/track/7o2CTH4ctstm8TNelqjb51',a:"Guns N' Roses – Sweet Child O' Mine"},
+{nr:2,h:'NL nummer',u:'https://open.spotify.com/track/629kbMNfMZRSfSHNhcMQyj',a:'Racoon – Oceaan'},
+{nr:3,h:'Film-duet',u:'https://open.spotify.com/track/5lK18Pt33xNudq4qYDxIm8',a:'Lady Gaga & Cooper – Shallow'},
+{nr:4,h:'Rap',u:'https://open.spotify.com/track/7w9bgPAmPTtrkt2v16QWvQ',a:'Eminem – Lose Yourself'},
+{nr:5,h:'Schots',u:'https://open.spotify.com/track/2bcC9Xyi40wnI7Od5uch31',a:'Paolo Nutini – Iron Sky'},
+{nr:6,h:'Hollands',u:'https://open.spotify.com/track/0GiWi4EkPduFWHQyhiKpRB',a:'Guus Meeuwis – Brabant'},
+{nr:7,h:'Brits',u:'https://open.spotify.com/track/5XfXMQOMSNeGFhQDHnetsT',a:'Robbie Williams – Angels'},
+{nr:8,h:'Grunge',u:'https://open.spotify.com/track/1L94M3KIu7QluZe60EJZ0G',a:'Pearl Jam – Alive'},
+{nr:9,h:'NL klein',u:'https://open.spotify.com/track/4U45aEWtQhrm8A5Uvgl51c',a:'Klein Orkest – Over de Muur'},
+{nr:10,h:'The Boss',u:'https://open.spotify.com/track/3CDEryyJIFoJzBpMONb4nz',a:'Bruce Springsteen – The River'},
+];
+
+let subs={},scores={},qS={},curR='nieuws';
+function gS(k){return qS[k]||'locked'}
+
+// ===== ROUND SELECTOR =====
+function rSel(){
+  document.getElementById('rsel').innerHTML=R.map(r=>
+    `<button class="rs ${r.id===curR?'act':''}" onclick="selR('${r.id}')">${r.emoji} ${r.name}</button>`
+  ).join('');
+}
+function selR(id){curR=id;rSel();rBatch();rQ();}
+
+// ===== BATCH ACTIONS =====
+function rBatch(){
+  const r=R.find(x=>x.id===curR);
+  // Find next locked question
+  const nextLocked=r.qs.findIndex((_,i)=>gS(r.id+'_'+i)==='locked');
+  const anyOpen=r.qs.some((_,i)=>gS(r.id+'_'+i)==='open');
+  document.getElementById('batch').innerHTML=`
+    <button class="bb bb-next" onclick="openNext()" ${nextLocked<0?'disabled':''}>▶ Volgende vraag openen</button>
+    <button class="bb bb-close" onclick="closeAllOpen()" ${!anyOpen?'disabled':''}>⏹ Alle open sluiten</button>
+    <button class="bb bb-open" onclick="openAll()">▶▶ Hele ronde open</button>
+    <button class="bb bb-lock" onclick="lockAll()">🔒 Hele ronde resetten</button>
+  `;
+}
+
+function openNext(){
+  const r=R.find(x=>x.id===curR);
+  // First close any currently open question
+  r.qs.forEach((_,i)=>{const k=r.id+'_'+i;if(gS(k)==='open') setQ(k,'closed')});
+  // Then open next locked
+  const idx=r.qs.findIndex((_,i)=>gS(r.id+'_'+i)==='locked');
+  if(idx>=0) setQ(r.id+'_'+idx,'open');
+}
+function closeAllOpen(){
+  const r=R.find(x=>x.id===curR);
+  r.qs.forEach((_,i)=>{const k=r.id+'_'+i;if(gS(k)==='open') setQ(k,'closed')});
+}
+function openAll(){
+  if(!confirm('Hele ronde openzetten?'))return;
+  const r=R.find(x=>x.id===curR);
+  r.qs.forEach((_,i)=>setQ(r.id+'_'+i,'open'));
+}
+function lockAll(){
+  if(!confirm('Hele ronde resetten naar "op slot"?'))return;
+  const r=R.find(x=>x.id===curR);
+  r.qs.forEach((_,i)=>{if(db)db.ref('pubquiz/qstates/'+r.id+'_'+i).remove()});
+}
+
+function setQ(key,state){
+  if(db) db.ref('pubquiz/qstates/'+key).set(state);
+}
+
+// ===== QUESTION LIST =====
+function rQ(){
+  const r=R.find(x=>x.id===curR);
+  document.getElementById('qlist').innerHTML=r.qs.map((q,i)=>{
+    const k=r.id+'_'+i;
+    const st=gS(k);
+    const stL=st==='locked'?'Op slot':st==='open'?'Open':'Dicht';
+    const stC=st==='locked'?'st-l':st==='open'?'st-o':'st-c';
+    return `<div class="qr">
+      <div class="qr-nr ${r.color}">${i+1}</div>
+      <div class="qr-q">${q}<br><span style="font-size:.65rem;color:var(--gold)">${ANS[k]||''}</span></div>
+      <span class="qr-st ${stC}">${stL}</span>
+      <button class="qr-btn b-open" onclick="setQ('${k}','open')" ${st==='open'?'disabled':''}>▶</button>
+      <button class="qr-btn b-close" onclick="setQ('${k}','closed')" ${st!=='open'?'disabled':''}>⏹</button>
+    </div>`;
+  }).join('');
+}
+
+// ===== SPOTIFY =====
+function rS(){
+  document.getElementById('slist').innerHTML=SPOT.map(t=>
+    `<div class="sp"><div class="sp-nr">${t.nr}</div><div class="sp-i"><div class="sp-h">${t.h}</div><div class="sp-a" onclick="this.classList.toggle('show')">${t.a}</div></div><a class="sp-p" href="${t.u}" target="_blank">▶</a></div>`
+  ).join('');
+}
+
+// ===== TEAMS =====
+function rT(){
+  const teams=Object.values(subs).sort((a,b)=>(a.team||'').localeCompare(b.team||''));
+  document.getElementById('tc').textContent=teams.length+' team'+(teams.length!==1?'s':'');
+  const el=document.getElementById('tlist');
+  if(!teams.length){el.innerHTML='<p style="color:#555;text-align:center;font-size:.85rem">Nog geen teams.</p>';return;}
+  el.innerHTML=teams.map(t=>{
+    const a=t.answers||{};
+    const allK=Object.keys(ANS);
+    const f=allK.filter(k=>a[k]).length;
+    let body='';
+    R.forEach(r=>{
+      if(!r.qs.length||(r.qs.length===1&&r.id==='ijsstokjes'))return;
+      body+=`<div class="tm-rh">${r.emoji} ${r.name}</div>`;
+      r.qs.forEach((_,i)=>{
+        const k=r.id+'_'+i;
+        const g=a[k]||'—';
+        const c=ANS[k]||'';
+        const gn=g.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+        const cn=c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+        const m=g!=='—'&&gn.length>1&&(cn.includes(gn)||gn.includes(cn.split(/[–\-\(]/)[0].trim()));
+        body+=`<div class="tm-r"><span class="tm-rn">${i+1}</span><span class="tm-g ${m?'tm-ok':'tm-no'}">${g}</span><span class="tm-ra">${c}</span></div>`;
+      });
+    });
+    return `<div class="tm"><div class="tm-h" onclick="this.nextElementSibling.classList.toggle('open')"><span style="font-size:1rem">${t.emoji}</span><span class="tm-n">${t.team}</span><span class="tm-s">${f}/${allK.length}</span><span style="color:#555">▸</span></div><div class="tm-b">${body}</div></div>`;
+  }).join('');
+}
+
+// ===== SCORES =====
+function rSc(){
+  const teams=Object.values(subs);
+  const el=document.getElementById('sboard');
+  if(!teams.length){el.innerHTML='<p style="color:#555;text-align:center">Geen teams.</p>';return;}
+  const sorted=teams.map(t=>{const k=t.team.replace(/[.#$/[\]]/g,'_');return{t:t.team,e:t.emoji,p:scores[k]||0,k}}).sort((a,b)=>b.p-a.p);
+  el.innerHTML=sorted.map((t,i)=>
+    `<div class="sr"><div class="sr-k">${i+1}</div><span style="font-size:1rem">${t.e}</span><span class="sr-n">${t.t}</span><button class="sr-b mi" onclick="adj('${t.k}',-1)">−</button><span class="sr-p">${t.p}</span><button class="sr-b pl" onclick="adj('${t.k}',1)">+</button></div>`
+  ).join('');
+}
+function adj(k,d){scores[k]=Math.max(0,(scores[k]||0)+d);if(db)db.ref('pubquiz/scores/'+k).set(scores[k]);rSc()}
+
+// ===== REF =====
+function rRef(){
+  let h='';
+  R.forEach(r=>{
+    if(!r.qs.length||(r.qs.length===1&&r.id==='ijsstokjes'))return;
+    h+=`<h3 style="margin-top:10px;font-size:.85rem;color:var(--gold)">${r.emoji} ${r.name}</h3>`;
+    r.qs.forEach((_,i)=>{h+=`<div class="rf"><span class="rf-n">${i+1}</span><span class="rf-a">${ANS[r.id+'_'+i]||'—'}</span></div>`});
+  });
+  document.getElementById('aref').innerHTML=h;
+}
+
+// ===== TABS =====
+function tt(t){['ctrl','spot','team','score','ref'].forEach(x=>{const e=document.getElementById('t-'+x);if(e)e.classList.toggle('hidden',x!==t)});document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('act',b.dataset.t===t))}
+
+// ===== FIREBASE =====
+function init(){
+  if(!db)return;
+  db.ref('pubquiz/qstates').on('value',s=>{qS=s.val()||{};rSel();rBatch();rQ()});
+  db.ref('pubquiz/submissions').on('value',s=>{subs=s.val()||{};rT();rSc()});
+  db.ref('pubquiz/scores').on('value',s=>{scores=s.val()||{};rSc()});
+}
+
+rSel();rBatch();rQ();rS();rRef();rT();rSc();init();
+</script>
+</body>
+</html>
