@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚖️ Vergelijking – Viehhofen vs Wald im Pinzgau</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#1e7f5c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DIJK SKI">
+
+  <style>
+    main { margin: 16px; }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      line-height: 1.7;
+    }
+
+    .sub {
+      background: #f2f6f4;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .sub h3 { margin: 0 0 6px; }
+
+    /* Vergelijkingstabel */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .compare-table th {
+      background: #1e7f5c;
+      color: white;
+      padding: 10px 8px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .compare-table th:first-child {
+      text-align: left;
+      border-radius: 10px 0 0 0;
+    }
+
+    .compare-table th:last-child {
+      border-radius: 0 10px 0 0;
+    }
+
+    .compare-table td {
+      padding: 9px 8px;
+      border-bottom: 1px solid #e8f0ec;
+      vertical-align: top;
+    }
+
+    .compare-table td:first-child {
+      font-weight: 600;
+      color: #1e3d2b;
+      width: 38%;
+    }
+
+    .compare-table td:nth-child(2) {
+      background: #f9fffe;
+      text-align: center;
+      width: 31%;
+    }
+
+    .compare-table td:nth-child(3) {
+      background: #f9fffe;
+      text-align: center;
+      width: 31%;
+    }
+
+    .compare-table tr:hover td { background: #eef7f3; }
+    .compare-table tr:hover td:first-child { background: #eef7f3; }
+
+    .winner {
+      background: #d4edda !important;
+      font-weight: 700;
+    }
+
+    /* Sterren */
+    .stars { color: #f5a623; letter-spacing: 1px; }
+
+    /* Conclusie kaart */
+    .verdict {
+      background: linear-gradient(135deg, #1e7f5c 0%, #0f5f45 100%);
+      color: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+      line-height: 1.7;
+    }
+
+    .verdict h2 { margin-top: 0; color: white; }
+    .verdict p { margin-bottom: 8px; }
+
+    .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 13px;
+      margin: 2px 3px;
+    }
+
+    .pro-list { padding-left: 18px; margin: 6px 0; }
+    .pro-list li { margin-bottom: 4px; }
+
+    .dest-header {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .dest-pill {
+      flex: 1;
+      text-align: center;
+      padding: 8px 4px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .pill-v { background: #e8f4fd; color: #1565c0; }
+    .pill-w { background: #e8f5e9; color: #2e7d32; }
+
+    a { font-weight: 600; text-decoration: none; color: #1e7f5c; }
+    a:hover { text-decoration: underline; }
+
+    .muted { opacity: .7; font-size: 13px; }
+    .tag { font-size: 12px; background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 20px; display: inline-block; margin: 2px; }
+    .tag-blue { background: #e3f2fd; color: #1565c0; }
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="verblijf.html">🏡 Verblijf</a>
+  <a href="meenemen.html">🎒 Meenemen</a>
+  <a href="onderweg.html">🚗 Onderweg</a>
+  <a href="ski.html">🎿 Ski</a>
+  <a href="boodschappen.html">🛒 Boodschappen</a>
+  <a href="fotos.html">📸 Foto's</a>
+  <a href="bingo.html">🎲 Bingo</a>
+  <a href="sos.html">🚨 SOS</a>
+  <a href="vergelijking.html">⚖️ Vergelijking</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <!-- TITEL -->
+  <div class="card">
+    <h1>⚖️ Viehhofen vs Wald im Pinzgau</h1>
+    <p>Welk skigebied past het beste bij gezinnen? Een eerlijke vergelijking van twee populaire bestemmingen in Salzburgerland.</p>
+    <div class="dest-header">
+      <div class="dest-pill pill-v">🔵 Viehhofen<br><small>Skicircus Saalbach</small></div>
+      <div style="display:flex;align-items:center;font-size:20px;font-weight:700;color:#888">vs</div>
+      <div class="dest-pill pill-w">🟢 Wald im Pinzgau<br><small>Zillertal Arena</small></div>
+    </div>
+  </div>
+
+  <!-- SNEL OVERZICHT -->
+  <div class="card">
+    <h2>📋 Snel overzicht</h2>
+
+    <div class="sub">
+      <h3>🔵 Viehhofen</h3>
+      <p>
+        Klein, charmant dorp in het Glemmtal, op slechts 5 minuten rijden van Saalbach-Hinterglemm.
+        Onderdeel van het <strong>Skicircus Saalbach Hinterglemm Leogang Fieberbrunn</strong> –
+        één van de grootste skigebieden van Oostenrijk.
+      </p>
+      <p>
+        <span class="tag tag-blue">270 km piste</span>
+        <span class="tag tag-blue">Hoogte 1.000–2.096 m</span>
+        <span class="tag tag-blue">96 liften</span>
+        <span class="tag tag-blue">Levendig après-ski</span>
+      </p>
+    </div>
+
+    <div class="sub">
+      <h3>🟢 Wald im Pinzgau / Hochkrimml</h3>
+      <p>
+        Rustig authentiek dorp in het Oberpinzgau, direct aan de Zillertal Arena.
+        Het kinderland bij <strong>Hochkrimml / Filzstein</strong> staat bekend als één van
+        de beste leergebieden voor jonge skiërs in Salzburgerland.
+      </p>
+      <p>
+        <span class="tag">166 km piste</span>
+        <span class="tag">Hoogte 1.067–2.500 m</span>
+        <span class="tag">67 liften</span>
+        <span class="tag">Rustige gezinssfeer</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- VERGELIJKINGSTABEL -->
+  <div class="card">
+    <h2>📊 Vergelijkingstabel voor gezinnen</h2>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Criterium</th>
+          <th>🔵 Viehhofen</th>
+          <th>🟢 Wald im Pinzgau</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Km piste</td>
+          <td>270 km</td>
+          <td>166 km</td>
+        </tr>
+        <tr>
+          <td>Kinderland kwaliteit</td>
+          <td><span class="stars">★★★★</span></td>
+          <td class="winner"><span class="stars">★★★★★</span></td>
+        </tr>
+        <tr>
+          <td>Skischool voor kinderen</td>
+          <td><span class="stars">★★★★</span></td>
+          <td class="winner"><span class="stars">★★★★★</span></td>
+        </tr>
+        <tr>
+          <td>Rustige sfeer voor gezinnen</td>
+          <td><span class="stars">★★★</span></td>
+          <td class="winner"><span class="stars">★★★★★</span></td>
+        </tr>
+        <tr>
+          <td>Beginner &amp; kind-vriendelijk</td>
+          <td><span class="stars">★★★★</span></td>
+          <td class="winner"><span class="stars">★★★★★</span></td>
+        </tr>
+        <tr>
+          <td>Aanbod voor gevorderde skiërs</td>
+          <td class="winner"><span class="stars">★★★★★</span></td>
+          <td><span class="stars">★★★★</span></td>
+        </tr>
+        <tr>
+          <td>Bereikbaarheid (vanuit NL)</td>
+          <td><span class="stars">★★★★</span></td>
+          <td class="winner"><span class="stars">★★★★</span></td>
+        </tr>
+        <tr>
+          <td>Drukte / wachtrijen</td>
+          <td><span class="stars">★★★</span> (drukker)</td>
+          <td class="winner"><span class="stars">★★★★★</span> (rustig)</td>
+        </tr>
+        <tr>
+          <td>Prijsniveau verblijf</td>
+          <td><span class="stars">★★★</span> (duurder)</td>
+          <td class="winner"><span class="stars">★★★★</span> (redelijk)</td>
+        </tr>
+        <tr>
+          <td>Après-ski / avondleven</td>
+          <td class="winner"><span class="stars">★★★★★</span></td>
+          <td><span class="stars">★★★</span></td>
+        </tr>
+        <tr>
+          <td>Winterwandelingen</td>
+          <td><span class="stars">★★★</span></td>
+          <td class="winner"><span class="stars">★★★★★</span></td>
+        </tr>
+        <tr>
+          <td>Skibus verbinding</td>
+          <td><span class="stars">★★★★</span></td>
+          <td class="winner"><span class="stars">★★★★★</span></td>
+        </tr>
+        <tr>
+          <td>Authentiek Oostenrijks karakter</td>
+          <td><span class="stars">★★★★</span></td>
+          <td class="winner"><span class="stars">★★★★★</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="muted">Beoordelingen specifiek vanuit gezinsperspectief met jonge kinderen.</p>
+  </div>
+
+  <!-- VOORDELEN PER BESTEMMING -->
+  <div class="card">
+    <h2>✅ Pluspunten per bestemming</h2>
+
+    <div class="sub">
+      <h3>🔵 Voordelen Viehhofen</h3>
+      <ul class="pro-list">
+        <li>Enorm groot skigebied – nooit uitgespeeld</li>
+        <li>Uitstekend voor gevorderde en enthousiaste skiërs</li>
+        <li>Levendig avondprogramma, gezellige après-ski</li>
+        <li>Veel variatie in restaurants op de piste</li>
+        <li>Moderne liften en uitstekende infrastructuur</li>
+        <li>Goede verbinding via skibus naar Saalbach centrum</li>
+      </ul>
+    </div>
+
+    <div class="sub">
+      <h3>🟢 Voordelen Wald im Pinzgau</h3>
+      <ul class="pro-list">
+        <li>Uitstekend kinderland bij Hochkrimml / Filzstein</li>
+        <li>Rustige omgeving – ideaal voor jonge kinderen</li>
+        <li>Nauwelijks wachtrijen, ook in schoolvakanties</li>
+        <li>Erkende skischool met kindgerichte aanpak</li>
+        <li>Prachtige winterwandelingen voor niet-skiërs</li>
+        <li>Authentieker en minder toeristisch dan Saalbach</li>
+        <li>Betaalbaardere verblijfsopties</li>
+        <li>Directe skibusverbinding vanuit Lahnsiedlung</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CONCLUSIE -->
+  <div class="verdict">
+    <h2>🏆 Conclusie voor gezinnen</h2>
+    <p>
+      Voor gezinnen met <strong>jonge of beginnende skiërs</strong> is
+      <strong>Wald im Pinzgau</strong> de duidelijke winnaar.
+      Het kinderland bij Hochkrimml is uitzonderlijk goed opgezet,
+      de sfeer is rustig en kindvriendelijk, en de skibus rijdt direct
+      voor de deur.
+    </p>
+    <p>
+      <strong>Viehhofen / Saalbach</strong> is de betere keuze voor gezinnen
+      waarbij de meeste leden al kunnen skiën en waarbij er ook een levendig
+      sociaal programma buiten de piste gewenst is.
+    </p>
+    <p>
+      <strong>Samengevat:</strong>
+    </p>
+    <p>
+      <span class="badge">👶 Kleine kinderen → Wald im Pinzgau</span>
+      <span class="badge">🎿 Enthousiaste skiërs → Viehhofen</span>
+    </p>
+    <p>
+      <span class="badge">🤫 Rust &amp; natuur → Wald im Pinzgau</span>
+      <span class="badge">🎉 Après-ski &amp; variatie → Viehhofen</span>
+    </p>
+  </div>
+
+  <!-- ONZE KEUZE -->
+  <div class="card">
+    <h2>📍 Onze keuze: Wald im Pinzgau</h2>
+    <p>
+      Voor de DIJK Skifestijn 2026 hebben wij gekozen voor Wald im Pinzgau –
+      en niet voor niets. Met meerdere gezinnen met jonge kinderen biedt
+      het kinderland bij <strong>Hochkrimml / Filzstein</strong> precies wat
+      wij nodig hebben: veiligheid, goede begeleiding en veel plezier voor
+      de kleintjes op de piste.
+    </p>
+    <p>
+      De rustige dorpssfeer, de directe skibusverbinding vanuit Lahnsiedlung
+      en de prachtige winterwandelingen voor wie een dagje niet skiët,
+      maken dit de perfecte bestemming voor een groepsreis met gezinnen.
+    </p>
+    <p>
+      👉 <a href="ski.html">Bekijk alle skiinfo voor Wald im Pinzgau</a>
+    </p>
+  </div>
+
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>
