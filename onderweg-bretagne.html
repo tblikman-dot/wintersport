@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚐 Onderweg naar Bretagne</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1e7f5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DIJK SKI">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+  main { margin: 16px; padding-bottom: 40px; }
+
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    line-height: 1.7;
+  }
+
+  a { font-weight: 600; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .muted { opacity: .7; font-size: 14px; }
+
+  /* ===== COUNTDOWN ===== */
+  .countdown-card {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 55%, #38bdf8 100%);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .countdown-card::after {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .cd-label {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    opacity: 0.85;
+    margin-bottom: 4px;
+  }
+  .cd-timer {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0 12px;
+    flex-wrap: wrap;
+  }
+  .cd-unit {
+    background: rgba(255,255,255,0.15);
+    border-radius: 14px;
+    padding: 10px 14px;
+    text-align: center;
+    min-width: 62px;
+    backdrop-filter: blur(6px);
+  }
+  .cd-unit .num { font-size: 1.8rem; font-weight: 800; line-height: 1; }
+  .cd-unit .lbl { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; opacity: 0.8; margin-top: 3px; }
+  .cd-set-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 6px;
+  }
+  .cd-set-row input[type="datetime-local"] {
+    flex: 1;
+    min-width: 160px;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    background: rgba(255,255,255,0.9);
+    color: #1e3a5f;
+  }
+  .cd-set-row button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 10px;
+    background: #fff;
+    color: #1e3a5f;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .cd-set-row button:active { transform: scale(0.96); }
+  .cd-arrived {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 6px 0 4px;
+  }
+
+  /* ===== SPELLEN (zelfde als skitrip-onderweg) ===== */
+  .games-card {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 2px solid #fde68a;
+    position: relative;
+    overflow: hidden;
+  }
+  .games-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(251,191,36,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .games-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .games-icon { font-size: 2.4rem; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.1)); animation: wiggle 2s ease-in-out infinite; }
+  @keyframes wiggle { 0%,100%{transform:rotate(-5deg);} 50%{transform:rotate(5deg);} }
+  .games-header h2 { font-size: 1.15rem; color: #92400e; margin: 0; }
+  .games-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .game-chip {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 12px 6px; border-radius: 14px; text-decoration: none; color: #1e293b;
+    transition: transform 0.12s, box-shadow 0.12s; border: 2px solid transparent;
+    background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .game-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); text-decoration: none; }
+  .game-chip:active { transform: scale(0.95); }
+  .gc-emoji { font-size: 1.6rem; }
+  .gc-name { font-size: 0.68rem; font-weight: 700; text-align: center; line-height: 1.2; }
+  .gc1 { border-color: #fde68a; } .gc2 { border-color: #bbf7d0; } .gc3 { border-color: #c7d2fe; }
+  .gc4 { border-color: #fecdd3; } .gc5 { border-color: #ddd6fe; } .gc6 { border-color: #a5f3fc; }
+  .games-cta {
+    display: block; text-align: center; padding: 12px;
+    background: linear-gradient(135deg, #f97316, #fbbf24); color: #fff;
+    border-radius: 14px; font-weight: 800; font-size: 0.95rem; text-decoration: none;
+    box-shadow: 0 4px 16px rgba(249,115,22,0.25);
+  }
+  .games-cta:hover { text-decoration: none; }
+  .games-cta:active { transform: scale(0.97); }
+
+  /* ===== STOPS ===== */
+  .sync-status {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600;
+    padding: 3px 10px; border-radius: 50px; float: right;
+  }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .sync-status.live .sync-dot { background: #43a047; } .sync-status.live { color: #43a047; }
+  .sync-status.offline .sync-dot { background: #ff9800; } .sync-status.offline { color: #ff9800; }
+  .sync-status.error .sync-dot { background: #e53935; } .sync-status.error { color: #e53935; }
+
+  .stop-item { display: flex; align-items: center; gap: 12px; padding: 9px 2px; border-top: 1px solid #f0f0f0; }
+  .stop-item:first-child { border-top: none; }
+  .stop-item .ck {
+    width: 26px; height: 26px; border-radius: 50%; border: 2px solid #ccc; background: #fff;
+    cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; transition: all 0.15s;
+  }
+  .stop-item .ck:active { transform: scale(0.9); }
+  .stop-item.done .ck { background: #43a047; border-color: #43a047; color: #fff; }
+  .stop-item .naam { flex: 1; min-width: 0; font-size: 15px; font-weight: 500; color: #333; cursor: pointer; }
+  .stop-item.done .naam { text-decoration: line-through; color: #aaa; }
+  .stop-item .del {
+    width: 24px; height: 24px; border-radius: 50%; border: none; background: transparent;
+    color: #ccc; cursor: pointer; font-size: 15px; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0;
+  }
+  .stop-item .del:active { color: #e53935; background: #ffebee; }
+  .leeg { text-align: center; padding: 18px; color: #bbb; font-size: 14px; }
+
+  .add-row { display: flex; gap: 8px; margin-top: 10px; }
+  .add-row input[type="text"] {
+    flex: 1; padding: 9px 12px; border: 2px solid #dce0dd; border-radius: 12px;
+    font-size: 14px; outline: none; background: #fff; transition: border-color 0.2s;
+  }
+  .add-row input[type="text"]:focus { border-color: #43a047; }
+  .add-row button {
+    padding: 9px 14px; border: none; border-radius: 12px; background: #43a047;
+    color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+  }
+  .add-row button:active { transform: scale(0.95); }
+
+  .tip-box {
+    margin-top: 12px; padding: 10px 14px; background: #f2f6f4;
+    border-radius: 10px; font-size: 13px; line-height: 1.6;
+  }
+
+  .link-list a { display: block; margin: 6px 0; }
+
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #333; color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 13px;
+    font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.3); z-index: 10000;
+    transition: transform 0.3s ease; pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="verblijf.html">🏡 Verblijf</a>
+  <a href="meenemen.html">🎒 Meenemen</a>
+  <a href="onderweg.html">🚗 Onderweg</a>
+  <a href="ski.html">🎿 Ski</a>
+  <a href="boodschappen.html">🛒 Boodschappen</a>
+  <a href="bretagne.html">🏖️ Bretagne</a>
+  <a href="onderweg-bretagne.html">🚐 Onderweg BR</a>
+  <a href="fotos.html">📸 Foto's</a>
+  <a href="bingo.html">🎲 Bingo</a>
+  <a href="sos.html">🚨 SOS</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <div class="card">
+    <h1>🚐 Onderweg naar Bretagne</h1>
+    <p class="muted">Alles voor de lange rit: een teller tot vertrek, spelletjes tegen de verveling en een gedeelde lijst met stops.</p>
+  </div>
+
+  <!-- COUNTDOWN -->
+  <div class="card countdown-card">
+    <div class="cd-label">⏱️ Aftellen</div>
+    <div id="cdBody">
+      <div class="cd-timer" id="cdTimer">
+        <div class="cd-unit"><div class="num" id="cdDays">–</div><div class="lbl">dagen</div></div>
+        <div class="cd-unit"><div class="num" id="cdHours">–</div><div class="lbl">uren</div></div>
+        <div class="cd-unit"><div class="num" id="cdMins">–</div><div class="lbl">minuten</div></div>
+      </div>
+    </div>
+    <div class="cd-set-row">
+      <input type="datetime-local" id="cdInput">
+      <button onclick="setVertrek()">Vertrektijd instellen</button>
+    </div>
+    <div class="muted" style="margin-top:6px; color:rgba(255,255,255,0.8);" id="cdMeta">Nog geen vertrektijd ingesteld.</div>
+  </div>
+
+  <!-- SPELLEN -->
+  <div class="card games-card">
+    <div class="games-header">
+      <span class="games-icon">🎮</span>
+      <div>
+        <h2>Kinderen vervelen zich?</h2>
+        <p class="muted" style="margin:4px 0 0;">Dezelfde 6 autospellen als op de skitrip — werken overal, ook naar Bretagne!</p>
+      </div>
+    </div>
+    <div class="games-grid">
+      <a href="spellen.html" class="game-chip gc1"><span class="gc-emoji">🚗</span><span class="gc-name">Auto Bingo</span></a>
+      <a href="spellen.html" class="game-chip gc2"><span class="gc-emoji">🏎️</span><span class="gc-name">Autojacht</span></a>
+      <a href="spellen.html" class="game-chip gc3"><span class="gc-emoji">👀</span><span class="gc-name">Ik Zie Ik Zie</span></a>
+      <a href="spellen.html" class="game-chip gc4"><span class="gc-emoji">🧠</span><span class="gc-name">Reis Quiz</span></a>
+      <a href="spellen.html" class="game-chip gc5"><span class="gc-emoji">🔢</span><span class="gc-name">Tel Wedstrijd</span></a>
+      <a href="spellen.html" class="game-chip gc6"><span class="gc-emoji">📖</span><span class="gc-name">Gekke Verhalen</span></a>
+    </div>
+    <a href="spellen.html" class="games-cta">🎮 Alle spellen openen →</a>
+  </div>
+
+  <!-- STOPS -->
+  <div class="card">
+    <h2>🛑 Stops onderweg <span id="stopsCount" style="font-size:14px;color:#999;font-weight:400;"></span></h2>
+    <div id="syncStatus" class="sync-status offline"><span class="sync-dot"></span><span id="syncLabel">Verbinden…</span></div>
+    <p class="muted">Plan samen waar jullie stoppen — tanken, plassen, speeltuin, lunch. Wie een stop toevoegt of afvinkt, ziet iedereen direct.</p>
+    <div id="stopsList"></div>
+    <div class="add-row">
+      <input type="text" id="stopInput" placeholder="Bijv. Speeltuin bij Rouen…" autocomplete="off">
+      <button onclick="addStop()">+</button>
+    </div>
+  </div>
+
+  <!-- VERKEER & TIPS -->
+  <div class="card">
+    <h2>🗺️ Verkeer & route-tools</h2>
+    <div class="link-list">
+      <a href="https://www.bison-fute.gouv.fr/" target="_blank">🇫🇷 Bison Futé — actueel verkeer & drukte in Frankrijk</a>
+      <a href="https://www.anwb.nl/verkeer/actueel/buitenland" target="_blank">🚦 ANWB — grensinfo & buitenlands verkeer</a>
+      <a href="https://www.google.com/maps" target="_blank">📍 Google Maps — live reistijd</a>
+      <a href="https://www.viamichelin.com/web/Traffic" target="_blank">🛣️ ViaMichelin — filekaart</a>
+    </div>
+    <div class="tip-box">
+      💡 <strong>Rijden met kinderen — tips:</strong><br>
+      • Plan elke 1,5–2 uur een korte stop (in Frankrijk vaak een "aire" met speeltuin)<br>
+      • Zoek onderweg tankstations met "aire de jeux" op Google Maps<br>
+      • Vermijd zaterdagen in de Franse schoolvakanties — dan is het drukst op de wegen naar het zuidwesten<br>
+      • Download de playlist en spellen vóór vertrek — onderweg is bereik niet altijd goed
+    </div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2000);
+}
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ===== FIREBASE (zelfde project) =====
+const FIREBASE_CONFIG = { databaseURL: 'https://dijkski-default-rtdb.europe-west1.firebasedatabase.app' };
+let fbRoot = null;
+let fbConnected = false;
+let vertrekRef = null, stopsRef = null;
+
+let vertrekTs = null;   // epoch ms
+let stops = {};         // { id: {name, done, ts} }
+
+function initFirebase(){
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    const db = firebase.database();
+    vertrekRef = db.ref('bretagneVertrek');
+    stopsRef = db.ref('bretagneStops');
+
+    db.ref('.info/connected').on('value', snap => {
+      if (snap.val() === true) { fbConnected = true; setSyncStatus('live', 'Live sync'); }
+      else { fbConnected = false; setSyncStatus('offline', 'Offline'); }
+    });
+
+    vertrekRef.on('value', snap => {
+      const v = snap.val();
+      if (v) { vertrekTs = v; saveLocalVertrek(); renderCountdown(); }
+    });
+
+    stopsRef.on('value', snap => {
+      stops = snap.val() || {};
+      saveLocalStops();
+      renderStops();
+    });
+  } catch(e) {
+    console.error('Firebase fout:', e);
+    setSyncStatus('error', 'Fout');
+  }
+}
+
+function setSyncStatus(status, label){
+  const el = document.getElementById('syncStatus');
+  const lbl = document.getElementById('syncLabel');
+  el.className = 'sync-status ' + status;
+  lbl.textContent = label;
+}
+
+// ===== OPSLAG =====
+function loadLocal(){
+  try { const s = localStorage.getItem('dijkBretagneVertrek'); if (s) vertrekTs = JSON.parse(s); } catch(e){}
+  try { const s = localStorage.getItem('dijkBretagneStops'); if (s) stops = JSON.parse(s); } catch(e){}
+}
+function saveLocalVertrek(){ try { localStorage.setItem('dijkBretagneVertrek', JSON.stringify(vertrekTs)); } catch(e){} }
+function saveLocalStops(){ try { localStorage.setItem('dijkBretagneStops', JSON.stringify(stops)); } catch(e){} }
+
+function setVertrek(){
+  const inp = document.getElementById('cdInput');
+  if(!inp.value) return;
+  vertrekTs = new Date(inp.value).getTime();
+  saveLocalVertrek();
+  if (vertrekRef && fbConnected) {
+    vertrekRef.set(vertrekTs).catch(e => console.error('Firebase write error:', e));
+  }
+  renderCountdown();
+  toast('⏱️ Vertrektijd ingesteld');
+}
+
+function addStop(){
+  const inp = document.getElementById('stopInput');
+  const naam = inp.value.trim();
+  if(!naam) return;
+  const id = 's'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  stops[id] = { name: naam, done: false, ts: Date.now() };
+  saveLocalStops();
+  if (stopsRef && fbConnected) stopsRef.set(stops).catch(e => console.error('Firebase write error:', e));
+  inp.value=''; inp.focus();
+  renderStops();
+  toast('✅ Stop toegevoegd');
+}
+function toggleStop(id){
+  if(!stops[id]) return;
+  stops[id].done = !stops[id].done;
+  saveLocalStops();
+  if (stopsRef && fbConnected) stopsRef.set(stops).catch(e => console.error('Firebase write error:', e));
+  renderStops();
+}
+function delStop(id){
+  delete stops[id];
+  saveLocalStops();
+  if (stopsRef && fbConnected) stopsRef.set(stops).catch(e => console.error('Firebase write error:', e));
+  renderStops();
+  toast('🗑️ Verwijderd');
+}
+
+function renderStops(){
+  const el = document.getElementById('stopsList');
+  const cnt = document.getElementById('stopsCount');
+  const entries = Object.entries(stops).sort((a,b)=>a[1].ts-b[1].ts);
+  const done = entries.filter(([,s])=>s.done).length;
+  cnt.textContent = entries.length ? `(${done}/${entries.length})` : '';
+
+  if(!entries.length){
+    el.innerHTML = '<div class="leeg">🛑 Nog geen stops gepland. Voeg er hieronder één toe!</div>';
+    return;
+  }
+  el.innerHTML = entries.map(([id, s]) => `
+    <div class="stop-item${s.done?' done':''}">
+      <div class="ck" onclick="toggleStop('${id}')">${s.done?'✓':''}</div>
+      <div class="naam" onclick="toggleStop('${id}')">${esc(s.name)}</div>
+      <button class="del" onclick="delStop('${id}')" title="Verwijderen">✕</button>
+    </div>
+  `).join('');
+}
+
+// ===== COUNTDOWN RENDER =====
+function renderCountdown(){
+  const meta = document.getElementById('cdMeta');
+  if(!vertrekTs){
+    document.getElementById('cdDays').textContent='–';
+    document.getElementById('cdHours').textContent='–';
+    document.getElementById('cdMins').textContent='–';
+    meta.textContent = 'Nog geen vertrektijd ingesteld.';
+    return;
+  }
+  const diff = vertrekTs - Date.now();
+  const d = new Date(vertrekTs);
+  const dtStr = d.toLocaleString('nl-NL', {weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'});
+
+  if(diff <= 0){
+    document.getElementById('cdDays').textContent='🚗';
+    document.getElementById('cdHours').textContent='';
+    document.getElementById('cdMins').textContent='';
+    meta.textContent = 'Onderweg! Vertrokken op ' + dtStr;
+    return;
+  }
+  const totalMin = Math.floor(diff/60000);
+  const days = Math.floor(totalMin/1440);
+  const hours = Math.floor((totalMin%1440)/60);
+  const mins = totalMin%60;
+  document.getElementById('cdDays').textContent = days;
+  document.getElementById('cdHours').textContent = hours;
+  document.getElementById('cdMins').textContent = mins;
+  meta.textContent = 'Vertrek gepland op ' + dtStr;
+}
+
+// ===== INIT =====
+loadLocal();
+renderCountdown();
+renderStops();
+initFirebase();
+setInterval(renderCountdown, 30000);
+</script>
+
+</body>
+</html>
