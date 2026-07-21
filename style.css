@@ -114,7 +114,7 @@ body {
 .app-header{position:sticky;top:0;z-index:1000;height:72px;background:#1f7f5c;display:flex;align-items:center;justify-content:center}
 .app-logo{height:48px;width:48px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .menu-btn{position:absolute;left:16px;font-size:26px;background:none;border:none;color:white;cursor:pointer}
-.side-menu{position:fixed;top:0;left:-260px;width:240px;height:100%;background:white;box-shadow:4px 0 20px rgba(0,0,0,.2);padding:88px 16px;display:flex;flex-direction:column;gap:14px;transition:.3s;z-index:1100}
+.side-menu{position:fixed;top:0;left:-260px;width:240px;height:100%;background:white;box-shadow:4px 0 20px rgba(0,0,0,.2);padding:88px 16px;display:flex;flex-direction:column;gap:14px;transition:.3s;z-index:1100;overflow-y:auto;box-sizing:border-box}
 .side-menu a{text-decoration:none;font-size:18px;font-weight:600;color:#143}
 .side-menu.open{left:0}
 #menuOverlay{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.3s;z-index:1050}
