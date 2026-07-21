@@ -131,8 +131,52 @@
     }
     .item .ck:active { transform: scale(0.9); }
     .item.done .ck { background: #43a047; border-color: #43a047; color: #fff; }
-    .item .naam { flex: 1; min-width: 0; font-size: 15px; font-weight: 500; color: #333; }
+    .item .naam { flex: 1; min-width: 0; font-size: 15px; font-weight: 500; color: #333; cursor: pointer; }
     .item.done .naam { text-decoration: line-through; color: #aaa; }
+    .item .del {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: #ccc;
+      cursor: pointer;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .item .del:active { color: #e53935; background: #ffebee; }
+
+    /* ===== ITEM TOEVOEGEN ===== */
+    .add-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .add-row input[type="text"] {
+      flex: 1;
+      padding: 9px 12px;
+      border: 2px solid #dce0dd;
+      border-radius: 12px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+      transition: border-color 0.2s;
+    }
+    .add-row input[type="text"]:focus { border-color: #43a047; }
+    .add-row button {
+      padding: 9px 14px;
+      border: none;
+      border-radius: 12px;
+      background: #43a047;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .add-row button:active { transform: scale(0.95); }
 
     .acties {
       display: flex;
@@ -201,7 +245,7 @@
   <!-- TITEL -->
   <div class="card">
     <h1>🏖️ Vakantiechecklist Bretagne</h1>
-    <p>Vink samen af wat al geregeld of ingepakt is. Wijzigingen worden direct gedeeld.</p>
+    <p>Vink samen af wat al geregeld of ingepakt is, en voeg zelf items toe die je nog mist. Wijzigingen worden direct gedeeld.</p>
     <div id="syncStatus" class="sync-status offline">
       <span class="sync-dot"></span>
       <span id="syncLabel">Verbinden…</span>
@@ -270,7 +314,8 @@ const categories = [
 // stabiele ids per item: catId-index
 categories.forEach(c => { c.itemIds = c.items.map((_,i) => c.id+'-'+i); });
 
-let state = {};       // { itemId: true/false }
+let state = {};       // { itemId: true/false }  vaste items uit de Excel
+let custom = {};      // { customId: {cat, name, done, ts} }  zelf toegevoegde items
 let collapsed = {};   // { catId: true/false }
 let fbRef = null;
 let fbConnected = false;
@@ -292,8 +337,15 @@ function initFirebase() {
     });
 
     fbRef.on('value', snap => {
-      const data = snap.val();
-      state = data || {};
+      const data = snap.val() || {};
+      // 'state'/'custom' herkennen we aan de sleutels; oudere data was een platte { itemId: bool } map
+      if ('state' in data || 'custom' in data) {
+        state = data.state || {};
+        custom = data.custom || {};
+      } else {
+        state = data;
+        custom = {};
+      }
       saveLocal();
       render();
     });
@@ -314,11 +366,23 @@ function setSyncStatus(status, label) {
 
 // ===== OPSLAG =====
 function loadLocal() {
-  try { const s = localStorage.getItem('dijkBretagne'); if (s) state = JSON.parse(s); } catch(e) {}
+  try {
+    const s = localStorage.getItem('dijkBretagne');
+    if (s) {
+      const parsed = JSON.parse(s);
+      if (parsed && ('state' in parsed || 'custom' in parsed)) {
+        state = parsed.state || {};
+        custom = parsed.custom || {};
+      } else {
+        state = parsed || {};
+        custom = {};
+      }
+    }
+  } catch(e) {}
   try { const s = localStorage.getItem('dijkBretagneCollapsed'); if (s) collapsed = JSON.parse(s); } catch(e) {}
 }
 function saveLocal() {
-  try { localStorage.setItem('dijkBretagne', JSON.stringify(state)); } catch(e) {}
+  try { localStorage.setItem('dijkBretagne', JSON.stringify({ state, custom })); } catch(e) {}
 }
 function saveCollapsedLocal() {
   try { localStorage.setItem('dijkBretagneCollapsed', JSON.stringify(collapsed)); } catch(e) {}
@@ -327,7 +391,7 @@ function saveCollapsedLocal() {
 function save() {
   saveLocal();
   if (fbRef && fbConnected) {
-    fbRef.set(state).catch(e => {
+    fbRef.set({ state, custom }).catch(e => {
       console.error('Firebase write error:', e);
       setSyncStatus('error', 'Schrijffout');
     });
@@ -342,8 +406,12 @@ function render() {
   let h = '';
 
   categories.forEach(cat => {
-    const done = cat.itemIds.filter(id => state[id]).length;
-    const all = cat.itemIds.length;
+    const customEntries = Object.entries(custom)
+      .filter(([,it]) => it.cat === cat.id)
+      .sort((a,b) => a[1].ts - b[1].ts);
+
+    const done = cat.itemIds.filter(id => state[id]).length + customEntries.filter(([,it]) => it.done).length;
+    const all = cat.itemIds.length + customEntries.length;
     totalDone += done; totalAll += all;
     const isCollapsed = !!collapsed[cat.id];
 
@@ -360,11 +428,24 @@ function render() {
     cat.items.forEach((name, i) => {
       const id = cat.itemIds[i];
       const isDone = !!state[id];
-      h += `<div class="item${isDone?' done':''}" onclick="toggle('${id}')">
-        <div class="ck">${isDone?'✓':''}</div>
-        <div class="naam">${esc(name)}</div>
+      h += `<div class="item${isDone?' done':''}">
+        <div class="ck" onclick="toggle('${id}')">${isDone?'✓':''}</div>
+        <div class="naam" onclick="toggle('${id}')">${esc(name)}</div>
       </div>`;
     });
+
+    customEntries.forEach(([id, it]) => {
+      h += `<div class="item${it.done?' done':''}">
+        <div class="ck" onclick="toggleCustom('${id}')">${it.done?'✓':''}</div>
+        <div class="naam" onclick="toggleCustom('${id}')">${esc(it.name)}</div>
+        <button class="del" onclick="delCustom('${id}')" title="Verwijderen">✕</button>
+      </div>`;
+    });
+
+    h += `<div class="add-row">
+        <input type="text" id="add-${cat.id}" placeholder="Item toevoegen…" autocomplete="off" onkeydown="if(event.key==='Enter'){event.stopPropagation();addCustomItem('${cat.id}');}" onclick="event.stopPropagation()">
+        <button onclick="event.stopPropagation();addCustomItem('${cat.id}')">+</button>
+      </div>`;
 
     h += `</div></div>`;
   });
@@ -386,6 +467,34 @@ function toggle(id){
   render();
 }
 
+function addCustomItem(catId){
+  const inp = document.getElementById('add-'+catId);
+  if(!inp) return;
+  const naam = inp.value.trim();
+  if(!naam) return;
+  const id = 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  custom[id] = { cat: catId, name: naam, done: false, ts: Date.now() };
+  save();
+  render();
+  toast('✅ Toegevoegd');
+  const newInp = document.getElementById('add-'+catId);
+  if(newInp) newInp.focus();
+}
+
+function toggleCustom(id){
+  if(!custom[id]) return;
+  custom[id].done = !custom[id].done;
+  save();
+  render();
+}
+
+function delCustom(id){
+  delete custom[id];
+  save();
+  render();
+  toast('🗑️ Verwijderd');
+}
+
 function toggleCat(catId){
   collapsed[catId] = !collapsed[catId];
   saveCollapsedLocal();
@@ -400,8 +509,9 @@ function alleUitklappen(){
 }
 
 function wisAlles(){
-  if(confirm('Alle vinkjes van de Bretagne-checklist wissen?')){
+  if(confirm('Alle vinkjes van de Bretagne-checklist wissen? (zelf toegevoegde items blijven staan)')){
     state = {};
+    Object.values(custom).forEach(it => { it.done = false; });
     save();
     render();
     toast('🧹 Checklist gereset');
