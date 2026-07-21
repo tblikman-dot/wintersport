@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>DIJK Skifestijn 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1e7f5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DIJK SKI">
+<link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+/* ===== COUNTDOWN BADGE TOP-RIGHT ===== */
+.countdown-badge {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #1a1a2e;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 50px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+.countdown-badge:active {
+  transform: scale(0.95);
+}
+.countdown-badge .cd-number {
+  font-size: 18px;
+  font-weight: 800;
+}
+.countdown-badge .cd-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.85;
+}
+.countdown-badge.live {
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 2px 12px rgba(99,102,241,0.3); }
+  50% { box-shadow: 0 2px 20px rgba(99,102,241,0.6); }
+}
+
+/* ===== FLOATING BUTTONS BOTTOM-RIGHT ===== */
+.floating-sticker {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.floating-sticker img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.floating-sticker:hover {
+  transform: scale(1.12);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+}
+.floating-sticker:active {
+  transform: scale(0.96);
+}
+
+.floating-groceries {
+  position: fixed;
+  bottom: 24px;
+  right: 100px;
+  z-index: 9999;
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #43a047, #66bb6a);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  line-height: 1.1;
+  user-select: none;
+}
+.floating-groceries:hover {
+  transform: scale(1.12);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+}
+.floating-groceries:active {
+  transform: scale(0.96);
+}
+.floating-groceries .fg-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+.floating-groceries .fg-label {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* ===== PISTE MAP BUTTON IN HEADER ===== */
+.piste-btn {
+  position: absolute;
+  left: 56px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.piste-btn:hover { text-decoration: none; background: rgba(255,255,255,0.3); }
+.piste-btn:active { transform: translateY(-50%) scale(0.95); }
+.webcam-btn {
+  left: 126px;
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.25);
+}
+
+/* ===== SPOTIFY TILE ===== */
+.tile-spotify {
+  background: linear-gradient(135deg, #1DB954, #1ed760);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.tile-spotify:active {
+  transform: scale(0.97);
+}
+.tile-spotify .sp-wave {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 30%;
+  background: rgba(0,0,0,0.08);
+  border-radius: 0 0 14px 14px;
+}
+
+/* ===== SPOTIFY EMBED SECTION ===== */
+.spotify-section {
+  margin: 0 16px 16px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+  border-radius: 16px;
+}
+.spotify-section.open {
+  max-height: 400px;
+  opacity: 1;
+}
+.spotify-section iframe {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+}
+/* ===== LIVE FOTO FEED ===== */
+.feed-section {
+  margin: 0 16px 24px;
+}
+.feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.feed-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.feed-live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #e53935;
+  display: inline-block;
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+.feed-link {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1565C0;
+  text-decoration: none;
+}
+
+.feed-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+  scrollbar-width: none;
+}
+.feed-scroll::-webkit-scrollbar { display: none; }
+
+.feed-card {
+  flex-shrink: 0;
+  width: 200px;
+  scroll-snap-align: start;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  transition: transform 0.15s;
+  cursor: pointer;
+}
+.feed-card:active { transform: scale(0.97); }
+.feed-card img {
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+.feed-card-info {
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.feed-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 50px;
+  font-size: 10px;
+  font-weight: 700;
+}
+.feed-tag-haarlem   { background: #FFE0B2; color: #5D4037; }
+.feed-tag-haren     { background: #B3E5FC; color: #01579B; }
+.feed-tag-sanne     { background: #C8E6C9; color: #1B5E20; }
+.feed-tag-zuidhorn  { background: #F8BBD0; color: #880E4F; }
+.feed-tag-joure     { background: #D1C4E9; color: #311B92; }
+.feed-time {
+  font-size: 10px;
+  color: #aaa;
+}
+.feed-reactions {
+  padding: 2px 10px 8px;
+  font-size: 12px;
+  color: #999;
+  display: flex;
+  gap: 6px;
+}
+.feed-reactions span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.feed-empty {
+  width: 100%;
+  text-align: center;
+  padding: 24px 16px;
+  color: #bbb;
+  font-size: 14px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+@keyframes feedSlideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.feed-card { animation: feedSlideIn 0.3s ease both; }
+
+/* ===== WEER WIDGET ===== */
+.weer-widget {
+  margin: 0 16px 16px;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 60%, #38bdf8 100%);
+  border-radius: 16px;
+  padding: 16px 18px;
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(30,58,95,0.25);
+  position: relative;
+  overflow: hidden;
+}
+.weer-widget::after {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.weer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.weer-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.weer-icon { font-size: 2.2rem; line-height: 1; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15)); }
+.weer-temp {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+.weer-temp .weer-unit { font-size: 1rem; font-weight: 400; opacity: 0.6; }
+.weer-meta {
+  text-align: right;
+  font-size: 0.72rem;
+  opacity: 0.7;
+  line-height: 1.4;
+}
+.weer-desc {
+  font-size: 0.82rem;
+  font-weight: 500;
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+.weer-stats {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.weer-stat {
+  background: rgba(255,255,255,0.13);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.weer-forecast {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.weer-forecast::-webkit-scrollbar { display: none; }
+.weer-fc-day {
+  flex-shrink: 0;
+  text-align: center;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 6px 8px;
+  min-width: 52px;
+  font-size: 0.7rem;
+}
+.weer-fc-day .fc-name { font-weight: 600; opacity: 0.7; margin-bottom: 2px; }
+.weer-fc-day .fc-icon { font-size: 1.1rem; }
+.weer-fc-day .fc-temps { font-weight: 700; font-size: 0.72rem; }
+.weer-fc-day .fc-snow { font-size: 0.62rem; color: #93c5fd; margin-top: 1px; }
+.weer-ski-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.weer-loading {
+  text-align: center;
+  padding: 12px;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+</style>
+</head>
+<body>
+
+<!-- COUNTDOWN BADGE TOP-RIGHT -->
+<div class="countdown-badge" id="countdownBadge">
+  <span class="cd-number" id="cdNumber">…</span>
+  <span class="cd-label" id="cdLabel"></span>
+</div>
+
+<!-- FLOATING BUTTONS BOTTOM-RIGHT -->
+<a href="https://app.wiebetaaltwat.nl/list_invitations/U-xA--NLV8LYT48WC_Sz?lang=nl" target="_blank" class="floating-sticker" id="wbwSticker">
+  <img src="wbw.png" alt="WBW">
+</a>
+
+<a href="boodschappen.html" class="floating-groceries">
+  <span class="fg-icon">🛒</span>
+  <span class="fg-label">Lijst</span>
+</a>
+
+<header class="app-header no-logo">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <a href="https://zillertal.intermaps.com/zillertalarena" target="_blank" class="piste-btn">🗺️ Piste</a>
+  <a href="https://panocam.zillertalarena.com/filzstein" target="_blank" class="piste-btn webcam-btn">📸 Webcam</a>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="wintersport.html">🎿 Wintersport Home</a>
+  <a href="verblijf.html">🏡 Verblijf</a>
+  <a href="meenemen.html">🎒 Meenemen</a>
+  <a href="onderweg.html">🚗 Onderweg</a>
+  <a href="ski.html">🎿 Ski</a>
+  <a href="boodschappen.html">🛒 Boodschappen</a>
+  <a href="fotos.html">📸 Foto's</a>
+  <a href="bingo.html">🎲 Bingo</a>
+  <a href="pubquiz.html">🧠 Pubquiz</a>
+  <a href="quizmaster.html">🎩 Quizmaster</a>
+  <a href="sos.html">🚨 SOS</a>
+  <a href="index.html" style="margin-top:auto; padding-top:14px; border-top:1px solid #eee; color:#888;">🔀 Wissel van reis</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<header class="header">
+  <img src="logo-dijk-soft.png" alt="DIJK logo" class="logo">
+</header>
+
+<section class="hero">
+  <img src="ai.jpg" alt="Skiplezier" class="hero-image">
+  <div class="hero-text">VEEL PLEZIER!!</div>
+</section>
+
+<section id="vandaag" class="today-card">
+  <h2>📅 Vandaag</h2>
+  <p id="vandaag-inhoud">Rooster laden…</p>
+</section>
+
+<!-- WEER WIDGET -->
+<div class="weer-widget" id="weerWidget">
+  <div class="weer-loading">🌨️ Weer ophalen…</div>
+</div>
+
+<main class="tiles">
+  <a class="tile" href="verblijf.html">🏠 Verblijf</a>
+  <a class="tile" href="meenemen.html">🧳 Meenemen</a>
+  <a class="tile" href="onderweg.html">🚗 Onderweg</a>
+  <a class="tile" href="ski.html">🎿 Ski</a>
+  <a class="tile" href="boodschappen.html">🛒 Boodschappen</a>
+  <a class="tile" href="fotos.html">📸 Foto's</a>
+  <a class="tile" href="bingo.html">🎲 Bingo</a>
+  <a class="tile" href="pubquiz.html">🧠 Pubquiz</a>
+  <a class="tile" href="quizmaster.html">🎩 Quizmaster</a>
+  <a class="tile" href="sos.html">🚨 SOS</a>
+  <div class="tile tile-spotify" onclick="toggleSpotify()">
+    🎵 Playlist
+    <div class="sp-wave"></div>
+  </div>
+</main>
+
+<!-- SPOTIFY EMBED (toggled by tile) -->
+<div class="spotify-section" id="spotifySection">
+  <iframe id="spotifyFrame" height="352" frameborder="0" allowfullscreen
+    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+    loading="lazy"></iframe>
+</div>
+
+<!-- LIVE FOTO FEED -->
+<div class="feed-section">
+  <div class="feed-header">
+    <div class="feed-title">
+      <span class="feed-live-dot"></span> Live foto's
+    </div>
+    <a href="fotos.html" class="feed-link">Alles bekijken →</a>
+  </div>
+  <div class="feed-scroll" id="feedScroll">
+    <div class="feed-empty">📷 Foto's laden…</div>
+  </div>
+</div>
+
+<script>
+const schema = {
+  "2026-02-21": {ontbijt:null, avond:"Jan Jaap", schoonmaak:"Geessien & Tim"},
+  "2026-02-22": {ontbijt:"Geessien & Tim", avond:"Sanne & Gert", schoonmaak:"Geessien & Tim"},
+  "2026-02-23": {ontbijt:"Kim & Pieter", avond:"Koos & Jan", schoonmaak:"Kim & Pieter"},
+  "2026-02-24": {ontbijt:"Jan Jaap", avond:"Geessien & Tim", schoonmaak:"Sanne & Gert"},
+  "2026-02-25": {ontbijt:"Sanne & Gert", avond:"Uit eten", schoonmaak:"Jan Jaap"},
+  "2026-02-26": {ontbijt:"Koos & Jan", avond:"Kim & Pieter", schoonmaak:"Koos & Jan"},
+  "2026-02-27": {ontbijt:"Jan Jaap", avond:"Pizza afhalen", schoonmaak:"Allen"},
+  "2026-02-28": {ontbijt:"Sanne & Gert", avond:null, schoonmaak:null}
+};
+
+const vandaag = new Date().toISOString().slice(0,10);
+const inhoud = document.getElementById("vandaag-inhoud");
+
+if (schema[vandaag]) {
+  const d = schema[vandaag];
+  inhoud.innerHTML = `
+    ${d.ontbijt ? "🥐 Ontbijt: <strong>"+d.ontbijt+"</strong><br>" : ""}
+    ${d.avond ? "🍽️ Avondeten: <strong>"+d.avond+"</strong><br>" : ""}
+    ${d.schoonmaak ? "🧽 Schoonmaak: <strong>"+d.schoonmaak+"</strong>" : ""}
+  `;
+} else {
+  inhoud.textContent = "Geen rooster voor vandaag.";
+}
+</script>
+
+<script>
+function toggleSpotify(){
+  const sec = document.getElementById('spotifySection');
+  const frame = document.getElementById('spotifyFrame');
+  sec.classList.toggle('open');
+  // Lazy-load iframe alleen bij eerste open
+  if (!frame.src) {
+    frame.src = 'https://open.spotify.com/embed/playlist/4UEajBJjXLcphtkw3zyFQC?utm_source=generator';
+  }
+  if (sec.classList.contains('open')) {
+    setTimeout(() => sec.scrollIntoView({ behavior:'smooth', block:'nearest' }), 100);
+  }
+}
+</script>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+<script>
+(function(){
+  const btn   = document.getElementById('countdownBadge');
+  const num   = document.getElementById('cdNumber');
+  const lbl   = document.getElementById('cdLabel');
+
+  const now      = new Date();
+  const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startMid = new Date(2026, 1, 21);
+  const endMid   = new Date(2026, 1, 28);
+
+  if (todayMid < startMid) {
+    const diff = Math.ceil((startMid - todayMid) / (1000*60*60*24));
+    num.textContent = diff;
+    lbl.textContent = diff === 1 ? 'nog 1 dag' : 'nog ' + diff + ' dgn';
+  } else if (todayMid >= startMid && todayMid <= endMid) {
+    const dag = Math.floor((todayMid - startMid) / (1000*60*60*24)) + 1;
+    num.textContent = dag;
+    lbl.textContent = 'dag ' + dag + ' 🎿';
+    btn.classList.add('live');
+  } else {
+    num.textContent = '✓';
+    lbl.textContent = 'voorbij';
+  }
+})();
+</script>
+
+<script>
+// ===== LIVE FOTO FEED =====
+(function(){
+  const FIREBASE_CONFIG = {
+    databaseURL: 'https://dijkski-default-rtdb.europe-west1.firebasedatabase.app'
+  };
+
+  const feedFams = [
+    { id:'haarlem',  short:'Jan Jaap' },
+    { id:'haren',    short:'Tim & Geessien' },
+    { id:'sanne',    short:'Sanne & Gert' },
+    { id:'zuidhorn', short:'Kim & Pieter' },
+    { id:'joure',    short:'Koos & Jan Dirk' },
+  ];
+
+  try {
+    // Check of Firebase al geïnitialiseerd is
+    if (!firebase.apps.length) {
+      firebase.initializeApp(FIREBASE_CONFIG);
+    }
+    const db = firebase.database();
+    const fbFotos = db.ref('fotos');
+    const fbReacties = db.ref('reacties');
+    let allReactions = {};
+
+    // Luister naar reacties
+    fbReacties.on('value', snap => {
+      allReactions = snap.val() || {};
+    });
+
+    // Luister naar laatste 10 foto's
+    fbFotos.orderByChild('ts').limitToLast(10).on('value', snap => {
+      const data = snap.val();
+      let photos = data ? Object.values(data) : [];
+      photos.sort((a,b) => b.ts - a.ts);
+
+      const container = document.getElementById('feedScroll');
+
+      if (photos.length === 0) {
+        container.innerHTML = '<div class="feed-empty">📷 Nog geen foto\'s gedeeld.<br><a href="fotos.html" style="color:#1565C0;font-weight:700;">Maak de eerste!</a></div>';
+        return;
+      }
+
+      container.innerHTML = photos.map((p, idx) => {
+        const fam = feedFams.find(f => f.id === p.fam);
+        const time = timeAgo(p.ts);
+
+        // Gather reactions for this photo
+        const pr = allReactions[p.id] || {};
+        let reactStr = '';
+        ['❄️','🔥','🎿','😂','❤️'].forEach(emoji => {
+          const cnt = pr[emoji] ? Object.keys(pr[emoji]).length : 0;
+          if (cnt > 0) reactStr += `<span>${emoji} ${cnt}</span>`;
+        });
+
+        return `<a href="fotos.html" class="feed-card" style="animation-delay:${idx*0.06}s; text-decoration:none; color:inherit;">
+          <img src="${p.data}" alt="Foto" loading="lazy">
+          <div class="feed-card-info">
+            <span class="feed-tag feed-tag-${p.fam}">${fam ? fam.short : '?'}</span>
+            <span class="feed-time">${time}</span>
+          </div>
+          ${reactStr ? `<div class="feed-reactions">${reactStr}</div>` : ''}
+        </a>`;
+      }).join('');
+    });
+
+  } catch(e) {
+    console.log('Feed: Firebase niet beschikbaar', e);
+    document.getElementById('feedScroll').innerHTML = '<div class="feed-empty">📷 <a href="fotos.html" style="color:#1565C0;font-weight:700;">Bekijk foto\'s →</a></div>';
+  }
+
+  function timeAgo(ts) {
+    const diff = Math.floor((Date.now() - ts) / 1000);
+    if (diff < 60) return 'zojuist';
+    if (diff < 3600) return Math.floor(diff/60) + ' min';
+    if (diff < 86400) return Math.floor(diff/3600) + ' uur';
+    return Math.floor(diff/86400) + ' dag' + (Math.floor(diff/86400) !== 1 ? 'en' : '');
+  }
+})();
+</script>
+
+<script>
+// ===== WEER WIDGET =====
+(function(){
+  const LAT = 47.2468, LON = 12.1714;
+  const WMO = {
+    0:['☀️','Zonnig'],1:['🌤️','Overwegend zonnig'],2:['⛅','Half bewolkt'],3:['☁️','Bewolkt'],
+    45:['🌫️','Mistig'],48:['🌫️','IJsmist'],
+    51:['🌦️','Lichte motregen'],53:['🌧️','Motregen'],55:['🌧️','Dichte motregen'],
+    56:['🌧️','IJzel'],57:['🌧️','IJzel'],
+    61:['🌧️','Lichte regen'],63:['🌧️','Regen'],65:['🌧️','Zware regen'],
+    66:['🌧️','IJzel'],67:['🌧️','IJzel'],
+    71:['🌨️','Lichte sneeuw'],73:['🌨️','Sneeuw'],75:['❄️','Zware sneeuw'],77:['❄️','Sneeuwkorrels'],
+    80:['🌦️','Buien'],81:['🌧️','Regenbuien'],82:['⛈️','Zware buien'],
+    85:['🌨️','Sneeuwbuien'],86:['❄️','Zware sneeuwbuien'],
+    95:['⛈️','Onweer'],96:['⛈️','Onweer+hagel'],99:['⛈️','Zwaar onweer']
+  };
+  function wmo(c){return WMO[c]||['🌡️','?'];}
+
+  const params = new URLSearchParams({
+    latitude:LAT, longitude:LON, timezone:'Europe/Vienna', forecast_days:6,
+    hourly:'temperature_2m,apparent_temperature,weather_code,wind_speed_10m,snowfall,visibility',
+    daily:'temperature_2m_max,temperature_2m_min,weather_code,snowfall_sum,wind_speed_10m_max,uv_index_max,sunrise,sunset'
+  });
+
+  fetch('https://api.open-meteo.com/v1/forecast?'+params)
+    .then(r=>r.json()).then(render)
+    .catch(()=>{
+      document.getElementById('weerWidget').innerHTML='<div class="weer-loading">⚠️ Weer niet beschikbaar</div>';
+    });
+
+  function render(d){
+    const now=new Date();
+    // Find current hour index
+    let hi=0, minD=Infinity;
+    d.hourly.time.forEach((t,i)=>{const df=Math.abs(new Date(t)-now);if(df<minD){minD=df;hi=i;}});
+
+    const code=d.hourly.weather_code[hi];
+    const [icon,desc]=wmo(code);
+    const temp=Math.round(d.hourly.temperature_2m[hi]);
+    const feels=Math.round(d.hourly.apparent_temperature[hi]);
+    const wind=Math.round(d.hourly.wind_speed_10m[hi]);
+    const vis=(d.hourly.visibility[hi]/1000).toFixed(0);
+    const tMax=Math.round(d.daily.temperature_2m_max[0]);
+    const tMin=Math.round(d.daily.temperature_2m_min[0]);
+    const snow=d.daily.snowfall_sum[0];
+    const uv=Math.round(d.daily.uv_index_max[0]);
+
+    // Ski score
+    let score=3;
+    if(snow>10)score+=2;else if(snow>3)score+=1;
+    if(code<=2)score+=1;
+    if(d.daily.wind_speed_10m_max[0]>50)score-=2;else if(d.daily.wind_speed_10m_max[0]>35)score-=1;
+    if(code>=61&&code<=67)score-=2;
+    if(tMax>8)score-=1;
+    if(code>=95)score-=2;
+    score=Math.max(1,Math.min(5,score));
+    const stars='⭐'.repeat(score);
+    const verdicts={1:'Rustdag 🛋️',2:'Lastig',3:'Prima!',4:'Goed! 🎿',5:'Perfect! 🏔️'};
+
+    // Forecast days
+    const dagen=['Zo','Ma','Di','Wo','Do','Vr','Za'];
+    let fcHtml='';
+    for(let i=1;i<d.daily.time.length;i++){
+      const dt=new Date(d.daily.time[i]);
+      const nm=i===1?'Morgen':dagen[dt.getDay()];
+      const [ic]=wmo(d.daily.weather_code[i]);
+      const h=Math.round(d.daily.temperature_2m_max[i]);
+      const l=Math.round(d.daily.temperature_2m_min[i]);
+      const sn=d.daily.snowfall_sum[i];
+      fcHtml+=`<div class="weer-fc-day">
+        <div class="fc-name">${nm}</div>
+        <div class="fc-icon">${ic}</div>
+        <div class="fc-temps">${h}° / ${l}°</div>
+        ${sn>0?'<div class="fc-snow">❄ '+sn.toFixed(0)+' cm</div>':''}
+      </div>`;
+    }
+
+    document.getElementById('weerWidget').innerHTML=`
+      <div class="weer-ski-score">${stars} ${verdicts[score]}</div>
+      <div class="weer-top">
+        <div class="weer-main">
+          <span class="weer-icon">${icon}</span>
+          <span class="weer-temp">${temp}°<span class="weer-unit">C</span></span>
+        </div>
+        <div class="weer-meta">Hochkrimml<br>↑${tMax}° ↓${tMin}°</div>
+      </div>
+      <div class="weer-desc">${desc} · voelt als ${feels}°</div>
+      <div class="weer-stats">
+        ${snow>0?'<div class="weer-stat">❄️ '+snow.toFixed(1)+' cm</div>':''}
+        <div class="weer-stat">💨 ${wind} km/u</div>
+        <div class="weer-stat">👁 ${vis} km</div>
+        <div class="weer-stat">☀️ UV ${uv}</div>
+      </div>
+      <div class="weer-forecast">${fcHtml}</div>
+    `;
+  }
+})();
+</script>
+
+</body>
+</html>

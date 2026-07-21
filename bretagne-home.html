@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>DIJK Bretagne 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0369a1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DIJK SKI">
+<link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+  .hero-bretagne {
+    position: relative;
+    width: 100%;
+    padding: 48px 16px 40px;
+    text-align: center;
+    background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 55%, #7dd3fc 100%);
+    overflow: hidden;
+  }
+  .hero-bretagne::after {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-emoji { font-size: 3.4rem; line-height: 1; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.15)); }
+  .hero-title { color: #fff; font-size: 1.6rem; font-weight: 800; margin-top: 8px; }
+  .hero-sub { color: rgba(255,255,255,0.85); font-size: 0.95rem; margin-top: 4px; }
+
+  /* COUNTDOWN BADGE TOP-RIGHT (leest bretagneVertrek uit Firebase) */
+  .countdown-badge {
+    position: fixed; top: 12px; right: 12px; z-index: 10000;
+    display: flex; align-items: center; gap: 6px;
+    background: #0c4a6e; color: #fff; padding: 6px 14px; border-radius: 50px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2); font-size: 13px; font-weight: 700;
+    line-height: 1; user-select: none; transition: transform 0.2s ease;
+    text-decoration: none;
+  }
+  .countdown-badge:active { transform: scale(0.95); }
+  .countdown-badge .cd-number { font-size: 18px; font-weight: 800; }
+  .countdown-badge .cd-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85; }
+
+  main { margin: 16px; }
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+  }
+  .tile {
+    background: white; border-radius: 18px; padding: 26px 18px; text-align: center;
+    text-decoration: none; color: #1e3d2b; font-size: 18px; font-weight: 700;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  }
+  @media (max-width: 600px) {
+    .tiles { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<a class="countdown-badge" id="countdownBadge" href="onderweg-bretagne.html">
+  <span class="cd-number" id="cdNumber">…</span>
+  <span class="cd-label" id="cdLabel"></span>
+</a>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="bretagne-home.html">🏖️ Bretagne Home</a>
+  <a href="bretagne.html">✅ Checklist</a>
+  <a href="onderweg-bretagne.html">🚐 Onderweg</a>
+  <a href="fotos.html">📸 Foto's</a>
+  <a href="sos.html">🚨 SOS</a>
+  <a href="index.html" style="margin-top:auto; padding-top:14px; border-top:1px solid #eee; color:#888;">🔀 Wissel van reis</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<section class="hero-bretagne">
+  <div class="hero-emoji">🏖️</div>
+  <div class="hero-title">Vakantie Bretagne 2026</div>
+  <div class="hero-sub">Checklist, onderweg-teller en spellen — alles op één plek</div>
+</section>
+
+<main>
+  <div class="tiles">
+    <a class="tile" href="bretagne.html">✅ Checklist</a>
+    <a class="tile" href="onderweg-bretagne.html">🚐 Onderweg</a>
+    <a class="tile" href="fotos.html">📸 Foto's</a>
+    <a class="tile" href="sos.html">🚨 SOS</a>
+  </div>
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+
+// ===== COUNTDOWN BADGE (leest dezelfde 'bretagneVertrek' als de Onderweg-pagina) =====
+(function(){
+  const FIREBASE_CONFIG = { databaseURL: 'https://dijkski-default-rtdb.europe-west1.firebasedatabase.app' };
+  const num = document.getElementById('cdNumber');
+  const lbl = document.getElementById('cdLabel');
+
+  function render(ts){
+    if(!ts){ num.textContent='⏱️'; lbl.textContent='stel vertrek in'; return; }
+    const diff = ts - Date.now();
+    if(diff <= 0){ num.textContent='🚗'; lbl.textContent='onderweg!'; return; }
+    const totalMin = Math.floor(diff/60000);
+    const days = Math.floor(totalMin/1440);
+    const hours = Math.floor((totalMin%1440)/60);
+    if(days > 0){ num.textContent = days; lbl.textContent = days===1 ? 'nog 1 dag' : 'nog '+days+' dgn'; }
+    else { num.textContent = hours; lbl.textContent = hours===1 ? 'nog 1 uur' : 'nog '+hours+' uur'; }
+  }
+
+  try {
+    const s = localStorage.getItem('dijkBretagneVertrek');
+    render(s ? JSON.parse(s) : null);
+  } catch(e) { render(null); }
+
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    firebase.database().ref('bretagneVertrek').on('value', snap => {
+      const v = snap.val();
+      if (v) { render(v); try { localStorage.setItem('dijkBretagneVertrek', JSON.stringify(v)); } catch(e){} }
+    });
+  } catch(e) { console.log('Countdown: Firebase niet beschikbaar', e); }
+
+  setInterval(() => {
+    try {
+      const s = localStorage.getItem('dijkBretagneVertrek');
+      if (s) render(JSON.parse(s));
+    } catch(e) {}
+  }, 30000);
+})();
+</script>
+
+</body>
+</html>
