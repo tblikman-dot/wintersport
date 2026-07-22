@@ -583,9 +583,9 @@ function toast(msg){
   setTimeout(()=>el.classList.remove('show'),2000);
 }
 
-// ===== WEER WIDGET (Quiberon / Zuid-Bretagne kust — pas LAT/LON aan als de camping elders ligt) =====
+// ===== WEER WIDGET (Le Pouldu, Bretagne — camping-locatie) =====
 (function(){
-  const LAT = 47.4844, LON = -3.1204;
+  const LAT = 47.7333, LON = -3.5333;
   const WMO = {
     0:['☀️','Zonnig'],1:['🌤️','Overwegend zonnig'],2:['⛅','Half bewolkt'],3:['☁️','Bewolkt'],
     45:['🌫️','Mistig'],48:['🌫️','IJsmist'],
@@ -660,7 +660,7 @@ function toast(msg){
           <span class="weer-icon">${icon}</span>
           <span class="weer-temp">${temp}°<span class="weer-unit">C</span></span>
         </div>
-        <div class="weer-meta">Bretagne-kust<br>↑${tMax}° ↓${tMin}°</div>
+        <div class="weer-meta">Le Pouldu<br>↑${tMax}° ↓${tMin}°</div>
       </div>
       <div class="weer-desc">${desc} · voelt als ${feels}°</div>
       <div class="weer-stats">
