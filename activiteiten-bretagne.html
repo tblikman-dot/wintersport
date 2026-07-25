@@ -66,6 +66,10 @@
   .details span{color:var(--graniet)}
   .details strong{font-weight:700;color:var(--inkt)}
   .notitie{margin-top:7px;font-size:.82rem;background:#F4EFE6;border-radius:8px;padding:6px 10px;color:#4C463B}
+  .meer-info{display:inline-flex;align-items:center;gap:5px;margin-top:9px;font-size:.82rem;font-weight:700;
+    color:var(--hortensia);text-decoration:none}
+  .meer-info:hover{text-decoration:underline}
+  .meer-info:active{opacity:.7}
   .leeg{text-align:center;color:var(--graniet);padding:40px 0;font-size:.95rem}
 
   /* ── Agenda-tabel ─────────────────────────────── */
@@ -212,6 +216,10 @@ CATS.forEach(cat=>{
 });
 document.getElementById("zoek").addEventListener("input",e=>{zoekterm=e.target.value.toLowerCase();render();});
 
+function meerInfoLink(zoekterm){
+  return `https://www.google.com/search?q=${encodeURIComponent(zoekterm+' Bretagne')}`;
+}
+
 function kaartHTML(it){
   const badge=it.a<=10?'afstand dichtbij':'afstand';
   const afst=it.a===0?"op de camping":it.a+" min";
@@ -223,6 +231,7 @@ function kaartHTML(it){
       <div><span>💶 </span><strong>${it.e}</strong></div>
     </div>
     ${it.o?`<div class="notitie">${it.o}</div>`:""}
+    <a class="meer-info" href="${meerInfoLink(it.n+' '+it.p)}" target="_blank" rel="noopener">🔗 Meer informatie</a>
   </article>`;
 }
 
@@ -257,7 +266,8 @@ function render(){
       agendaSectie.hidden=false;
       agendaEl.innerHTML=items.map(a=>
         `<div class="agenda-item"><div class="agenda-datum">${a.d}</div>
-        <div class="agenda-body"><h3>${a.n}</h3><p>${a.x}</p></div></div>`).join("");
+        <div class="agenda-body"><h3>${a.n}</h3><p>${a.x}</p>
+        <a class="meer-info" href="${meerInfoLink(a.n)}" target="_blank" rel="noopener">🔗 Meer informatie</a></div></div>`).join("");
     } else agendaSectie.hidden=true;
   } else agendaSectie.hidden=true;
 
