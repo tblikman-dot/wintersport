@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌊 Activiteiten – Le Pouldu</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#13303F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DIJK SKI">
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --inkt:#13303F;        /* diep zeewater */
+    --schuim:#FAF7F2;      /* krijtwit strand */
+    --graniet:#5E6E75;     /* Bretons graniet */
+    --boei:#E4572E;        /* boei-oranje accent */
+    --hortensia:#5B8FB9;   /* hortensia-blauw */
+    --kaart:#FFFFFF;
+    --lijn:#E3DCD0;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Nunito',system-ui,sans-serif;background:var(--schuim);color:var(--inkt);line-height:1.5}
+
+  /* ── Marinière-band + header ───────────────────── */
+  .stripes{height:14px;background:repeating-linear-gradient(90deg,var(--inkt) 0 26px,#fff 26px 52px)}
+  .hero-header{background:var(--inkt);color:#fff;padding:20px 16px 16px}
+  .header-inner{max-width:960px;margin:0 auto}
+  .hero-header .eyebrow{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9FC2D8}
+  .hero-header h1{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(1.6rem,5vw,2.3rem);margin:.15em 0 .1em}
+  .hero-header p{font-size:.9rem;color:#CFE0EA;max-width:60ch}
+  .backlink{display:inline-block;margin-top:10px;color:#fff;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);
+    padding:6px 14px;border-radius:999px;font-size:.82rem;font-weight:700;text-decoration:none}
+  .backlink:active{transform:scale(.96)}
+
+  /* ── Zoek + filters (sticky) ───────────────────── */
+  .toolbar{position:sticky;top:72px;z-index:50;background:var(--schuim);border-bottom:1px solid var(--lijn);padding:10px 16px}
+  .toolbar-inner{max-width:960px;margin:0 auto}
+  .zoek{width:100%;padding:10px 14px;border:1.5px solid var(--lijn);border-radius:12px;font:inherit;font-size:.95rem;background:#fff;color:var(--inkt)}
+  .zoek:focus{outline:2px solid var(--hortensia);border-color:var(--hortensia)}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;border:1.5px solid var(--inkt);background:#fff;color:var(--inkt);border-radius:999px;
+    padding:7px 14px;font:inherit;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap}
+  .chip[aria-pressed="true"]{background:var(--inkt);color:#fff}
+  .chip:focus-visible{outline:2px solid var(--boei);outline-offset:2px}
+
+  /* ── Kaarten ───────────────────────────────────── */
+  main{max-width:960px;margin:0 auto;padding:16px}
+  .cat-kop{font-family:'Fraunces',serif;font-weight:600;font-size:1.15rem;margin:22px 0 10px;display:flex;align-items:center;gap:10px}
+  .cat-kop::after{content:"";flex:1;height:1px;background:var(--lijn)}
+  .grid{display:grid;gap:12px}
+  @media(min-width:680px){.grid{grid-template-columns:1fr 1fr}}
+  .kaart{background:var(--kaart);border:1px solid var(--lijn);border-radius:14px;padding:14px 16px;box-shadow:0 1px 3px rgba(19,48,63,.06)}
+  .kaart-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .kaart h3{font-size:1rem;font-weight:800;line-height:1.3}
+  .plaats{font-size:.82rem;color:var(--graniet);font-weight:600;margin-top:1px}
+  .afstand{flex:0 0 auto;background:var(--hortensia);color:#fff;font-size:.74rem;font-weight:800;
+    border-radius:999px;padding:4px 10px;white-space:nowrap}
+  .afstand.dichtbij{background:var(--boei)}
+  .details{margin-top:8px;font-size:.85rem;display:grid;gap:3px}
+  .details span{color:var(--graniet)}
+  .details strong{font-weight:700;color:var(--inkt)}
+  .notitie{margin-top:7px;font-size:.82rem;background:#F4EFE6;border-radius:8px;padding:6px 10px;color:#4C463B}
+  .leeg{text-align:center;color:var(--graniet);padding:40px 0;font-size:.95rem}
+
+  /* ── Agenda-tabel ─────────────────────────────── */
+  .agenda-item{display:flex;gap:12px;background:var(--kaart);border:1px solid var(--lijn);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+  .agenda-datum{flex:0 0 92px;font-weight:800;font-size:.82rem;color:var(--boei);text-transform:uppercase;letter-spacing:.03em;padding-top:2px}
+  .agenda-body h3{font-size:.95rem;font-weight:800}
+  .agenda-body p{font-size:.83rem;color:var(--graniet);margin-top:2px}
+
+  .activiteiten-footer{max-width:960px;margin:8px auto 0;padding:14px 16px 30px;font-size:.75rem;color:var(--graniet)}
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="bretagne-home.html">🏖️ Bretagne Home</a>
+  <a href="bretagne.html">✅ Checklist</a>
+  <a href="onderweg-bretagne.html">🚐 Onderweg</a>
+  <a href="activiteiten-bretagne.html">🌊 Activiteiten</a>
+  <a href="fotos.html">📸 Foto's</a>
+  <a href="sos.html">🚨 SOS</a>
+  <a href="index.html" style="margin-top:auto; padding-top:14px; border-top:1px solid #eee; color:#888;">🔀 Wissel van reis</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<div class="stripes" aria-hidden="true"></div>
+<header class="hero-header">
+  <div class="header-inner">
+    <div class="eyebrow">Bretagne · 25 juli – 8 augustus</div>
+    <h1>Activiteiten rond Le Pouldu</h1>
+    <p>Alles uit de campingmap en ons vakantieplan, gesorteerd op categorie en reistijd. Oranje = binnen 10 minuten.</p>
+    <a class="backlink" href="bretagne-home.html">← Terug naar Bretagne</a>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <input class="zoek" id="zoek" type="search" placeholder="Zoek op naam, plaats of trefwoord…" aria-label="Zoeken">
+    <div class="chips" id="chips" role="group" aria-label="Categoriefilter"></div>
+  </div>
+</div>
+
+<main>
+  <section id="lijst" aria-live="polite"></section>
+
+  <section id="agenda-sectie" hidden>
+    <h2 class="cat-kop">Markten &amp; evenementen</h2>
+    <div id="agenda"></div>
+  </section>
+
+  <p class="leeg" id="leeg" hidden>Niets gevonden — probeer een ander trefwoord of filter.</p>
+</main>
+
+<footer class="activiteiten-footer">
+  Bron: infomap Camping du Pouldu (juli 2026) + eigen vakantieplan. Sommige flyerdatums lijken uit een eerder seizoen te stammen; check bij twijfel de actuele openingstijden. Royal Kids (Lanester) is in de map doorgestreept en daarom weggelaten.
+</footer>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+
+const ACTIVITEITEN=[
+ // Kunst & cultuur (Gauguin-route)
+ {c:"Kunst & cultuur",n:"Maison-Musée du Pouldu",p:"Le Pouldu",a:8,t:"11:00–19:00 · maandag gesloten",e:"€2,60–4,10 · gratis <12 jr",o:"Gauguin woonde en schilderde hier. Vanaf 3 jaar."},
+ {c:"Kunst & cultuur",n:"Musée de Pont-Aven",p:"Pont-Aven",a:25,t:"Dagelijks 10:00–19:00 (juli/aug)",e:"€5 · reductie €3 · gratis <18 jr",o:"School van Pont-Aven — logisch vervolg op de Maison-Musée."},
+ {c:"Kunst & cultuur",n:"Chapelle des Ursulines & Maison des Archers",p:"Quimperlé",a:15,t:"10:00–12:30 en 14:00–18:00 · dinsdag gesloten",e:"€5 · reductie €3 (<25 jr)",o:"Combineren met de vrijdagmarkt van Quimperlé."},
+ {c:"Kunst & cultuur",n:"Site abbatial St. Maurice",p:"Clohars-Carnoët",a:15,t:"Dagelijks 11:00–19:00",e:"€5 (+16 jr) · reductie €3",o:"Abdijruïne midden in de natuur."},
+ {c:"Kunst & cultuur",n:"Musée des Tours Broërec'h",p:"Hennebont",a:30,t:"Dagelijks 10:30–12:30 en 13:30–18:30",e:"€5 · reductie €3 · gratis <12 jr",o:""},
+ {c:"Kunst & cultuur",n:"Musée du Faouët",p:"Le Faouët",a:40,t:"Tijden niet vermeld — zelf checken",e:"Onbekend",o:"Handgeschreven tip van de camping."},
+ {c:"Kunst & cultuur",n:"Abbaye Sainte-Barbe + Roches du Diable",p:"Le Faouët / Ellé-vallei",a:40,t:"Tijden niet vermeld",e:"Onbekend",o:"Handgeschreven tip: laarzen meenemen. Mooie wandelcombi."},
+ // Eten & drinken
+ {c:"Eten & drinken",n:"Cidrerie des Bouteilles à l'Amère",p:"Kerou",a:4,t:"Juli/aug: wo en vr 14:00–19:00",e:"Proeverij & verkoop",o:"Cider, appelsap, lambig. Combineren met de woensdagmarkt van Le Pouldu."},
+ {c:"Eten & drinken",n:"Huitrières du Château du Bélon",p:"Riec-sur-Bélon",a:20,t:"10:30–13:30 en 15:00–18:00 · za gesloten (juli/aug)",e:"€2,50",o:"Oesters direct van de kweker — past bij het pêche à pied-thema."},
+ {c:"Eten & drinken",n:"Biscuiterie de Pont-Aven",p:"Pont-Aven",a:25,t:"Di–za 10:00–12:30 en 14:00–16:30",e:"Gratis",o:"Reserveren verplicht!"},
+ {c:"Eten & drinken",n:"Brasserie Tri Martolod",p:"Concarneau",a:45,t:"Vrij bezoek hele jaar · rondleiding do 11:00",e:"Gratis",o:"Combineren met de Concarneau-dag."},
+ {c:"Eten & drinken",n:"Conserverie Courtin",p:"Concarneau",a:45,t:"Dagelijks 9:00–19:00",e:"Gratis",o:"Visconserven — ook voor de Concarneau-dag."},
+ {c:"Eten & drinken",n:"Le Monde de Carabreizh",p:"Landévant",a:40,t:"Ma–za 10:00–19:00 · zo 14:00–18:00",e:"€3 vanaf 18 jr",o:"Karamelfabriek (salidou)."},
+ {c:"Eten & drinken",n:"Port du Guilvinec (visafslag)",p:"Le Guilvinec",a:50,t:"Aanlanding vloot eind van de middag",e:"Gratis (kade)",o:"Handgeschreven tip van de camping."},
+ // Maritiem & musea
+ {c:"Maritiem & musea",n:"Cité de la Voile Éric Tabarly",p:"Lorient",a:25,t:"10:00–19:00",e:"€12 · kind €9 · gratis <3 jr",o:"Groot interactief zeilmuseum — sterke slechtweeroptie."},
+ {c:"Maritiem & musea",n:"Sous-marin Flore + museum",p:"Lorient",a:25,t:"10:00–19:00",e:"€7–9,20 · gratis <7 jr",o:"Een echte onderzeeër bezoeken."},
+ {c:"Maritiem & musea",n:"Musée de la Marine",p:"Port-Louis",a:40,t:"Mei–aug dagelijks",e:"€8 · reductie €6,30",o:"In de citadel van Port-Louis."},
+ {c:"Maritiem & musea",n:"Musée de la Pêche",p:"Concarneau",a:45,t:"Dagelijks 10:00–19:00 (juli/aug)",e:"€5 · reductie €3 · gratis <18 jr",o:"Combineren met de Ville Close."},
+ // Natuur & dieren
+ {c:"Natuur & dieren",n:"L'Odyssaum",p:"Pont-Scorff",a:25,t:"10:00–19:00",e:"€6,30 · 7–17 jr €4,80 · gratis <7 jr",o:"Zalm en riviernatuur."},
+ {c:"Natuur & dieren",n:"Maison de la Chauve-souris",p:"Kernascléden",a:40,t:"Dagelijks 10:00–18:30 (juli/aug)",e:"€5 · 5–11 jr €3 · gratis <5 jr",o:"Vleermuizencentrum."},
+ {c:"Natuur & dieren",n:"Maison de l'Île Kerner",p:"Riantec",a:40,t:"10:00–12:30 en 14:00–19:00",e:"€5 · 7–17 jr €3,90 · gratis <7 jr",o:"Kustnatuur."},
+ {c:"Natuur & dieren",n:"Jardin aux Papillons",p:"Vannes",a:60,t:"10:00–19:00 (juli/aug)",e:"€10,90 · 4–11 jr €7,60 · gratis <4 jr",o:"Vlindertuin — te combineren met het aquarium."},
+ {c:"Natuur & dieren",n:"Aquarium de Vannes",p:"Vannes",a:60,t:"9:30–19:00",e:"€13 · 4–11 jr €8,90 · gratis <4 jr",o:""},
+ // Dorpen & erfgoed
+ {c:"Dorpen & erfgoed",n:"Concarneau – Ville Close",p:"Concarneau",a:45,t:"Vrij toegankelijk",e:"Gratis",o:"Ommuurde vestingstad — dé klassieker. Gepland za 1 aug."},
+ {c:"Dorpen & erfgoed",n:"Manoir de Kernault",p:"Mellac",a:20,t:"Dagelijks 11:00–18:30",e:"€3–5 · gratis <7 jr",o:"Landgoed."},
+ {c:"Dorpen & erfgoed",n:"La Tisserie",p:"Brandérion",a:30,t:"Ma–vr 10:00–18:00 · zo 14:00–18:00 · za gesloten",e:"€5 · 7–17 jr €3,90 · gratis <7 jr",o:"Weverij."},
+ {c:"Dorpen & erfgoed",n:"Village de Poul Fétan",p:"Quistinic",a:50,t:"10:30–19:00 (juli/aug)",e:"€10,80 · 5–15 jr €5",o:"Historisch dorp met oude ambachten."},
+ {c:"Dorpen & erfgoed",n:"Village de l'An Mil",p:"Melrand",a:50,t:"11:00–18:00 (juli/aug)",e:"€6 · 6–18 jr €4 · gratis <6 jr",o:"Middeleeuws dorp."},
+ // Actief & buiten
+ {c:"Actief & buiten",n:"GR34-kustpad",p:"o.a. richting Pointe du Kerfany",a:0,t:"Altijd open",e:"Gratis",o:"Stond al in het dagprogramma (di 28 juli)."},
+ {c:"Actief & buiten",n:"Kajak / sup op de Laïta",p:"Le Pouldu · basis nautique",a:5,t:"Bij vloed plannen",e:"Huur ter plaatse",o:"Bij vloed peddel je zo het bos in. Gepland di 4 aug."},
+ {c:"Actief & buiten",n:"E-bike huren op de camping",p:"Camping",a:0,t:"Via de receptie",e:"€28 halve dag · €60 per week",o:"Weekprijs is snel rendabel. Kustweg Fort-Bloqué / Guidel-Plages."},
+ {c:"Actief & buiten",n:"Pêche à pied (schelpdieren rapen)",p:"Stranden Le Pouldu",a:5,t:"Bij laagwater — getijden checken",e:"Gratis",o:"Out-of-the-box idee uit het vakantieplan."},
+ {c:"Actief & buiten",n:"Stranden Grands Sables / Bellangenet",p:"Le Pouldu",a:5,t:"Altijd open",e:"Gratis",o:"De zee ligt op 800 m van de camping."},
+ {c:"Actief & buiten",n:"Dagtrip Île de Groix",p:"Ferry vanuit Lorient",a:25,t:"Ferrydienstregeling checken",e:"Ferry + fietshuur op het eiland",o:"Optie voor vr 7 aug."},
+ // Indoor / slecht weer
+ {c:"Indoor / slecht weer",n:"Le Pratell (campingbar)",p:"Camping",a:0,t:"Zie camping",e:"Consumpties",o:"Spelletjes, warme chocolademelk, cosy bij regen."},
+ {c:"Indoor / slecht weer",n:"Eden Bowl (bowling)",p:"Mellac (Keridanou)",a:15,t:"Di–do, vr+za, zo vanaf 14:00 (flyer deels onleesbaar)",e:"€3,50–5,50 per spel",o:"Tijden ter plaatse verifiëren."},
+ {c:"Indoor / slecht weer",n:"Cinéma La Bobine",p:"Quimperlé",a:15,t:"Programma per week",e:"Bioscooptarief",o:"Diverse films in het plan, o.a. Kitano op ma 3 aug."},
+ {c:"Indoor / slecht weer",n:"Cinéma Le Kerfany",p:"Moëlan-sur-Mer",a:10,t:"Programma per week",e:"Bioscooptarief",o:"Handgeschreven tip van de camping."},
+ {c:"Indoor / slecht weer",n:"Emmaüs Rédéné",p:"Rédéné",a:15,t:"Tijden niet vermeld",e:"—",o:"Kringloop — handgeschreven tip."}
+];
+
+const AGENDA=[
+ {d:"Elke zondag",n:"Markt Guidel",x:"'s Ochtends."},
+ {d:"Elke dinsdag",n:"Markt Moëlan-sur-Mer",x:"'s Ochtends."},
+ {d:"Elke woensdag",n:"Markt Le Pouldu",x:"Naast het toeristenbureau, dus dichtbij."},
+ {d:"Elke vrijdag",n:"Markt Quimperlé",x:"Mooi stadje; benedenstad met abdijkerk."},
+ {d:"Donderdags",n:"Rondleiding Brasserie Tri Martolod",x:"11:00 · gratis · Concarneau."},
+ {d:"Do 30 juli",n:"Fest'in d'Mouettes – concert",x:"Kergroës · avond · gratis."},
+ {d:"Do 30 juli",n:"Openluchtfilm Dragons (2025)",x:"Prairie Saint-Nicolas, Quimperlé · gratis · alternatief voor het concert."},
+ {d:"31 jul – 9 aug",n:"Festival Interceltique",x:"Lorient · grotendeels gratis · ±30 min rijden."},
+ {d:"Zo 2 aug",n:"Grande Parade des Nations Celtes",x:"Lorient · 10:00 · hoogtepunt van het festival, op tijd vertrekken."},
+ {d:"Do 6 aug",n:"Fest'in d'Mouettes – strandconcert",x:"Plage de Kerfany · zonsondergang · gratis · mooie afsluiter."}
+];
+
+const CATS=["Alles","Kunst & cultuur","Eten & drinken","Maritiem & musea","Natuur & dieren","Dorpen & erfgoed","Actief & buiten","Indoor / slecht weer","Markten & agenda"];
+let actiefFilter="Alles", zoekterm="";
+
+const chipsEl=document.getElementById("chips");
+CATS.forEach(cat=>{
+  const b=document.createElement("button");
+  b.className="chip"; b.textContent=cat;
+  b.setAttribute("aria-pressed",cat==="Alles");
+  b.onclick=()=>{actiefFilter=cat;
+    chipsEl.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",c.textContent===cat));
+    render();};
+  chipsEl.appendChild(b);
+});
+document.getElementById("zoek").addEventListener("input",e=>{zoekterm=e.target.value.toLowerCase();render();});
+
+function kaartHTML(it){
+  const badge=it.a<=10?'afstand dichtbij':'afstand';
+  const afst=it.a===0?"op de camping":it.a+" min";
+  return `<article class="kaart">
+    <div class="kaart-top"><div><h3>${it.n}</h3><div class="plaats">${it.p}</div></div>
+    <span class="${badge}">${afst}</span></div>
+    <div class="details">
+      <div><span>🕐 </span><strong>${it.t}</strong></div>
+      <div><span>💶 </span><strong>${it.e}</strong></div>
+    </div>
+    ${it.o?`<div class="notitie">${it.o}</div>`:""}
+  </article>`;
+}
+
+function render(){
+  const lijst=document.getElementById("lijst");
+  const agendaSectie=document.getElementById("agenda-sectie");
+  const agendaEl=document.getElementById("agenda");
+  const leeg=document.getElementById("leeg");
+  lijst.innerHTML=""; agendaEl.innerHTML="";
+
+  const toonAgenda=(actiefFilter==="Alles"||actiefFilter==="Markten & agenda");
+  const toonActiviteiten=(actiefFilter!=="Markten & agenda");
+  let aantal=0;
+
+  if(toonActiviteiten){
+    const cats=[...new Set(ACTIVITEITEN.map(a=>a.c))];
+    cats.forEach(cat=>{
+      if(actiefFilter!=="Alles"&&actiefFilter!==cat)return;
+      const items=ACTIVITEITEN.filter(a=>a.c===cat&&
+        (a.n+" "+a.p+" "+a.o+" "+a.t).toLowerCase().includes(zoekterm));
+      if(!items.length)return;
+      aantal+=items.length;
+      lijst.insertAdjacentHTML("beforeend",
+        `<h2 class="cat-kop">${cat}</h2><div class="grid">${items.map(kaartHTML).join("")}</div>`);
+    });
+  }
+
+  if(toonAgenda){
+    const items=AGENDA.filter(a=>(a.n+" "+a.d+" "+a.x).toLowerCase().includes(zoekterm));
+    if(items.length){
+      aantal+=items.length;
+      agendaSectie.hidden=false;
+      agendaEl.innerHTML=items.map(a=>
+        `<div class="agenda-item"><div class="agenda-datum">${a.d}</div>
+        <div class="agenda-body"><h3>${a.n}</h3><p>${a.x}</p></div></div>`).join("");
+    } else agendaSectie.hidden=true;
+  } else agendaSectie.hidden=true;
+
+  leeg.hidden=aantal>0;
+}
+render();
+</script>
+</body>
+</html>
