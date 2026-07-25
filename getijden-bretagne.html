@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌊 Getijden – Le Pouldu</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0369a1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DIJK SKI">
+<link rel="stylesheet" href="style.css">
+<style>
+  main { margin: 16px; padding-bottom: 40px; }
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    line-height: 1.7;
+  }
+  .muted { opacity: .7; font-size: 14px; }
+
+  .tide-hero {
+    background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 55%, #7dd3fc 100%);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .tide-hero::after {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .tide-hero h1 { margin: 0 0 6px; }
+  .tide-hero p { color: rgba(255,255,255,0.9); margin: 0; }
+
+  .activiteit-tide {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-top: 1px solid #eee;
+  }
+  .activiteit-tide:first-child { border-top: none; }
+  .activiteit-tide .icoon { font-size: 28px; flex-shrink: 0; }
+  .activiteit-tide h3 { margin: 0 0 2px; font-size: 16px; }
+  .tide-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 50px;
+    margin-top: 4px;
+  }
+  .tide-badge.vloed { background: #dbeafe; color: #1e40af; }
+  .tide-badge.eb { background: #fef3c7; color: #92400e; }
+
+  .live-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .live-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: #f2f6f4;
+    text-decoration: none;
+    color: #1e3d2b;
+    font-weight: 700;
+    font-size: 15px;
+    transition: transform 0.15s;
+  }
+  .live-link:hover { text-decoration: none; }
+  .live-link:active { transform: scale(0.98); }
+  .live-link .sub { display: block; font-size: 12px; font-weight: 500; opacity: 0.7; margin-top: 2px; }
+  .live-link .arrow { font-size: 20px; flex-shrink: 0; }
+
+  .tip-box {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #fff3e0;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="bretagne-home.html">🏖️ Bretagne Home</a>
+  <a href="bretagne.html">✅ Checklist</a>
+  <a href="onderweg-bretagne.html">🚐 Onderweg</a>
+  <a href="activiteiten-bretagne.html">🌊 Activiteiten</a>
+  <a href="getijden-bretagne.html">🌊 Getijden</a>
+  <a href="fotos.html">📸 Foto's</a>
+  <a href="sos.html">🚨 SOS</a>
+  <a href="index.html" style="margin-top:auto; padding-top:14px; border-top:1px solid #eee; color:#888;">🔀 Wissel van reis</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <div class="card tide-hero">
+    <h1>🌊 Getijden Le Pouldu</h1>
+    <p>Voor suppen op de Laïta en schelpen/mosselen/garnalen zoeken heb je het juiste getij nodig.</p>
+  </div>
+
+  <div class="card">
+    <h2>Wat heb je wanneer nodig?</h2>
+
+    <div class="activiteit-tide">
+      <div class="icoon">🛶</div>
+      <div>
+        <h3>Kajak / SUP op de Laïta</h3>
+        <div class="muted">Le Pouldu · basis nautique</div>
+        <span class="tide-badge vloed">🔵 Bij vloed (hoogwater)</span>
+        <p class="muted" style="margin-top:6px;">Bij vloed peddel je zo de rivier op, het bos in. Vaar het beste rond het hoogste punt van het getij (ca. 1–2 uur ervoor tot erna).</p>
+      </div>
+    </div>
+
+    <div class="activiteit-tide">
+      <div class="icoon">🦪</div>
+      <div>
+        <h3>Pêche à pied — schelpen, mosselen, garnalen zoeken</h3>
+        <div class="muted">Stranden Le Pouldu</div>
+        <span class="tide-badge eb">🟡 Bij eb (laagwater)</span>
+        <p class="muted" style="margin-top:6px;">Ga zo'n 1,5–2 uur vóór laagwater het strand op, zodat de wadplaten droogvallen. Kom op tijd terug — het water komt sneller op dan je denkt!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📅 Actuele getijtijden opzoeken</h2>
+    <p class="muted">
+      Getijden zijn precieze astronomische berekeningen die per dag zo'n 45–50 minuten opschuiven.
+      Een vaste tabel zou binnen een paar dagen alweer achterhaald zijn — daarom linken we hier door
+      naar de officiële, altijd actuele tabellen voor Le Pouldu.
+    </p>
+    <div class="live-links">
+      <a class="live-link" href="https://meteofrance.com/meteo-marine/le-pouldu/570352/maree" target="_blank" rel="noopener">
+        <span>🇫🇷 Météo-France (SHOM)
+          <span class="sub">Officiële Franse getijtabel — per dag hoogwater/laagwater + coëfficiënt</span>
+        </span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="live-link" href="https://marine.meteoconsult.fr/meteo-marine/horaires-des-marees/le-pouldu-1831" target="_blank" rel="noopener">
+        <span>⚓ Météo Consult Marine
+          <span class="sub">Overzicht per maand, 15 dagen vooruit, met hoogtes in meters</span>
+        </span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+    <div class="tip-box">
+      💡 <strong>Vuistregel:</strong> is het vandaag om 14:00 hoogwater, dan is dat morgen rond 14:45–14:50.
+      Zo kun je tussen twee keer opzoeken door al ruw inschatten wanneer het weer zover is.
+    </div>
+  </div>
+
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>
