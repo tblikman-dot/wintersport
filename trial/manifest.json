@@ -1,0 +1,23 @@
+{
+  "name": "SOFT & TEXT-trial — Informatie voor patiënten",
+  "short_name": "SOFT & TEXT",
+  "description": "Laagdrempelige patiënteninformatie over de SOFT- en TEXT-trial (hormonale behandeling bij premenopauzale borstkanker)",
+  "start_url": "https://tblikman-dot.github.io/wintersport/trial/index.html",
+  "scope": "https://tblikman-dot.github.io/wintersport/trial/",
+  "display": "standalone",
+  "background_color": "#f6f4fb",
+  "theme_color": "#7c3aed",
+  "lang": "nl",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resultaten — SOFT & TEXT-trial</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#7c3aed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SOFT & TEXT">
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <span class="app-title">SOFT & TEXT-trial</span>
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="over.html">📖 Over de studie</a>
+  <a href="behandelingen.html">💊 Behandelingen</a>
+  <a href="resultaten.html">📊 Resultaten</a>
+  <a href="bijwerkingen.html">🩺 Bijwerkingen & tips</a>
+  <a href="vragen.html">❓ Veelgestelde vragen</a>
+  <a href="bronnen.html">🔗 Bronnen & contact</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <div class="card">
+    <span class="pill">Resultaten</span>
+    <h1>📊 Wat lieten de trials zien?</h1>
+    <p>
+      Hieronder staat de <strong>algemene, kwalitatieve</strong> conclusie
+      uit de gepubliceerde analyses, inclusief de definitieve 15-jaars
+      resultaten. Exacte percentages en risicoreducties verschillen per
+      subgroep (leeftijd, of er chemotherapie is gegeven, tumorkenmerken) —
+      voor cijfers die op jou van toepassing zijn, is je oncologisch team
+      de juiste bron.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>1. Eierstokonderdrukking (OFS) toevoegen aan tamoxifen hielp</h2>
+    <p>
+      Vrouwen die naast tamoxifen ook OFS kregen, hadden over het geheel
+      genomen een <strong>lagere kans op terugkeer</strong> van de
+      borstkanker dan vrouwen die alleen tamoxifen gebruikten. Dit voordeel
+      was het duidelijkst zichtbaar bij vrouwen met een
+      <strong>hoger risico</strong> op terugkeer — bijvoorbeeld jongere
+      vrouwen (bijvoorbeeld onder de 35) en vrouwen die ook chemotherapie
+      hadden gehad.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>2. Exemestaan + OFS werkte nog iets beter dan tamoxifen + OFS</h2>
+    <p>
+      In de vergelijking tussen de twee OFS-armen (TEXT/SOFT gecombineerd)
+      gaf <strong>exemestaan + OFS</strong> een verdere verlaging van het
+      risico op terugkeer van de ziekte ten opzichte van
+      <strong>tamoxifen + OFS</strong>. Dit voordeel bleef ook op de lange
+      termijn (15 jaar) merkbaar, vooral bij vrouwen met een hoger
+      uitgangsrisico.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>3. Meer intensieve behandeling = vaak ook meer bijwerkingen</h2>
+    <p>
+      De armen met OFS — en zeker de combinatie met exemestaan — gingen
+      gepaard met meer overgangsklachten en andere bijwerkingen dan
+      tamoxifen alleen (zie de pagina "Bijwerkingen & tips"). Dit is
+      precies waarom de uitkomst per vrouw wordt afgewogen: is het extra
+      voordeel de extra bijwerkingen waard?
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>4. Niet iedereen heeft evenveel baat</h2>
+    <p>
+      Een belangrijke, herhaaldelijk bevestigde conclusie is dat het
+      voordeel van de intensievere behandelingen (OFS, en zeker
+      exemestaan + OFS) <strong>het grootst is bij vrouwen met een hoger
+      risico</strong> op terugkeer. Bij vrouwen met een laag risico is het
+      absolute verschil vaak klein, en kan tamoxifen alleen (of tamoxifen +
+      OFS) een prima, minder belastende keuze zijn.
+    </p>
+    <p class="muted">
+      Daarom stelt een oncologisch team de keuze altijd op maat vast, aan
+      de hand van onder andere leeftijd, tumorstadium, of er chemotherapie
+      is gegeven, en de klachten die iemand al heeft of verwacht.
+    </p>
+  </div>
+
+  <div class="notice">
+    <strong>⚠️ Let op met cijfers online</strong>
+    Percentages over "risicoreductie" zijn zonder de juiste context lastig
+    te interpreteren (relatief risico versus absoluut risico, per
+    subgroep, per follow-up moment). Vraag je behandelend team gerust om
+    de cijfers die specifiek voor jouw situatie gelden, en waarom een
+    bepaalde behandeling voor jou wordt geadviseerd.
+  </div>
+
+  <div class="card">
+    <a class="backlink" href="bronnen.html">Naar de oorspronkelijke publicaties →</a>
+  </div>
+
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>

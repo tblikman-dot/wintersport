@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veelgestelde vragen — SOFT & TEXT-trial</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#7c3aed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SOFT & TEXT">
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <span class="app-title">SOFT & TEXT-trial</span>
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="over.html">📖 Over de studie</a>
+  <a href="behandelingen.html">💊 Behandelingen</a>
+  <a href="resultaten.html">📊 Resultaten</a>
+  <a href="bijwerkingen.html">🩺 Bijwerkingen & tips</a>
+  <a href="vragen.html">❓ Veelgestelde vragen</a>
+  <a href="bronnen.html">🔗 Bronnen & contact</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <div class="card">
+    <span class="pill">FAQ</span>
+    <h1>❓ Veelgestelde vragen</h1>
+    <p class="muted">Tik op een vraag om het antwoord te lezen.</p>
+  </div>
+
+  <details class="faq">
+    <summary>Kan ik nog meedoen aan de SOFT- of TEXT-trial?</summary>
+    <p>
+      Nee. De werving van deelneemsters is al in 2011 gesloten. Deze app
+      is bedoeld om uit te leggen wat er destijds is onderzocht en wat de
+      resultaten betekenen — niet om je aan te melden voor een lopend
+      onderzoek.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Ik heb destijds meegedaan — wat betekent dat nu voor mij?</summary>
+    <p>
+      Dat hangt af van in welke arm je hebt gezeten en wat je huidige
+      follow-upschema is. Neem voor vragen over je eigen dossier en
+      vervolgcontroles contact op met het ziekenhuis waar je destijds
+      onder behandeling was.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Is exemestaan + OFS altijd de beste keuze?</summary>
+    <p>
+      Niet per se. De trials laten zien dat deze combinatie gemiddeld het
+      grootste effect heeft op het verlagen van terugkeerkans, maar ook
+      de meeste bijwerkingen geeft. Voor vrouwen met een lager risico kan
+      een minder intensieve behandeling (tamoxifen, eventueel met OFS)
+      een net zo passende keuze zijn. Dit is altijd maatwerk.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Hoelang duurt de hormonale behandeling?</summary>
+    <p>
+      In de trials was dit oorspronkelijk 5 jaar. Op basis van later
+      onderzoek en richtlijnen wordt bij sommige vrouwen verlengde
+      behandeling (langer dan 5 jaar) geadviseerd. Dit verschilt per
+      persoon — bespreek dit met je behandelend team.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Wat is het verschil tussen tamoxifen en exemestaan?</summary>
+    <p>
+      Tamoxifen blokkeert het effect van oestrogeen op de tumorcel zelf.
+      Exemestaan remt juist de aanmaak van oestrogeen in het lichaam
+      (een "aromataseremmer") en werkt daardoor alleen goed als de
+      eierstokken ook stilliggen. Zie de pagina "Behandelingen" voor meer
+      uitleg.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Waarom wordt bij de ene vrouw wel OFS geadviseerd en bij de andere niet?</summary>
+    <p>
+      Het (extra) voordeel van OFS is het grootst bij een hoger
+      terugkeerrisico, bijvoorbeeld bij jongere leeftijd of wanneer ook
+      chemotherapie nodig was. Bij een lager risico wegen de voordelen
+      soms minder zwaar op tegen de bijwerkingen. Je oncologisch team
+      maakt deze afweging samen met jou.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Kan ik stoppen als de bijwerkingen te zwaar zijn?</summary>
+    <p>
+      Bespreek dit altijd eerst met je zorgteam. Er zijn vaak
+      tussenstappen mogelijk — een andere OFS-methode, een ander medicijn,
+      extra ondersteuning bij bijwerkingen — voordat volledig stoppen aan
+      de orde is.
+    </p>
+  </details>
+
+  <details class="faq">
+    <summary>Waar vind ik de originele wetenschappelijke publicaties?</summary>
+    <p>
+      Zie de pagina "Bronnen & contact" voor links naar de belangrijkste
+      publicaties en betrouwbare Nederlandstalige informatie.
+    </p>
+  </details>
+
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>

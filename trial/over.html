@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Over de studie — SOFT & TEXT-trial</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#7c3aed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SOFT & TEXT">
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <span class="app-title">SOFT & TEXT-trial</span>
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="over.html">📖 Over de studie</a>
+  <a href="behandelingen.html">💊 Behandelingen</a>
+  <a href="resultaten.html">📊 Resultaten</a>
+  <a href="bijwerkingen.html">🩺 Bijwerkingen & tips</a>
+  <a href="vragen.html">❓ Veelgestelde vragen</a>
+  <a href="bronnen.html">🔗 Bronnen & contact</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <div class="card">
+    <span class="pill">Achtergrond</span>
+    <h1>📖 Over de SOFT- en TEXT-trial</h1>
+    <p>
+      SOFT (<em>Suppression of Ovarian Function Trial</em>) en TEXT
+      (<em>Tamoxifen and Exemestane Trial</em>) zijn twee samenhangende
+      internationale fase III-onderzoeken bij vrouwen met
+      <strong>hormoongevoelige borstkanker</strong> (oestrogeen- en/of
+      progesteronreceptor-positief) die op het moment van hun diagnose nog
+      <strong>niet in de overgang</strong> waren (premenopauzaal).
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Wie voerde het onderzoek uit?</h2>
+    <p>
+      De trials werden internationaal gecoördineerd door de
+      <strong>International Breast Cancer Study Group (IBCSG)</strong>,
+      in samenwerking met de <strong>Breast International Group (BIG)</strong>
+      en verschillende nationale kankeronderzoeksgroepen. Tientallen
+      ziekenhuizen wereldwijd namen deel, ook in Europa.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Tijdlijn</h2>
+    <div class="sub">
+      <table>
+        <tr><th>2003</th><td>Start van de werving van deelneemsters, wereldwijd</td></tr>
+        <tr><th>2011</th><td>SOFT sluit de werving (inclusie); TEXT was al eerder gesloten</td></tr>
+        <tr><th>2014–2018</th><td>Eerste tussentijdse resultaten gepubliceerd</td></tr>
+        <tr><th>2024–2025</th><td>Definitieve resultaten na 15 jaar follow-up gepubliceerd</td></tr>
+      </table>
+    </div>
+    <p class="muted">
+      Er worden op dit moment dus geen nieuwe patiënten meer in deze
+      onderzoeken opgenomen — de trials zijn afgerond. Vrouwen die destijds
+      hebben meegedaan, kunnen nog wel in langdurige follow-up zijn.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Waarom dit onderzoek?</h2>
+    <p>
+      Bij premenopauzale vrouwen maken de eierstokken nog hormonen
+      (met name oestrogeen) die hormoongevoelige borstkanker kunnen
+      voeden. Tamoxifen was lange tijd de standaardbehandeling na de
+      operatie. Onderzoekers wilden weten:
+    </p>
+    <ul>
+      <li>Helpt het om de eierstokfunctie tijdelijk <strong>uit te schakelen</strong> (ovariële suppressie, OFS), naast tamoxifen?</li>
+      <li>Is <strong>exemestaan</strong> (een aromataseremmer) in combinatie met OFS beter dan tamoxifen met OFS?</li>
+    </ul>
+    <a class="backlink" href="behandelingen.html">Bekijk de onderzochte behandelingen →</a>
+  </div>
+
+  <div class="card">
+    <h2>Hoeveel vrouwen deden mee?</h2>
+    <p>
+      Samen omvatten SOFT en TEXT ongeveer <strong>4.700 vrouwen</strong>
+      wereldwijd. SOFT alleen omvatte ongeveer 3.000 deelneemsters; TEXT
+      werd hierbij opgeteld voor de gecombineerde analyses van exemestaan
+      versus tamoxifen (beide met OFS).
+    </p>
+    <p class="muted">
+      Exacte aantallen verschillen licht per publicatie, afhankelijk van
+      welke sub-analyse wordt getoond.
+    </p>
+  </div>
+
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>

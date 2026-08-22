@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bronnen & contact — SOFT & TEXT-trial</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#7c3aed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SOFT & TEXT">
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <span class="app-title">SOFT & TEXT-trial</span>
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="over.html">📖 Over de studie</a>
+  <a href="behandelingen.html">💊 Behandelingen</a>
+  <a href="resultaten.html">📊 Resultaten</a>
+  <a href="bijwerkingen.html">🩺 Bijwerkingen & tips</a>
+  <a href="vragen.html">❓ Veelgestelde vragen</a>
+  <a href="bronnen.html">🔗 Bronnen & contact</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <div class="card">
+    <span class="pill">Bronnen</span>
+    <h1>🔗 Bronnen & meer informatie</h1>
+    <p>
+      Deze app is gebaseerd op openbaar gepubliceerd wetenschappelijk
+      onderzoek. Onderstaande links gaan naar de originele publicaties en
+      betrouwbare achtergrondinformatie.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Wetenschappelijke publicaties</h2>
+    <ul>
+      <li>
+        <a href="https://pubmed.ncbi.nlm.nih.gov/42229584/" target="_blank" rel="noopener">
+          Final outcomes of the SOFT and TEXT phase III trials in premenopausal hormone receptor-positive early breast cancer
+        </a> — PubMed
+      </li>
+      <li>
+        <a href="https://pubmed.ncbi.nlm.nih.gov/36521078/" target="_blank" rel="noopener">
+          Adjuvant Exemestane With Ovarian Suppression in Premenopausal Breast Cancer: Long-Term Follow-Up of the Combined TEXT and SOFT Trials
+        </a> — PubMed
+      </li>
+      <li>
+        <a href="https://pubmed.ncbi.nlm.nih.gov/24095609/" target="_blank" rel="noopener">
+          Adjuvant treatment of premenopausal women with endocrine-responsive early breast cancer: design of the TEXT and SOFT trials
+        </a> — PubMed
+      </li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Achtergrondartikelen</h2>
+    <ul>
+      <li>
+        <a href="https://ascopost.com/issues/july-25-2018/8-year-update-of-soft-and-text-trials/" target="_blank" rel="noopener">
+          8-Year Update of SOFT and TEXT Trials
+        </a> — The ASCO Post
+      </li>
+      <li>
+        <a href="https://www.cancer.gov/news-events/press-releases/2014/softtrialresult" target="_blank" rel="noopener">
+          SOFT trial result
+        </a> — National Cancer Institute (VS)
+      </li>
+      <li>
+        <a href="https://www.icr.ac.uk/research-and-discoveries/centres-and-strategic-collaborations/clinical-trials-and-statistics-unit-icr-ctsu/detail/soft" target="_blank" rel="noopener">
+          SOFT | Clinical Trial
+        </a> — Institute of Cancer Research (VK)
+      </li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Nederlandstalige patiënteninformatie</h2>
+    <ul>
+      <li>
+        <a href="https://www.kanker.nl" target="_blank" rel="noopener">kanker.nl</a>
+        — algemene, onafhankelijke informatie over borstkanker en behandelingen
+      </li>
+    </ul>
+    <p class="muted">
+      Deze app is geen officiële uitgave van kanker.nl, IBCSG of BIG — het
+      is een zelfgemaakt overzicht op basis van bovenstaande openbare
+      bronnen.
+    </p>
+  </div>
+
+  <div class="notice">
+    <strong>📞 Contact met je eigen zorgteam</strong>
+    Voor vragen over jouw persoonlijke situatie, dossier of
+    behandelplan: neem contact op met je behandelend oncoloog,
+    (gespecialiseerd) verpleegkundige of huisarts. Zij kennen jouw
+    medische geschiedenis en kunnen advies geven dat op jou is
+    toegespitst.
+  </div>
+
+  <div class="card">
+    <h2>Over deze app</h2>
+    <p class="muted">
+      Gemaakt als laagdrempelig, persoonlijk overzicht — niet als
+      vervanging van officiële voorlichting door je ziekenhuis. Zie je een
+      fout of verouderde informatie? Laat het weten aan de maker van deze
+      app.
+    </p>
+  </div>
+
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>

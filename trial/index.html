@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOFT & TEXT-trial — Patiënteninformatie</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#7c3aed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SOFT & TEXT">
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <span class="app-title">SOFT & TEXT-trial</span>
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="over.html">📖 Over de studie</a>
+  <a href="behandelingen.html">💊 Behandelingen</a>
+  <a href="resultaten.html">📊 Resultaten</a>
+  <a href="bijwerkingen.html">🩺 Bijwerkingen & tips</a>
+  <a href="vragen.html">❓ Veelgestelde vragen</a>
+  <a href="bronnen.html">🔗 Bronnen & contact</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <div class="card">
+    <span class="pill">Patiënteninformatie</span>
+    <h1>Welkom</h1>
+    <p>
+      Deze app geeft je op een rustige, overzichtelijke manier informatie over de
+      <strong>SOFT-</strong> en <strong>TEXT-trial</strong> — twee internationale
+      onderzoeken naar hormonale behandeling na borstkanker bij vrouwen die nog
+      niet in de overgang waren op het moment van de diagnose.
+    </p>
+    <p class="muted">
+      Neem gerust de tijd. Je hoeft dit niet in één keer door te lezen — de
+      onderwerpen staan los van elkaar in het menu (☰).
+    </p>
+  </div>
+
+  <div class="notice">
+    <strong>⚠️ Belangrijk om te weten</strong>
+    Deze app is bedoeld als algemene, begrijpelijke uitleg en vervangt geen
+    persoonlijk medisch advies. Jouw situatie kan afwijken van wat hier
+    beschreven staat. Bespreek vragen over jouw eigen behandeling altijd met
+    je oncologisch team.
+  </div>
+
+  <div class="card">
+    <h2>Snel naar een onderwerp</h2>
+    <div class="tiles">
+      <a class="tile" href="over.html"><span class="emoji">📖</span>Over de studie</a>
+      <a class="tile" href="behandelingen.html"><span class="emoji">💊</span>Behandelingen</a>
+      <a class="tile" href="resultaten.html"><span class="emoji">📊</span>Resultaten</a>
+      <a class="tile" href="bijwerkingen.html"><span class="emoji">🩺</span>Bijwerkingen &amp; tips</a>
+      <a class="tile" href="vragen.html"><span class="emoji">❓</span>Veelgestelde vragen</a>
+      <a class="tile" href="bronnen.html"><span class="emoji">🔗</span>Bronnen &amp; contact</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>In het kort</h2>
+    <p>
+      SOFT en TEXT onderzochten of het onderdrukken van de eierstokfunctie
+      (<em>ovarian function suppression</em>, OFS) — samen met tamoxifen of
+      exemestaan — beter beschermt tegen terugkeer van hormoongevoelige
+      borstkanker dan tamoxifen alleen. De onderzoeken liepen wereldwijd van
+      2003 tot 2011 en de langetermijnresultaten (15 jaar) zijn inmiddels
+      gepubliceerd.
+    </p>
+    <a class="backlink" href="over.html">Lees meer over de opzet van de studie →</a>
+  </div>
+
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>

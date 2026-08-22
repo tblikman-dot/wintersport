@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behandelingen — SOFT & TEXT-trial</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#7c3aed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SOFT & TEXT">
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <span class="app-title">SOFT & TEXT-trial</span>
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="index.html">🏠 Home</a>
+  <a href="over.html">📖 Over de studie</a>
+  <a href="behandelingen.html">💊 Behandelingen</a>
+  <a href="resultaten.html">📊 Resultaten</a>
+  <a href="bijwerkingen.html">🩺 Bijwerkingen & tips</a>
+  <a href="vragen.html">❓ Veelgestelde vragen</a>
+  <a href="bronnen.html">🔗 Bronnen & contact</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <div class="card">
+    <span class="pill">Behandelingen</span>
+    <h1>💊 De onderzochte behandelarmen</h1>
+    <p>
+      Alle deelneemsters kregen 5 jaar lang hormonale (endocriene)
+      behandeling, bovenop de gebruikelijke lokale behandeling (operatie,
+      eventueel bestraling en/of chemotherapie). De trials vergeleken drie
+      hormonale schema's met elkaar.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>1. Tamoxifen alleen</h2>
+    <div class="sub">
+      <p>
+        Een dagelijkse tablet die de werking van oestrogeen op
+        borstkankercellen blokkeert. Dit was al jarenlang de
+        standaardbehandeling voor premenopauzale vrouwen — en de
+        vergelijkingsbasis in SOFT.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Tamoxifen + eierstokonderdrukking (OFS)</h2>
+    <div class="sub">
+      <p>
+        Dezelfde tablet, gecombineerd met het tijdelijk stilleggen van de
+        eierstokfunctie, zodat het lichaam nauwelijks nog eigen oestrogeen
+        aanmaakt.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>3. Exemestaan + eierstokonderdrukking (OFS)</h2>
+    <div class="sub">
+      <p>
+        Exemestaan is een <strong>aromataseremmer</strong>: een tablet die
+        de aanmaak van oestrogeen in andere weefsels remt. Deze
+        medicijngroep werkt alleen goed als de eierstokken ook stilliggen
+        — vandaar de combinatie met OFS. Dit was de vergelijking in TEXT.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Hoe wordt de eierstokfunctie onderdrukt (OFS)?</h2>
+    <p>Dit kan op een paar manieren, meestal met:</p>
+    <ul>
+      <li><strong>Maandelijkse of driemaandelijkse injecties</strong> met een GnRH-agonist (bijvoorbeeld triptoreline of goserelin), die de eierstokken tijdelijk "op pauze" zetten.</li>
+      <li>In sommige gevallen: <strong>chirurgische verwijdering</strong> van de eierstokken.</li>
+      <li>Zelden: bestraling van de eierstokken.</li>
+    </ul>
+    <p class="muted">
+      Welke methode gebruikt is, verschilde per deelneemster en per
+      ziekenhuis. Dit staat los van deze app — bespreek met je eigen team
+      welke methode bij jou is (of wordt) toegepast.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Waarom is dit onderscheid belangrijk?</h2>
+    <p>
+      Hoe intensiever de hormonale behandeling, hoe groter over het
+      algemeen ook de kans op bijwerkingen door een kunstmatige,
+      vervroegde overgang. De trials zochten daarom een balans tussen
+      <strong>effectiviteit</strong> (minder kans op terugkeer van de
+      ziekte) en <strong>kwaliteit van leven</strong>.
+    </p>
+    <a class="backlink" href="resultaten.html">Bekijk wat de trials lieten zien →</a>
+  </div>
+
+</main>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+</script>
+
+</body>
+</html>
