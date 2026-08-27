@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍼 Oppas &amp; Agenda</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1e7f5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DIJK SKI">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<style>
+  main { margin: 16px; padding-bottom: 40px; }
+
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    line-height: 1.6;
+  }
+  .card h2 { margin-top: 0; }
+  .muted { opacity: .7; font-size: 13px; }
+
+  .sync-status {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; padding: 3px 10px;
+    border-radius: 50px; float: right;
+  }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .sync-status.live .sync-dot { background: #43a047; }
+  .sync-status.live { color: #43a047; }
+  .sync-status.offline .sync-dot { background: #ff9800; }
+  .sync-status.offline { color: #ff9800; }
+  .sync-status.error .sync-dot { background: #e53935; }
+  .sync-status.error { color: #e53935; }
+
+  /* ===== GOOGLE LOGIN ===== */
+  .g-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .btn {
+    padding: 10px 16px; border: none; border-radius: 14px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: #1e7f5c; color: #fff; }
+  .btn-google { background: #fff; color: #444; border: 2px solid #ddd; }
+  .btn-danger { background: #e53935; color: #fff; }
+  .btn-wa { background: #25D366; color: #fff; }
+  .btn-outline { background: #fff; color: #1e7f5c; border: 2px solid #1e7f5c; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .g-status { font-size: 13px; font-weight: 600; }
+
+  details.setup summary {
+    cursor: pointer; font-weight: 700; color: #1e7f5c; font-size: 14px;
+  }
+  details.setup { margin-top: 10px; background: #f2f6f4; border-radius: 12px; padding: 10px 14px; }
+  details.setup ol { margin: 8px 0 0; padding-left: 20px; font-size: 13px; line-height: 1.7; }
+  details.setup code {
+    background: #e0e6e2; padding: 1px 6px; border-radius: 6px; font-size: 12px; word-break: break-all;
+  }
+
+  .field { margin-top: 10px; }
+  .field label { display: block; font-size: 12px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .field input, .field textarea {
+    width: 100%; box-sizing: border-box; padding: 10px 12px;
+    border: 2px solid #dce0dd; border-radius: 12px; font-size: 14px; outline: none;
+  }
+  .field input:focus, .field textarea:focus { border-color: #43a047; }
+
+  /* ===== WEEK NAV ===== */
+  .week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .week-nav button {
+    background: #f2f6f4; border: none; border-radius: 50%;
+    width: 38px; height: 38px; font-size: 18px; cursor: pointer;
+  }
+  .week-nav button:active { background: #e0e6e2; }
+  .week-label { font-weight: 700; font-size: 15px; text-align: center; }
+
+  /* ===== DAY CARD ===== */
+  .day-card { margin-bottom: 10px; }
+  .day-card.today { border: 2px solid #1e7f5c; }
+  .day-head {
+    font-weight: 700; font-size: 14px; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .day-head .badge-today {
+    background: #1e7f5c; color: #fff; font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 50px; text-transform: uppercase;
+  }
+
+  .slot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 10px 0; border-top: 1px solid #eee;
+    cursor: pointer;
+  }
+  .slot:first-of-type { border-top: none; }
+  .slot:active { background: #f7f9f8; }
+  .slot-label { font-size: 12px; font-weight: 700; color: #888; width: 56px; flex-shrink: 0; }
+  .slot-info { flex: 1; min-width: 0; }
+  .slot-status { font-size: 13.5px; font-weight: 600; }
+  .slot-status.vrij { color: #43a047; }
+  .slot-status.bezet { color: #e53935; }
+  .slot-event { font-size: 11.5px; color: #999; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .slot-req { font-size: 11.5px; margin-top: 2px; font-weight: 700; }
+  .slot-req.gevraagd { color: #f57f17; }
+  .slot-req.bevestigd { color: #1e7f5c; }
+  .slot-req.afgewezen { color: #e53935; }
+  .slot-arrow { color: #ccc; font-size: 18px; flex-shrink: 0; }
+  .loading-row { text-align: center; padding: 20px; color: #bbb; font-size: 13px; }
+
+  /* ===== CONTACTEN ===== */
+  .contact-row {
+    display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid #eee;
+  }
+  .contact-row:first-of-type { border-top: none; }
+  .contact-row .naam { font-weight: 600; flex: 1; }
+  .contact-row .tel { font-size: 12.5px; color: #999; }
+  .contact-row .del { border: none; background: none; color: #ccc; font-size: 16px; cursor: pointer; }
+  .contact-row .del:active { color: #e53935; }
+  .add-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .add-row input { flex: 1; min-width: 110px; padding: 10px 12px; border: 2px solid #dce0dd; border-radius: 12px; font-size: 14px; outline: none; }
+  .add-row input:focus { border-color: #43a047; }
+
+  /* ===== MODAL ===== */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.45);
+    display: none; align-items: flex-end; justify-content: center; z-index: 2000;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: 20px 20px 0 0; padding: 20px;
+    width: 100%; max-width: 480px; max-height: 88vh; overflow-y: auto;
+    box-shadow: 0 -8px 30px rgba(0,0,0,.2);
+  }
+  @media (min-width: 560px) {
+    .overlay { align-items: center; }
+    .modal { border-radius: 20px; }
+  }
+  .modal h3 { margin-top: 0; }
+  .modal-close { float: right; border: none; background: none; font-size: 20px; cursor: pointer; color: #999; }
+  select {
+    width: 100%; box-sizing: border-box; padding: 10px 12px;
+    border: 2px solid #dce0dd; border-radius: 12px; font-size: 14px; outline: none; background: #fff;
+  }
+  textarea { min-height: 90px; resize: vertical; font-family: inherit; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .modal-actions .btn { flex: 1; min-width: 120px; }
+  .status-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .status-actions .btn { font-size: 12.5px; padding: 8px 12px; }
+
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #333; color: #fff; padding: 10px 20px; border-radius: 50px;
+    font-size: 13px; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,.3);
+    z-index: 3000; transition: transform .3s ease; pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+  <img src="logo-dijk-soft.png" alt="DIJK" class="app-logo">
+</header>
+
+<nav id="sideMenu" class="side-menu">
+  <a href="wintersport.html">🎿 Wintersport Home</a>
+  <a href="bretagne-home.html">🏖️ Bretagne Home</a>
+  <a href="oppas.html">🍼 Oppas &amp; Agenda</a>
+  <a href="fotos.html">📸 Foto's</a>
+  <a href="sos.html">🚨 SOS</a>
+  <a href="index.html" style="margin-top:auto; padding-top:14px; border-top:1px solid #eee; color:#888;">🔀 Wissel van reis</a>
+</nav>
+
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+
+<main>
+
+  <div class="card">
+    <h2>🍼 Oppas &amp; Agenda</h2>
+    <p>Koppel je Google Agenda om te zien wanneer jullie erop uit zijn, en vraag de oppas met één tik via WhatsApp.</p>
+    <div id="syncStatus" class="sync-status offline"><span class="sync-dot"></span><span id="syncLabel">Verbinden…</span></div>
+  </div>
+
+  <div class="card">
+    <h2>🔑 Google Agenda</h2>
+    <div class="g-row">
+      <button class="btn btn-google" id="googleBtn" onclick="handleGoogleClick()">Inloggen met Google</button>
+      <span class="g-status" id="googleStatus">Niet ingelogd</span>
+    </div>
+    <p class="muted">We vragen alleen leesrechten voor je agenda — er wordt niets aangepast in Google Agenda zelf.</p>
+
+    <details class="setup">
+      <summary>⚙️ Instellingen &amp; hoe krijg ik een Client-ID?</summary>
+      <div class="field">
+        <label>Google Client-ID</label>
+        <input type="text" id="clientIdInput" placeholder="xxxxxxx.apps.googleusercontent.com" onchange="saveClientId()">
+      </div>
+      <div class="field">
+        <label>Kalender-ID's (kommagescheiden)</label>
+        <input type="text" id="calendarIdsInput" placeholder="primary" onchange="saveCalendarIds()">
+      </div>
+      <p class="muted">Standaard <code>primary</code> = je eigen hoofdagenda. Deel je agenda's met elkaar in Google Agenda en voeg hier het e-mailadres van de andere agenda toe (bv. <code>partner@gmail.com,primary</code>) om ook diens afspraken te zien.</p>
+      <ol>
+        <li>Ga naar <code>console.cloud.google.com</code> en maak (of kies) een project.</li>
+        <li>Ga naar <b>API's &amp; services → Bibliotheek</b>, zoek <b>Google Calendar API</b> en klik op <b>Inschakelen</b>.</li>
+        <li>Ga naar <b>API's &amp; services → OAuth-toestemmingsscherm</b> en stel deze in op "Extern" (of "Intern" binnen een Workspace), voeg jezelf en je partner toe als testgebruikers.</li>
+        <li>Ga naar <b>Inloggegevens → Inloggegevens maken → OAuth-client-ID</b>, type <b>Webtoepassing</b>.</li>
+        <li>Voeg bij <b>Geautoriseerde JavaScript-bronnen</b> toe: <code id="originHint">deze website</code></li>
+        <li>Kopieer de Client-ID en plak 'm hierboven. Dit hoeft maar één keer per toestel/browser.</li>
+      </ol>
+    </details>
+  </div>
+
+  <div class="card">
+    <div class="week-nav">
+      <button onclick="changeWeek(-1)">◀</button>
+      <div class="week-label" id="weekLabel">Week</div>
+      <button onclick="changeWeek(1)">▶</button>
+    </div>
+    <div id="weekGrid"><div class="loading-row">Log in met Google om je agenda te zien.</div></div>
+  </div>
+
+  <div class="card">
+    <h2>👶 Oppas-contacten</h2>
+    <div id="contactList"><div class="muted">Nog geen oppascontacten toegevoegd.</div></div>
+    <div class="add-row">
+      <input type="text" id="cNaam" placeholder="Naam">
+      <input type="text" id="cTel" placeholder="Telefoonnummer (06...)">
+      <button class="btn btn-primary" onclick="addContact()">+ Toevoegen</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL: vraag oppas -->
+<div class="overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modalTitle">Oppas vragen</h3>
+    <p class="muted" id="modalContext"></p>
+
+    <div class="field">
+      <label>Oppas</label>
+      <select id="modalContact"></select>
+    </div>
+    <div class="field">
+      <label>Bericht</label>
+      <textarea id="modalMessage"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-wa" onclick="verstuurWhatsapp()">📱 Verstuur WhatsApp</button>
+    </div>
+
+    <div id="statusBlock" style="display:none; margin-top:14px; padding-top:14px; border-top:1px solid #eee;">
+      <p class="muted" style="margin:0 0 4px;">Status van dit verzoek:</p>
+      <div id="statusText" style="font-weight:700;"></div>
+      <div class="status-actions">
+        <button class="btn btn-outline" onclick="setSlotStatus('bevestigd')">✅ Bevestigd</button>
+        <button class="btn btn-outline" onclick="setSlotStatus('afgewezen')">❌ Afgewezen</button>
+        <button class="btn btn-danger" onclick="setSlotStatus(null)">🗑️ Verwijderen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function toggleMenu(){
+  document.getElementById('sideMenu').classList.toggle('open');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2200);
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+document.getElementById('originHint').textContent = location.origin;
+
+// ===== FIREBASE (zelfde project als de rest van de app, apart pad) =====
+const FIREBASE_CONFIG = { databaseURL: 'https://dijkski-default-rtdb.europe-west1.firebasedatabase.app' };
+let fbConnected = false, contactsRef = null, requestsRef = null;
+
+let contacts = [];      // [{id, naam, tel}]
+let requests = {};      // { "2026-09-05_avond": {contactId, naam, tel, bericht, status, ts, event} }
+
+function setSyncStatus(status, label){
+  const el = document.getElementById('syncStatus');
+  const lbl = document.getElementById('syncLabel');
+  el.className = 'sync-status ' + status;
+  lbl.textContent = label;
+}
+
+function loadLocal(){
+  try { const c = localStorage.getItem('dijkOppasContacten'); if (c) contacts = JSON.parse(c); } catch(e){}
+  try { const r = localStorage.getItem('dijkOppasVerzoeken'); if (r) requests = JSON.parse(r); } catch(e){}
+}
+function saveLocalContacts(){ try { localStorage.setItem('dijkOppasContacten', JSON.stringify(contacts)); } catch(e){} }
+function saveLocalRequests(){ try { localStorage.setItem('dijkOppasVerzoeken', JSON.stringify(requests)); } catch(e){} }
+
+function initFirebase(){
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    const db = firebase.database();
+    contactsRef = db.ref('oppas/contacten');
+    requestsRef = db.ref('oppas/verzoeken');
+
+    db.ref('.info/connected').on('value', snap=>{
+      fbConnected = snap.val() === true;
+      setSyncStatus(fbConnected ? 'live' : 'offline', fbConnected ? 'Live sync' : 'Offline');
+    });
+
+    contactsRef.on('value', snap=>{
+      const data = snap.val();
+      contacts = data ? Object.values(data) : [];
+      saveLocalContacts();
+      renderContacts();
+    });
+
+    requestsRef.on('value', snap=>{
+      requests = snap.val() || {};
+      saveLocalRequests();
+      renderWeek();
+    });
+  } catch(e){
+    console.error('Firebase fout:', e);
+    setSyncStatus('error', 'Fout');
+  }
+}
+
+// ===== CONTACTEN =====
+function renderContacts(){
+  const el = document.getElementById('contactList');
+  if (!contacts.length){ el.innerHTML = '<div class="muted">Nog geen oppascontacten toegevoegd.</div>'; return; }
+  el.innerHTML = contacts.map(c=>`
+    <div class="contact-row">
+      <div class="naam">${esc(c.naam)}</div>
+      <div class="tel">${esc(c.tel)}</div>
+      <button class="del" onclick="delContact('${c.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+function addContact(){
+  const naamEl = document.getElementById('cNaam');
+  const telEl = document.getElementById('cTel');
+  const naam = naamEl.value.trim();
+  const tel = telEl.value.trim();
+  if (!naam || !tel){ toast('Vul naam en telefoonnummer in'); return; }
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  contacts.push({ id, naam, tel });
+  naamEl.value=''; telEl.value='';
+  saveContacts();
+  toast('✅ Oppas toegevoegd');
+}
+function delContact(id){
+  contacts = contacts.filter(c=>c.id!==id);
+  saveContacts();
+}
+function saveContacts(){
+  saveLocalContacts();
+  renderContacts();
+  if (contactsRef && fbConnected){
+    const obj = {}; contacts.forEach(c=>obj[c.id]=c);
+    contactsRef.set(obj).catch(()=>setSyncStatus('error','Schrijffout'));
+  }
+}
+
+// ===== GOOGLE LOGIN =====
+let accessToken = null;
+let tokenClient = null;
+
+function getClientId(){ try { return localStorage.getItem('dijkOppasClientId') || ''; } catch(e){ return ''; } }
+function getCalendarIds(){
+  let raw = '';
+  try { raw = localStorage.getItem('dijkOppasCalendarIds') || 'primary'; } catch(e){ raw = 'primary'; }
+  return raw.split(',').map(s=>s.trim()).filter(Boolean);
+}
+function saveClientId(){
+  const v = document.getElementById('clientIdInput').value.trim();
+  try { localStorage.setItem('dijkOppasClientId', v); } catch(e){}
+  initGoogle();
+  toast('Client-ID opgeslagen');
+}
+function saveCalendarIds(){
+  const v = document.getElementById('calendarIdsInput').value.trim();
+  try { localStorage.setItem('dijkOppasCalendarIds', v || 'primary'); } catch(e){}
+  toast('Kalender-ID\'s opgeslagen');
+  if (accessToken) laadWeek();
+}
+
+function initGoogle(){
+  const clientId = getClientId();
+  document.getElementById('clientIdInput').value = clientId;
+  document.getElementById('calendarIdsInput').value = (function(){ try { return localStorage.getItem('dijkOppasCalendarIds')||'primary'; } catch(e){ return 'primary'; } })();
+
+  if (!clientId || typeof google === 'undefined' || !google.accounts) return;
+
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: clientId,
+    scope: 'https://www.googleapis.com/auth/calendar.readonly',
+    callback: (resp)=>{
+      if (resp.error){ toast('Inloggen mislukt: ' + resp.error); return; }
+      accessToken = resp.access_token;
+      updateGoogleUI();
+      laadWeek();
+    }
+  });
+}
+
+function handleGoogleClick(){
+  const clientId = getClientId();
+  if (!clientId){ toast('Vul eerst een Google Client-ID in bij Instellingen'); return; }
+  if (accessToken){
+    google.accounts.oauth2.revoke(accessToken, ()=>{});
+    accessToken = null;
+    updateGoogleUI();
+    document.getElementById('weekGrid').innerHTML = '<div class="loading-row">Log in met Google om je agenda te zien.</div>';
+    return;
+  }
+  if (!tokenClient) initGoogle();
+  if (tokenClient) tokenClient.requestAccessToken();
+}
+
+function updateGoogleUI(){
+  const btn = document.getElementById('googleBtn');
+  const status = document.getElementById('googleStatus');
+  if (accessToken){ btn.textContent = 'Uitloggen'; status.textContent = '✅ Ingelogd'; }
+  else { btn.textContent = 'Inloggen met Google'; status.textContent = 'Niet ingelogd'; }
+}
+
+window.addEventListener('load', ()=>setTimeout(initGoogle, 300));
+
+// ===== WEEK / DAGDELEN =====
+const DAGDELEN = [
+  { id:'ochtend', label:'Ochtend', startH:7,  endH:12 },
+  { id:'middag',  label:'Middag',  startH:12, endH:18 },
+  { id:'avond',   label:'Avond',   startH:18, endH:23.99 },
+];
+let weekOffset = 0;
+let weekEvents = []; // {start:Date, end:Date, title, allDay}
+
+function mondayOf(date){
+  const d = new Date(date);
+  const day = (d.getDay() + 6) % 7; // ma=0
+  d.setDate(d.getDate() - day);
+  d.setHours(0,0,0,0);
+  return d;
+}
+function dateISO(d){ return d.toISOString().slice(0,10); }
+function fmtDayHead(d){
+  const isToday = dateISO(d) === dateISO(new Date());
+  const label = d.toLocaleDateString('nl-NL', { weekday:'long', day:'numeric', month:'long' });
+  return { label: label.charAt(0).toUpperCase()+label.slice(1), isToday };
+}
+
+function changeWeek(delta){
+  weekOffset += delta;
+  renderWeekLabelAndGrid();
+  if (accessToken) laadWeek(); else renderWeek();
+}
+
+function getWeekDates(){
+  const monday = mondayOf(new Date());
+  monday.setDate(monday.getDate() + weekOffset*7);
+  const days = [];
+  for (let i=0;i<7;i++){ const d = new Date(monday); d.setDate(monday.getDate()+i); days.push(d); }
+  return days;
+}
+
+function renderWeekLabelAndGrid(){
+  const days = getWeekDates();
+  const first = days[0], last = days[6];
+  const fmt = (d)=>d.toLocaleDateString('nl-NL',{day:'numeric',month:'short'});
+  document.getElementById('weekLabel').textContent = fmt(first) + ' – ' + fmt(last);
+}
+
+async function laadWeek(){
+  renderWeekLabelAndGrid();
+  const grid = document.getElementById('weekGrid');
+  grid.innerHTML = '<div class="loading-row">Agenda laden…</div>';
+
+  const days = getWeekDates();
+  const timeMin = days[0].toISOString();
+  const timeMax = new Date(days[6].getTime() + 24*3600*1000).toISOString();
+  const calendarIds = getCalendarIds();
+
+  const results = await Promise.allSettled(calendarIds.map(calId=>
+    fetch('https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(calId) +
+      '/events?timeMin=' + encodeURIComponent(timeMin) + '&timeMax=' + encodeURIComponent(timeMax) +
+      '&singleEvents=true&orderBy=startTime', {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    }).then(r=>{
+      if (!r.ok) throw new Error(calId + ': ' + r.status);
+      return r.json();
+    })
+  ));
+
+  weekEvents = [];
+  let hadError = false;
+  results.forEach(res=>{
+    if (res.status === 'fulfilled'){
+      (res.value.items||[]).forEach(ev=>{
+        if (ev.status === 'cancelled') return;
+        if (ev.start && ev.start.date){
+          weekEvents.push({ start: new Date(ev.start.date+'T00:00:00'), end: new Date(ev.end.date+'T00:00:00'), title: ev.summary||'(geen titel)', allDay:true });
+        } else if (ev.start && ev.start.dateTime){
+          weekEvents.push({ start: new Date(ev.start.dateTime), end: new Date(ev.end.dateTime), title: ev.summary||'(geen titel)', allDay:false });
+        }
+      });
+    } else { hadError = true; console.warn(res.reason); }
+  });
+  if (hadError) toast('Let op: niet alle agenda\'s konden geladen worden');
+
+  renderWeek();
+}
+
+function eventsForSlot(day, dagdeel){
+  const start = new Date(day); start.setHours(dagdeel.startH, (dagdeel.startH%1)*60, 0, 0);
+  const end = new Date(day); end.setHours(Math.floor(dagdeel.endH), (dagdeel.endH%1)*60, 0, 0);
+  return weekEvents.filter(ev=> ev.start < end && ev.end > start);
+}
+
+function renderWeek(){
+  const grid = document.getElementById('weekGrid');
+  const days = getWeekDates();
+
+  grid.innerHTML = days.map(day=>{
+    const head = fmtDayHead(day);
+    const iso = dateISO(day);
+    const slots = DAGDELEN.map(dd=>{
+      const evs = eventsForSlot(day, dd);
+      const bezet = evs.length > 0;
+      const key = iso + '_' + dd.id;
+      const req = requests[key];
+      let reqHtml = '';
+      if (req && req.status){
+        const icon = req.status==='gevraagd' ? '🍼' : req.status==='bevestigd' ? '✅' : '❌';
+        reqHtml = `<div class="slot-req ${req.status}">${icon} ${req.status} bij ${esc(req.naam)}</div>`;
+      }
+      return `
+        <div class="slot" onclick="openModal('${iso}','${dd.id}')">
+          <div class="slot-label">${dd.label}</div>
+          <div class="slot-info">
+            <div class="slot-status ${bezet?'bezet':'vrij'}">${bezet?'🔴 Bezet':'🟢 Vrij'}</div>
+            ${bezet ? `<div class="slot-event">${esc(evs.map(e=>e.title).join(', '))}</div>` : ''}
+            ${reqHtml}
+          </div>
+          <div class="slot-arrow">›</div>
+        </div>`;
+    }).join('');
+
+    return `<div class="card day-card ${head.isToday?'today':''}">
+      <div class="day-head">${head.label}${head.isToday?'<span class="badge-today">Vandaag</span>':''}</div>
+      ${slots}
+    </div>`;
+  }).join('');
+}
+
+renderWeekLabelAndGrid();
+
+// ===== MODAL: OPPAS VRAGEN =====
+let modalKey = null, modalDay = null, modalDagdeel = null;
+
+function waNumber(tel){
+  let n = tel.replace(/[^\d+]/g,'');
+  if (n.startsWith('+')) n = n.slice(1);
+  else if (n.startsWith('0')) n = '31' + n.slice(1);
+  return n;
+}
+
+function openModal(iso, dagdeelId){
+  modalKey = iso + '_' + dagdeelId;
+  modalDay = new Date(iso + 'T00:00:00');
+  modalDagdeel = DAGDELEN.find(d=>d.id===dagdeelId);
+
+  const evs = eventsForSlot(modalDay, modalDagdeel);
+  const dayLabel = fmtDayHead(modalDay).label;
+  document.getElementById('modalTitle').textContent = 'Oppas vragen: ' + modalDagdeel.label.toLowerCase();
+  document.getElementById('modalContext').textContent = dayLabel +
+    (evs.length ? ' — wij zijn dan: ' + evs.map(e=>e.title).join(', ') : ' — nog geen afspraak bekend');
+
+  const sel = document.getElementById('modalContact');
+  if (!contacts.length){
+    sel.innerHTML = '<option value="">Voeg eerst een oppas toe hieronder ⬇️</option>';
+  } else {
+    sel.innerHTML = contacts.map(c=>`<option value="${c.id}">${esc(c.naam)}</option>`).join('');
+  }
+
+  const existing = requests[modalKey];
+  const naamVoorBericht = existing ? existing.naam : (contacts[0] ? contacts[0].naam : 'daar');
+  document.getElementById('modalMessage').value = existing && existing.bericht ? existing.bericht :
+    `Hoi ${naamVoorBericht}! 👋 Ben je op ${dayLabel.toLowerCase()} in de ${modalDagdeel.label.toLowerCase()} beschikbaar om bij ons op te passen?` +
+    (evs.length ? ` Wij zijn dan: ${evs.map(e=>e.title).join(', ')}.` : '') +
+    ` Laat het even weten!`;
+
+  if (existing && contacts.some(c=>c.id===existing.contactId)) sel.value = existing.contactId;
+
+  const statusBlock = document.getElementById('statusBlock');
+  if (existing && existing.status){
+    statusBlock.style.display = 'block';
+    document.getElementById('statusText').textContent =
+      (existing.status==='gevraagd'?'🍼 Gevraagd':existing.status==='bevestigd'?'✅ Bevestigd':'❌ Afgewezen') + ' bij ' + existing.naam;
+  } else {
+    statusBlock.style.display = 'none';
+  }
+
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('show'); }
+
+function verstuurWhatsapp(){
+  const sel = document.getElementById('modalContact');
+  const contact = contacts.find(c=>c.id===sel.value);
+  if (!contact){ toast('Kies (of voeg) eerst een oppas'); return; }
+  const bericht = document.getElementById('modalMessage').value.trim();
+
+  const evs = eventsForSlot(modalDay, modalDagdeel);
+  requests[modalKey] = {
+    contactId: contact.id,
+    naam: contact.naam,
+    tel: contact.tel,
+    bericht,
+    status: 'gevraagd',
+    ts: Date.now(),
+    event: evs.map(e=>e.title).join(', ')
+  };
+  saveRequests();
+
+  window.open('https://wa.me/' + waNumber(contact.tel) + '?text=' + encodeURIComponent(bericht), '_blank');
+  closeModal();
+  toast('📱 WhatsApp geopend, verzoek genoteerd');
+}
+
+function setSlotStatus(status){
+  if (!status){
+    delete requests[modalKey];
+  } else {
+    if (!requests[modalKey]) return;
+    requests[modalKey].status = status;
+  }
+  saveRequests();
+  closeModal();
+  toast(status ? '✅ Status bijgewerkt' : '🗑️ Verzoek verwijderd');
+}
+
+function saveRequests(){
+  saveLocalRequests();
+  renderWeek();
+  if (requestsRef && fbConnected){
+    requestsRef.set(requests).catch(()=>setSyncStatus('error','Schrijffout'));
+  }
+}
+
+// ===== INIT =====
+loadLocal();
+renderContacts();
+renderWeek();
+initFirebase();
+</script>
+
+</body>
+</html>
