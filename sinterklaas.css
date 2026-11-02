@@ -1,0 +1,185 @@
+/* ============================================================
+   Sinterklaasfestijn 2026 — eigen stijl, los van style.css
+   iPhone-achtig: rustig, grote titel, gegroepeerde lijsten,
+   licht en donker thema.
+   TIJDELIJK — zie sinterklaas-data.js.
+   ============================================================ */
+
+:root {
+  --sint-bg: #f2f2f7;
+  --sint-groep: #ffffff;
+  --sint-tekst: #000000;
+  --sint-grijs: #8a8a8e;
+  --sint-lijn: #d8d8dc;
+  --sint-rood: #c8102e;
+  --sint-rood-zacht: #fdecef;
+  --sint-groen: #1e7f5c;
+  --sint-blauw: #0a84ff;
+  --sint-schaduw: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sint-bg: #000000;
+    --sint-groep: #1c1c1e;
+    --sint-tekst: #ffffff;
+    --sint-grijs: #98989f;
+    --sint-lijn: #38383a;
+    --sint-rood: #ff6b6b;
+    --sint-rood-zacht: #2a1416;
+    --sint-groen: #30d158;
+    --sint-blauw: #0a84ff;
+    --sint-schaduw: none;
+  }
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  margin: 0;
+  padding: 0 0 48px;
+  background: var(--sint-bg);
+  color: var(--sint-tekst);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI',
+               system-ui, Roboto, sans-serif;
+  font-size: 17px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+.sint-wrap { max-width: 640px; margin: 0 auto; padding: 0 16px; }
+
+/* ---------- navigatiebalk ---------- */
+.sint-balk {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: 10px;
+  min-height: 48px; padding: 8px 16px;
+  background: color-mix(in srgb, var(--sint-bg) 88%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--sint-lijn);
+}
+.sint-terug {
+  background: none; border: none; padding: 0;
+  color: var(--sint-blauw); font-size: 17px; font-family: inherit;
+  cursor: pointer; display: flex; align-items: center; gap: 2px;
+}
+.sint-balk-vul { flex: 1; }
+.sint-ikben {
+  background: none; border: none; padding: 6px 10px;
+  border-radius: 999px; font-family: inherit; font-size: 14px; font-weight: 600;
+  color: var(--sint-blauw); cursor: pointer;
+  background: color-mix(in srgb, var(--sint-blauw) 12%, transparent);
+}
+
+/* ---------- grote titel ---------- */
+.sint-titel { font-size: 34px; font-weight: 700; letter-spacing: -0.4px; margin: 18px 0 2px; }
+.sint-onder { color: var(--sint-grijs); font-size: 17px; margin: 0 0 18px; }
+
+/* ---------- aftellen ---------- */
+.sint-tellen {
+  background: linear-gradient(135deg, var(--sint-rood) 0%, #8c0b20 100%);
+  color: #fff; border-radius: 18px; padding: 20px;
+  text-align: center; margin: 0 0 24px;
+}
+@media (prefers-color-scheme: dark) {
+  .sint-tellen { background: linear-gradient(135deg, #7a1020 0%, #3d0810 100%); }
+}
+.sint-tellen-dagen { font-size: 52px; font-weight: 700; line-height: 1; letter-spacing: -1px; }
+.sint-tellen-label { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; margin-top: 6px; }
+.sint-tellen-klok { font-variant-numeric: tabular-nums; font-size: 15px; opacity: 0.9; margin-top: 10px; }
+
+/* ---------- gegroepeerde lijst ---------- */
+.sint-kopje {
+  font-size: 13px; text-transform: uppercase; letter-spacing: 0.6px;
+  color: var(--sint-grijs); margin: 26px 4px 8px; font-weight: 600;
+}
+.sint-groep {
+  background: var(--sint-groep); border-radius: 12px;
+  overflow: hidden; box-shadow: var(--sint-schaduw);
+}
+.sint-rij {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; min-height: 48px;
+  border-bottom: 1px solid var(--sint-lijn);
+  text-decoration: none; color: inherit; width: 100%;
+  background: none; border-left: 0; border-right: 0; border-top: 0;
+  font-family: inherit; font-size: 17px; text-align: left; cursor: pointer;
+}
+.sint-rij:last-child { border-bottom: none; }
+.sint-rij:active { background: var(--sint-lijn); }
+.sint-rij-emoji { font-size: 24px; flex: 0 0 auto; }
+.sint-rij-tekst { flex: 1; min-width: 0; }
+.sint-rij-naam { display: block; font-weight: 500; }
+.sint-rij-sub { display: block; font-size: 13px; color: var(--sint-grijs); margin-top: 1px; }
+.sint-rij-pijl { color: var(--sint-grijs); font-size: 18px; flex: 0 0 auto; }
+.sint-badge {
+  font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+  background: color-mix(in srgb, var(--sint-blauw) 15%, transparent);
+  color: var(--sint-blauw); flex: 0 0 auto;
+}
+
+/* ---------- wens ---------- */
+.sint-wens { padding: 14px 16px; border-bottom: 1px solid var(--sint-lijn); }
+.sint-wens:last-child { border-bottom: none; }
+.sint-wens-top { display: flex; align-items: baseline; gap: 10px; }
+.sint-wens-titel { font-weight: 600; flex: 1; min-width: 0; overflow-wrap: break-word; }
+.sint-wens-prijs { color: var(--sint-grijs); font-size: 15px; white-space: nowrap; }
+.sint-wens-toel { color: var(--sint-grijs); font-size: 15px; margin-top: 4px; overflow-wrap: break-word; }
+.sint-wens-link { display: inline-block; margin-top: 6px; color: var(--sint-blauw); font-size: 15px; text-decoration: none; overflow-wrap: anywhere; }
+.sint-wens-link:hover { text-decoration: underline; }
+.sint-wens-knoppen { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
+.sint-knop {
+  font-family: inherit; font-size: 15px; font-weight: 600;
+  padding: 7px 14px; border-radius: 999px; border: none; cursor: pointer;
+  background: color-mix(in srgb, var(--sint-blauw) 14%, transparent);
+  color: var(--sint-blauw);
+}
+.sint-knop.vol { background: var(--sint-blauw); color: #fff; }
+.sint-knop.rood { background: color-mix(in srgb, var(--sint-rood) 14%, transparent); color: var(--sint-rood); }
+.sint-knop.stil { background: color-mix(in srgb, var(--sint-grijs) 18%, transparent); color: var(--sint-grijs); }
+.sint-knop:active { opacity: 0.6; }
+
+.sint-gekocht {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 10px;
+  font-size: 14px; font-weight: 600; padding: 5px 12px; border-radius: 999px;
+  background: color-mix(in srgb, var(--sint-groen) 15%, transparent);
+  color: var(--sint-groen);
+}
+
+/* ---------- tip ---------- */
+.sint-tip { padding: 12px 16px; border-bottom: 1px solid var(--sint-lijn); }
+.sint-tip:last-child { border-bottom: none; }
+.sint-tip-van { font-size: 13px; color: var(--sint-grijs); font-weight: 600; }
+.sint-tip-tekst { margin-top: 2px; overflow-wrap: break-word; }
+
+/* ---------- formulier ---------- */
+.sint-veld { padding: 10px 16px; border-bottom: 1px solid var(--sint-lijn); }
+.sint-veld:last-of-type { border-bottom: none; }
+.sint-veld label { display: block; font-size: 13px; color: var(--sint-grijs); margin-bottom: 2px; }
+.sint-veld input, .sint-veld textarea {
+  width: 100%; border: none; background: none; color: var(--sint-tekst);
+  font-family: inherit; font-size: 17px; padding: 0; resize: vertical;
+}
+.sint-veld input:focus, .sint-veld textarea:focus { outline: none; }
+.sint-formknoppen { display: flex; gap: 10px; padding: 12px 16px 0; }
+
+/* ---------- meldingen ---------- */
+.sint-leeg { padding: 20px 16px; color: var(--sint-grijs); text-align: center; font-size: 15px; }
+.sint-geheim {
+  background: var(--sint-rood-zacht); color: var(--sint-rood);
+  border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 1.5;
+  margin: 0 0 16px;
+}
+.sint-voet { color: var(--sint-grijs); font-size: 13px; line-height: 1.6; margin: 28px 4px 0; }
+
+.sint-sync {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--sint-grijs);
+}
+.sint-stip { width: 8px; height: 8px; border-radius: 50%; background: var(--sint-grijs); }
+.sint-sync.live .sint-stip { background: var(--sint-groen); }
+.sint-sync.fout .sint-stip { background: var(--sint-rood); }
+
+.sint-verborgen { display: none !important; }
